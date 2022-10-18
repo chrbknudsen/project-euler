@@ -1,0 +1,18 @@
+---
+title: "Euler 1"
+author: "Christian Knudsen"
+date: "2022-10-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+t <- 1:999
+answer <- sum(t[t %% 3 == 0 | t %% 5 == 0])
+```
+

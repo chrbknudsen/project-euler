@@ -1,0 +1,19 @@
+---
+title: "Euler 3"
+author: "Christian Knudsen"
+date: "2022-10-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+The prime factors of 13195 are 5, 7, 13 and 29.
+
+What is the largest prime factor of the number 600851475143 ?
+
+
+```{r}
+library(numbers)
+answer <- max(primeFactors(600851475143))
+```
