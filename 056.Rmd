@@ -1,0 +1,31 @@
+---
+title: "Euler 56"
+author: "Christian Knudsen"
+date: "2022-10-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Brutalt:
+```{r}
+library(gmp)
+
+digitsum <- function(x){
+  t <- as.character(as.bigz(x))
+  unname(sapply(t, function(x) sum(as.numeric(strsplit(x, "")[[1]])) ))
+}
+
+answer <- as.bigz(0)
+for(i in 1:99){
+  for(j in 1:99){
+    res <- digitsum(as.bigz(i)^(as.bigz(j)))
+    if(res > answer){
+      answer <<- res
+    }
+  }
+}
+```
