@@ -1,0 +1,28 @@
+---
+title: "Euler 4"
+format: html
+editor: visual
+---
+
+A palindromic number reads the same both ways. The largest palindrome made from the product of two 2-digit numbers is 9009 = 91 × 99.
+
+Find the largest palindrome made from the product of two 3-digit numbers.
+
+
+First a function that tests i a number is palindromic. Vectorized!
+```{r}
+is_palindromic <- function(x){
+  y <- as.character(x)
+  y <- strsplit(y, "")
+  y <- lapply(y, rev)
+  y <- lapply(y, paste, collapse = "")
+  y == x
+}
+```
+
+```{r}
+t <- expand.grid(100:999, 100:999)
+t <- t[,"Var1"] * t[,"Var2"]
+answer <- max(t[is_palindromic(t)])
+```
+
