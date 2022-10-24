@@ -1,0 +1,30 @@
+---
+title: "Euler 9"
+author: "Christian Knudsen"
+date: "2022-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+31875000
+
+```{r}
+t <- expand.grid(a = 1:1000, b = 1:1000)
+class(t)
+
+library(dplyr)
+answer <- t %>% 
+  mutate(sum = a + b) %>% 
+  filter(sum < 1000) %>% 
+  select(-sum) %>% 
+  mutate(c = sqrt(a^2 + b^2)) %>% 
+  mutate(sum = a + b + c) %>% 
+  filter(sum == 1000) %>% 
+  slice(1) %>% 
+  transmute(answer = a*b*c)
+```
+Man bør nok generere de der tripler.
