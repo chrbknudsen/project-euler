@@ -1,0 +1,214 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Project Euler 59
+
+Første udfordringer er at få de her decimale ascii værdier konverteret til noget der faktisk kan laves xor på.
+
+```{r}
+
+install.packages("DescTools")
+library(DescTools)
+
+# konverterer fra character to ascii værdien
+asc <- function(x) { strtoi(charToRaw((x)),16L) }
+
+
+
+# konverterer fra ascii værdi til character.
+chr <- function(n) { rawToChar(as.raw(n)) }
+
+```
+
+Så skal vi have konverteret et decimalt tal til et binært.
+
+Det klarer biblioteket DescTools for os. Det klarer også den anden vej.
+```{r}
+
+library(DescTools)
+c <- DecToBin(5)
+class(c)
+```
+
+Men den giver os en character som resultat. Den kan vi ikke lave xor på.
+
+Ikke direkte i hvert fald.
+
+Vi tager to decimale tal, konverterer dem til binært, splitter tingene, sørger for at de har samme længde, kører xor på dem, etc til vi kan returnere et decimalt tal.
+```{r}
+min_xor <- function(a, b){
+  a <- DecToBin(a)
+  b <- DecToBin(b)
+  a <- unlist(strsplit(a,""))
+  b <- unlist(strsplit(b,""))
+  if(length(a)>length(b)){
+    b <- c(rep(0,(length(a)-length(b))),b)
+  }
+  if(length(b)>length(a)){
+    a <- c(rep(0,(length(b)-length(a))),a)
+  }
+  a <- as.numeric(a)
+  b <- as.numeric(b)
+  res <- xor(a,b)
+  res <- as.numeric(res)
+  res <- paste(res,collapse="")
+  res <- BinToDec(res)
+  return(res)
+}
+```
+
+Godt. Jeg har nu en funktion der kan lave xor på to decimale værdier.
+Denne decimale værdi kan jeg konvertere til tegn.
+
+
+
+Vi skal også have indlæst filen.
+
+```{r}
+library(readr)
+
+data <- read_file("p059_cipher.txt")
+
+
+data2 <- unlist(strsplit(data,","))
+data2 <- as.numeric(data2)
+
+```
+
+OK. hvert af disse tal skal nu decrypteres. 
+
+Nøglen er abc - altså tre små karakterer. Der er en pæn sjat at vælge imellem. 
+
+Så jeg skal have skrevet noget, hvor jeg udsætter data2 for tre små bogstaver, og ser på resultatet. 
+
+
+```{r}
+length(data2)
+a <- seq(1,length(data2), by=3)
+a <- "g"
+b <- "o"
+c <- "d"
+test <- function(a,b,c){
+  res1 <- data2[seq(1,length(data2), by=3)]
+  res2 <- data2[seq(2,length(data2), by=3)]
+  res2 <- data2[seq(3,length(data2), by=3)]
+  a <- asc(a)
+  b <- asc(b)
+  c <- asc(c)
+  res1 <- sapply(res1,function(x) min_xor(x,a))
+  res2 <- sapply(res1,function(x) min_xor(x,b))
+  res3 <- sapply(res1,function(x) min_xor(x,c))
+  res <- data2
+  res[seq(1,length(data2), by=3)] <- res1
+  res[seq(2,length(data2), by=3)] <- res2
+  res[seq(3,length(data2), by=3)] <- res3
+  return(res)
+  }
+
+tester <- test("g", "o", "d")
+chr(tester[1:20])
+```
+
+Her kan vi jo faktisk tage et kig på hvad der er muligt. 
+
+```{r}
+data2[1]
+```
+
+Når vi dekrypterer, skal vi have en ascii værdi ud. Den må ikke være lavere end 32. For værdier under 32 er mærkelige.
+
+Der er andre der ikke er særligt sandsynlige. Men de kan i princippet godt være der.
+
+Dvs. intet under 32. Intet over 126.
+
+Kigger vi på det første bogstav i koden - så skal det xores med den første, den fjerde etc værdi i den krypterede fil.
+
+Lad os kigge på den. Og se hvilke bogstaver der kan være tale om.
+
+```{r}
+første <- data2[seq(1,length(data2), by=3)]
+res <- character(0)
+for(i in 97:122){
+  if(min(sapply(første, function(x) min_xor(x,i)))>31){
+    if(max(sapply(første, function(x) min_xor(x,i)))<128){
+      res <- c(res,chr(i))
+    }
+  }
+}
+
+
+res
+
+```
+
+Kun bogstaverne b, c, d, e, f, g, i, r, x kan være det første.
+
+Hvad med nr 2?
+
+```{r}
+andet <- data2[seq(1,length(data2), by=3)]
+res <- character(0)
+for(i in 97:122){
+  if(min(sapply(andet, function(x) min_xor(x,i)))>31){
+    if(max(sapply(andet, function(x) min_xor(x,i)))<128){
+      res <- c(res,chr(i))
+    }
+  }
+}
+
+res
+asc("d")
+nr2 <- (sapply(andet, function(x) min_xor(x,111)))
+nr1 <- (sapply(første, function(x) min_xor(x,103)))
+nr3 <- (sapply(tredie, function(x) min_xor(x,100)))
+
+nr1 <- chr(nr1)
+
+rn1 <- unlist(strsplit(nr1,""))
+nr2 <- chr(nr2)
+nr3 <- chr(nr3)
+totalen <- character(1202)
+
+for(i in 1:length(nr1)){
+  totalen[3*(i-1)+1] <- nr1[i]
+}
+totalen
+
+```
+
+
+
+
+Men sandsynligvis er den mellem 65 og 90.
+
+Hvilke værdier kan vi kaste efter den, og få det? Givet at 
+```{r}
+asc("a")
+bogstaver <- sapply(letters,asc)
+
+bogstaver
+asc("z")
+```
+
+```{r}
+BOGSTAVER <- sapply(LETTERS, asc)
+BOGSTAVER
+```
+
+
+dvs mellem 97 og 122
+
+```{r}
+
+for(i in 97:122){
+  print(i)
+  print(chr(min_xor(2,i)))
+  print("-----")
+}
+
+min_xor(79,98)
+
+```
+
