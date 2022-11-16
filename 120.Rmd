@@ -1,0 +1,33 @@
+---
+title: "Euler 120"
+author: "Christian Knudsen"
+date: "2022-10-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+Clearly we will need a function to check if a number is bouncy.
+
+```{r}
+bouncy <- function(x){
+  digits <- as.numeric(unlist(strsplit(as.character(x),"")))
+  return(digits)
+}
+
+a <- bouncy(155349)
+a
+c <- c(0,a)
+c  
+```
+
+```{r}
+(b <- c(a,0))
+b-c
+```
+hvis position i altid er st?rre end position i-1
+så er den vel ikke bouncy...

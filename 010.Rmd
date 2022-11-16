@@ -8,14 +8,11 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.
-
-Find the sum of all the primes below two million.
 
 
 ```{r}
 library(numbers)
+svar <- sum(Primes(1, 2000000))
 
-answer <- sum(Primes(1, 2000000))
 ```
 

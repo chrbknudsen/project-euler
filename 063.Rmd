@@ -1,0 +1,109 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# euler 63
+
+Hvor mange n-digit tal findes der, der også er en nte power
+
+Som i :
+
+16807 er på fem cifre. 
+
+Så. 
+
+1^1
+2^1
+
+9^1
+
+Og det skal Være positive integers, så 0 er ikke med.
+
+I anden.
+Er 1^2 to cifret?
+
+
+Så. vi lader n gå fra 1 til noget.
+
+Så lader vi a gå fra 1 til noget
+
+Indtil antallet af cifre i a^n er større end n
+Hvis antallet af cifre i a^n er lig n tæller vi op.
+
+
+
+Hvordan finder vi lettest antallet af cifre i a^n?
+
+```{r}
+7**5
+```
+Antallet af cifre:
+```{r}
+floor(log10(7**5))+1
+```
+Logb(x y) = y ??? logb(x)
+
+Så log(7**5) er lig 5*log(7)
+
+og antallet af cifre i en arbitrær potens er så:
+n*log10(y) + 1
+
+```{r}
+floor(5*log10(7)+1)
+```
+Den skal så være lig n
+
+floor(n*log10(a)) + 1 = n
+
+```{r}
+5*log10(10) + 1
+log10(10)
+print(10*10*10*10*10, digits=7)
+```
+Jeg føler mig med andre ord ret sikker på at a skal være mindre end 10.
+
+```{r}
+
+log10(1:9)
+```
+a skal også være større end 1.
+
+```{r}
+log10(2:9)
+```
+
+```{r}
+2**20
+```
+2 kommer heller ikke til at levere varen.
+```{r}
+2**(1:10)
+```
+
+Vi har selvfølgelig alle de encifrede tal, opløftet i 1st. De giver sig selv. Spørgsmålet er om de betragtes som trivielle.
+```{r}
+
+```
+
+a skal altså være 3:9.
+
+Og skal opløftes i 2 til et eller andet
+
+Men 3 - vokser den hurtigt nok?
+```{r}
+3**(1:20)
+```
+
+Nope.
+Hvad med 4?
+```{r}
+(floor(log10(7**(1:50)))+1) == 1:50
+```
+```{r}
+count <- 0
+for(i in 1:9){
+  count <- count + sum((floor(log10(i**(1:50)))+1) == 1:50)
+}
+count
+```
+
