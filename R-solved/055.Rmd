@@ -1,0 +1,99 @@
+---
+title: "Euler 55"
+output: html_document
+date: '2023-05-27'
+---
+## Lychrel Numbers
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Tag et tal. Vend det om. Læg dem sammen. Gentag indtil vi får et palindromisk 
+tal. 
+
+Eg. 349 + 943 = 1292
+
+1292 + 2921 = 4213
+
+4213 + 3124 = 7337
+
+Tesen er at nogen tal, aldrig vil producere et palindromisk tal. 
+
+Disse tal kaldes Lychrel tal. 
+
+Vi ved ikke om det passer. Men. Hvor mange tal, under 10.000 vil ikke blive
+palindromiske på under 50 iterationer?
+
+
+Nødvendige biblioteker:
+```{r}
+library(gmp)
+library(tidyverse)
+```
+
+Lav en funktion der vender en tal, og fjerner foranstående 0'er (for as.bigz
+opfører sig underligt når den får en streng med 0'er i starten):
+```{r}
+omvendt <- function(x){
+  x <- as.character(x)
+  x <- strsplit(x, "")
+  x <- unlist(x)
+  x <- rev(x)
+  x <- paste(x, collapse="")
+  x <- str_remove(x, "^0+")
+  x
+}
+```
+
+Lav en funktion der tester om et tal er palindromisk:
+```{r}
+palindromisk <- function(x){
+  x <- as.character(x)
+  y <- x
+  y <- strsplit(y, "")
+  y <- unlist(y)
+  y <- rev(y)
+  y <- paste(y, collapse="")
+  x == y
+}
+```
+
+Lav en funktion er lægger to tal sammen og returnerer en streng:
+```{r}
+adder <- function(x,y){
+  x <- as.bigz(x)
+  y <- as.bigz(y)
+  as.character(x + y)
+}
+```
+
+Lav en test dataframe:
+```{r}
+test <- data.frame(x= 1:10000) %>% 
+  mutate(x = as.character(x))
+```
+
+Iterer. Beregn det omvendte tal, beregn nyt x som summen af det omvendte tal
+og det oprindelige tal. Test om den nye sum er palindromisk. Filter de 
+palindromiske tal fra. Gentag 50 gange.
+```{r}
+i <- 0
+while(i < 51){
+  test <- test %>% 
+  mutate(ny = map_chr(x, omvendt)) %>% 
+  mutate(x = map2_chr(x, ny, adder)) %>% 
+  mutate(palindromisk = map_lgl(x, palindromisk))  %>% 
+  filter(!palindromisk) %>% 
+    select(-palindromisk)
+  i <- i +1
+}
+```
+
+Og find svaret som antallet af rækker i den endelige dataframe.
+```{r}
+answer <- nrow(test)
+
+
+
+```
+

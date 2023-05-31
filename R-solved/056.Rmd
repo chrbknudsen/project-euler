@@ -4,7 +4,7 @@ author: "Christian Knudsen"
 date: "2022-10-18"
 output: html_document
 ---
-
+## Powerful Digit Sum
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -13,10 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 Brutalt:
 ```{r}
 library(gmp)
-
+x <- 42
 digitsum <- function(x){
   t <- as.character(as.bigz(x))
-  unname(sapply(t, function(x) sum(as.numeric(strsplit(x, "")[[1]])) ))
+  y <- unname(sapply(t, function(x) sum(as.numeric(strsplit(x, "")[[1]])) ))
+  return(y)
 }
 
 answer <- as.bigz(0)
@@ -24,8 +25,9 @@ for(i in 1:99){
   for(j in 1:99){
     res <- digitsum(as.bigz(i)^(as.bigz(j)))
     if(res > answer){
-      answer <<- res
+      answer <- res
     }
   }
 }
+
 ```
