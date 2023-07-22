@@ -35,32 +35,46 @@ input <- "08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
 grid <- matrix(as.numeric(unlist(str_split(input, "\n| "))), nrow = 20, byrow = T)
 
 
+x <- 0:3
+y <- 0:3
+
+grid[cbind(x, y)]
 ```
+Matricer til subsetting af ting 
+```{r}
+
+vandret <- cbind(x = 0, y = 0:3)
+lodret <- cbind(x = 0:3, y = 0)
+right <- cbind(x = 0:3, y = 0:3)
+left <- cbind(x = -(0:3), y = 0:3)
+
+```
+
 
 ```{r}
-max_prod <- function(i,j){
-  k <- i + 0:3
-  l <- j + 0:3
-  if(any(c(k,l)>20)){
-    return(0)
-  }else{
-    max(prod(grid[i,l]), prod(grid[k,j]), prod(diag(grid[k,l])))
-  }
+ny_max_prod <- function(i,j){
+  position <- cbind(x = rep(i, 4), y =rep(j, 4))  
+  liste <- list(position + vandret, position - vandret,
+     position + lodret, position - lodret,
+     position + right, position- right,
+     position + left, position - left)
+  liste <- liste[sapply(liste, function(mat) all(mat > 0))]
+  liste <- liste[sapply(liste, function(mat) all(mat < 21))]
+
+mapply(function(x) grid[x], liste) %>% 
+  apply(2, prod) %>% 
+  max()
+
+  
 }
 
-max_prod(1,1)
-i <- 1
-j <- 1
-answer <- 0
-for(i in 1:20){
-  for(j in 1:20){
-    answer <- max(max_prod(i,j), answer)
-  }
-}
-answer
 
+
+answer <- expand.grid(x = 1:20, y = 1:20) %>% 
+  rowwise() %>% 
+  mutate(maks = map2(x,y, ny_max_prod)) %>% 
+  pull(maks)  %>% 
+  unlist() %>% 
+  max()
 ```
-Det er så ikke det rigtige resultat - for jeg mangler diagonaler
-i min max_prod funktion
 
-What is the greatest product of four adjacent numbers in the same direction (up, down, left, right, or diagonally) in the 20×20 grid?

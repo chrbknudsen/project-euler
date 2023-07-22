@@ -1,0 +1,92 @@
+---
+title: "Euler"
+output: html_document
+date: '2023-05-27'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Tricket er at i stedet for at finde den største sum der starter
+i toppen. Så fjerner vi den øverste linie. Og behandler resten
+som to trekanter, en med 95 og en med 64 i toppen. Vi finder den 
+størst mulige sum for hver af de trekanter. Den største af de
+to, lagt til 75 er den største sum. Det kan vi gentage.
+
+Men vi kan også tage det nede fra. Fjern den nederste række, og find
+den største sum i den resterende trekant. Hvis den involverer 
+tallet 66, vil vi skulle lægge enten 62 eller 98 til for at få
+den største samlede sum. 
+
+Det kan vi gøre iterativt. Kig på næstnederste linie. Hvis vi
+følger en sti der ender med tallet 63 i næstnederste linie - så 
+kan vi kun tilføje 04 til den. Det er ækvivalent til at der i stedet
+for 63 skal stå 67. Følger vi en sti der ender med tallet 66,
+skal vi enten lægge 62 eller 98 til. Vi vælger 98, for det vil maksimere
+den samlede sum. Så vi kan kollapse de to nederste linier til en
+ny nederste linie.
+
+Lad os prøve det.
+```{r}
+næst <- c(63, 66, 04, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31)
+nederst <- c(04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23)
+
+```
+
+
+position 1 i næst, kan kun pege på position i nederst.
+Position 2 i næst, kan kun pege på position 2 og 3 i nederst
+
+Så vi kan skrive en funktion, der kollapser de to nederste til
+en ny nederst:
+```{r}
+
+# b er den nederste. a er den næstnederste.
+# funktionen kollapser de to til en ny nederste række.
+kollaps <- function(a, b ){
+output <- numeric()
+for(i in 1:length(a)){
+  output[i] <- max(a[i]+b[i], a[i]+b[i+1])
+}
+output}
+```
+
+Og det betyder at den nye nederste er:
+```{r}
+kollaps(næst, nederst)
+```
+Lad os få data ind i noget vi kan arbejde med:
+
+```{r}
+trekant <- "75
+95 64
+17 47 82
+18 35 87 10
+20 04 82 47 65
+19 01 23 75 03 34
+88 02 77 73 07 63 67
+99 65 04 28 06 16 70 92
+41 41 26 56 83 40 80 70 33
+41 48 72 33 47 32 37 16 94 29
+53 71 44 65 25 43 91 52 97 51 14
+70 11 33 28 77 73 17 78 39 68 17 57
+91 71 52 38 17 14 91 43 58 50 27 29 48
+63 66 04 68 89 53 67 30 73 16 69 87 40 31
+04 62 98 27 23 09 70 98 73 93 38 53 60 04 23"
+trekant <- str_split(trekant, "\\n") %>% unlist() %>% 
+  str_split(" ") %>% 
+  lapply(as.numeric)
+```
+
+Og så kaster vi det hele sammen:
+```{r}
+nederst <- 1000
+while(nederst > 2){
+  nederst <- length(trekant)
+  trekant[[nederst - 1]] <- kollaps(trekant[[nederst-1]], trekant[[nederst]])
+  trekant[[nederst]] <- NULL  
+}
+answer <- unlist(trekant)
+```
+
