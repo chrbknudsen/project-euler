@@ -1,0 +1,37 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# Project Euler 112 - bouncy...
+
+Working from left-to-right if no digit is exceeded by the digit to its left it is called an increasing number; for example, 134468.
+
+Similarly if no digit is exceeded by the digit to its right it is called a decreasing number; for example, 66420.
+
+We shall call a positive integer that is neither increasing nor decreasing a "bouncy" number; for example, 155349.
+
+There are a lot of bouncy numbers. There are 525 below 1000. When we get to 538, the proportion of bouncy numbers reaches 50% (for the first time)
+
+When we get to 21780, the proportion reaches 90% (for the first time).
+
+For what number, do we reach 99% bouncy numbers for the first time?
+
+Clearly we will need a function to check if a number is bouncy.
+
+```{r}
+bouncy <- function(x){
+  digits <- as.numeric(unlist(strsplit(as.character(x),"")))
+  return(digits)
+}
+
+a <- bouncy(155349)
+
+c <- c(0,a)
+c  
+```
+
+```{r}
+(b <- c(a,0))
+b-c
+```
+hvis position i altid er større end position i-1
