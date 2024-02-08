@@ -3,6 +3,8 @@ title: "Euler 1"
 author: "Christian Knudsen"
 date: "2022-10-17"
 output: html_document
+params:
+  done: T
 ---
 
 ```{r setup, include=FALSE}
