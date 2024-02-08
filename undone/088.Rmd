@@ -1,29 +1,47 @@
 ---
-title: "Euler"
+title: "Euler 88"
 output: html_document
 date: '2023-05-27'
+params:
+  done: F
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+Vi skal finde det minimale produkt-sum tal for k = noget
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Dette minimale tal er karakteriseret ved at det kan udtrykkes som både sum og 
+produkt af k tal. 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Partitioner
 
-```{r cars}
-summary(cars)
+1 kan partitioneres på en måde: 1
+2 kan partitioneres på to måder: 1 + 1 og 2
+3 kan partitioneres på disse måder: 3 og 1 + 2. Og 2 kan så partitioneres yderligere.
+4 kan partitioneres som 4, og 1 + 3. Og 3-tallet kan så partitioneres på alle de
+måder som 3 kan partitioneres.
+
+møde ind dag fast om torsdag. Det overvejes to dage. 
+Vi skal ikke skrive til lew og bofr hver gang - lokal flexibilitet. Skriv ind
+i kalenderen. 
+
+
+```{r}
+listen <- tibble(x = c(1, 2), part = list(list(c(1)), list(2, c(1, 1))))
+listen
 ```
 
-## Including Plots
+```{r}
+library(tidyverse)
+voks <- function(df){
+  next_x <- listen[[nrow(listen),1]] + 1
+  next_part <- c(next_x, next_x - 1)
+  next_part
+}
+voks(listen)
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+men det fanger ikke 2 + 2 ?
