@@ -1,29 +1,69 @@
 ---
-title: "Euler"
+title: "Euler 145"
 output: html_document
-date: '2023-05-27'
+date: '2024-02-13'
+output: html_document
+params:
+  done: T
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+Denne kan løses på bagsiden af en kuvert. Men jeg øver programmering, ikke
+matematik. Og hvis vi glemmer de matematiske genveje, er det brute-force der
+er vejen frem her. Så det gør vi.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Først biblioteker:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r eval  = F}
+library(tidyverse)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+Så tre hjælpefunktioner. En funktion til at vende tal.
+```{r eval  = F}
+reverse_digits_math <- function(number) {
+  reversed = 0
+  while (number > 0) {
+    reversed <- (reversed * 10) + (number %% 10)
+    number <- number %/% 10
+  }
+  return(reversed)
+}
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Og en til at finde det sidste ciffer af et tal
+```{r eval  = F}
+# Funktion til at finde det sidste ciffer af et tal
+last_digit <- function(numbers) {
+  numbers %% 10
+}
+```
+
+Så går vi i gang. Først skærer vi problemet lidt til:
+```{r eval  = F}
+tests <- tibble(x = 1:10^9)
+tests <- tests %>% 
+  mutate(last_digit = last_digit(x)) %>% 
+  filter(last_digit != 0)
+```
+
+Så brute-forcer vi:
+```{r eval  = F}
+tests <- tests %>% 
+  mutate(omvendt = map_int(x, reverse_digits_math)) %>% 
+  transmute(sum = x + omvendt)
+```
+
+Og fjerner til sidst alle de tal der har lige cifre i sig:
+```{r eval  = F}
+tests <- tests %>% 
+  filter(!str_detect(sum, "0|2|4|6|8"))
+```
+
+```{r eval = F}
+svar <- nrow(tests)
+```
+
+Og lad os da bare være ærlige - det tager en krig!
