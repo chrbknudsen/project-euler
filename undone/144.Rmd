@@ -43,7 +43,8 @@ points2vector <- function(x1,y1,x2,y2){
 ```
 
 ```{r}
-points2vector(0,10.1,1.4,-9.6)
+vektor1 <- points2vector(0,10.1,1.4,-9.6)
+
 ```
 Vi skal også bruge prikproduktet af de to vektorer.
 
@@ -64,3 +65,78 @@ Så når det rammer 8 i 1.4, -9.6, er hældningen
 
 
 Hvordan finder jeg normalen til den?
+
+
+
+# Definerer vektoren for den indkommende lysstråle og normalvektoren
+v <- c(1, 2, 3) # Eksempel på en indkommende vektor
+n <- c(0, 1, 0) # Eksempel på normalvektoren til overfladen
+
+# Normaliserer normalvektoren, hvis den ikke allerede er en enhedsvektor
+n <- n / sqrt(sum(n^2))
+
+# Beregner den reflekterede vektor
+r <- v - 2 * sum(v * n) * n
+
+# Udskriver den reflekterede vektor
+r
+
+
+```{r}
+positioner <- data.frame(x = c(0,1.4), y = c(10.1,-9.6))
+
+
+positioner
+
+```
+
+```{r}
+x <- 3
+sqrt(100-4*x^2)
+```
+```{r}
+a <- 5
+b <- 10
+theta <- seq(0,2*pi,length.out = 100)
+x <- a*cos(theta)
+y <- b * sin(theta)
+ellipse_df <- data.frame(x,y)
+ellipse_df %>% 
+  ggplot(aes(x,y))+
+  geom_path() +
+  coord_fixed() +
+  geom_path(positioner, mapping = aes(x,y))
+```
+
+Så skal vi have beregnet det næste punkt. 
+
+```{r}
+positioner
+```
+
+Vi skal bruge normalvektoren til tangenten til elipsen.
+
+Hældningen på den tangent kender vi. Så finder vi vektoren ved
+
+```{r}
+normalen <- function(x,y){
+  
+}
+punktet er:
+(1.4, -9.6)
+
+hældningen er
+
+m(1.4, -9.6) # 0.5833333
+
+det nye punkt er derfor (2.4, -9.6+0.5833333) 
+og derfor er vektoren i reflektion altid (1, hældningen)
+Den har to normalvektorer.
+
+```
+
+
+```{r}
+
+```
+
