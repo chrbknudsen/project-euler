@@ -1,0 +1,104 @@
+---
+title: "oversigt"
+format: html
+editor: visual
+---
+
+
+```{r}
+library(yaml)
+library(tidyverse)
+library(gt)
+dirname <- "undone"
+antalkolonner <- 11
+dokumentnavne <- list.files(dirname)
+
+done <- function(filnavn){
+  indhold <- readLines(filnavn)
+# Find starten og slutningen af YAML-headeren
+start_yaml <- which(indhold == "---")[1]
+end_yaml <- which(indhold == "---")[2]
+
+# Ekstraher YAML-indholdet
+yaml_indhold <- paste(indhold[(start_yaml + 1):(end_yaml - 1)], collapse = "\n")
+
+# Parse YAML-indholdet til en liste
+yaml_data <- yaml.load(yaml_indhold)
+parameter_navn <- "done"
+if(!is.null(yaml_data$params[[parameter_navn]])){
+  return(yaml_data$params[[parameter_navn]]=="T")
+}else{
+  return(F)
+}
+  }
+df <- dokumentnavne %>% 
+  enframe(name = NULL, value = "sti") %>% 
+  mutate(sti = str_c("undone/", sti)) %>% 
+  mutate(solved = map_lgl(sti, done))
+
+
+
+```
+
+
+
+```{r}
+# vi sikrer os at antallet af observationer er deleligt med antallet af
+# kolonner
+stier <- df$sti
+solved <- df$solved
+antal_rækker <- ceiling(length(stier) / antalkolonner)
+udvidet_sti <- c(stier, rep(NA, antal_rækker * antalkolonner - length(dokumentnavne)))
+udvidet_solved <- c(solved, rep(F, antal_rækker * antalkolonner - length(dokumentnavne)))
+
+stier <- matrix(udvidet_sti, nrow = antal_rækker, byrow = TRUE)
+stier <- as.data.frame(stier)
+solved <- matrix(udvidet_solved, nrow = antal_rækker, byrow = TRUE)
+solved <- as.data.frame(solved)
+```
+
+
+
+```{r}
+# Opret gt tabel
+gt_table <- gt(stier) %>% 
+  tab_options(
+    column_labels.hidden = T
+  )
+```
+
+
+
+
+
+```{r}
+# Gennemgå hver kolonne og anvend styling baseret på den logiske data.frame
+for(col in seq_along(solved)) {
+  gt_table <- gt_table %>%
+    tab_style(
+      style = cell_fill(color = "red"),
+      locations = cells_body(
+        columns = col,
+        rows = !solved[[col]]
+      )
+    ) %>%
+    tab_style(
+      style = cell_fill(color = "green"),
+      locations = cells_body(
+        columns = col,
+        rows = solved[[col]]
+      )
+    ) 
+}
+
+```
+
+```{r}
+gt_table
+```
+
+
+
+
+
+

@@ -20,22 +20,33 @@ reverse_digits_math <- function(number) {
   return(reversed)
 }
 
+
+
+1:10
+rev(1:10)
+
 # Funktion til at finde det første ciffer af et tal
 first_digit <- function(number){
-  number %/% 10^floor(log10(number))
+  number %/% 10^signif(log10(number), digits = 0)
 }
-
 
 last_digit <- function(numbers) {
   numbers %% 10
 }
+2/542
 
-
+library(tidyverse)
 x <- 1:10^9
 tests <- tibble(x=x)
 tests <- tests %>% 
   mutate(last_digit = last_digit(x)) %>% 
   filter(last_digit != 0)
+
+tests <- tests %>% 
+  mutate(omvendt = map_int(x, reverse_digits_math)) %>% 
+  mutate(sum = x + omvendt) %>% 
+  filter(!str_detect(sum, "0|2|4|6|8"))
+
 
 tests <- tests %>% 
   mutate(first_digit = first_digit(x))
@@ -53,8 +64,19 @@ tests <- tests %>%
 tests <- tests %>% 
   mutate(omvendt = map_int(x, reverse_digits_math))
 
-tests <- tests %>% transmute(y = x+omvendt)
+test2 <- tests %>% transmute(y = x+omvendt)
 
+test3 <- test2 %>% 
+  filter(!str_detect(y, "0|2|4|6|8"))
+nrow(tests)
+
+test3 %>% sample_n(10)
+
+
+str_detect("133557", "0|2|4|6|8")
+
+
+str_detect(1234, "5")
 
 test2 <- tests %>% 
   filter( first_digit(y) %% 2 == 1)
@@ -85,14 +107,28 @@ str_detect("133557", "0|2|4|6|8")
 
 # og hvor hurtigt kan vi så bruteforce?
 
-reverse_digits_vectorized <- function(number) {
+reverse_digits <- function(number) {
   # Konverterer tallet til en streng, splitter det i cifre, omvender rækkefølgen, og samler det igen
   reversed_str <- paste(rev(strsplit(as.character(number), "")[[1]]), collapse = "")
   # Konverterer den omvendte streng tilbage til et tal
   as.numeric(reversed_str)
 }
+revers <- function(z){sum(((z %/% 10^(0:trunc(log10(z)))) %% 10) * base::rev(10^(0:trunc(log10(z)))))}
 
 
+reverse_digits(1234:4321)
+revers(1234:4321)
+
+revers()
+
+library(microbenchmark)
+x <- 987654321098
+x <- 1234
+microbenchmark(reverse_digits(x), revers(x), reverse_digits_math(x), times = 100)
+
+
+
+reverse_digits_vectorized <- Vectorize(reverse_digits)
 library(tidyverse)
 tic <- Sys.time()
 x <- 1:10^9
@@ -106,14 +142,18 @@ tests %>%
 toc <- Sys.time()
 toc-tic
 
+bitwise!
 
-
-revers <- function(z){sum(((z %/% 10^(0:signif(log10(z), digits = 0))) %% 10) * rev(10^(0:signif(log10(z), digits = 0))))}
+revers <- function(z){sum(((z %/% 10^(0:floor(log10(z)))) %% 10) * base::rev(10^(0:floor(log10(z)))))}
 
 tic <- Sys.time()
 x <- 1:10^9
 x <- x[x %% 10 != 0]
 x <- x[x %/% 10^floor(log10(x)) %% 2 != (x %% 10) %% 2]
+
+y <- sapply(x, revers)
+
+z <- x + y
 
 revers(1234)
 qa <- tail(x)
@@ -129,8 +169,13 @@ first_digit <- function(number){
   number %/% 10^floor(log10(number))
 }
 
-number <- 123456
-revers <- function(z){sum(((z %/% 10^(0:(floor(log10(z)) )+1)) %% 10) * rev(10^(0:(floor(log10(z))) +1) ))}
+number <- 123456789
+
+sum(((number %/% 10^(0:floor(log10(number)))) %% 10) * base::rev(10^(0:floor(log10(number)))))
+
+10^(0:floor(log10(number)))
+
+
 z <- 1345
 revers(z)
 revers(qa[1])
