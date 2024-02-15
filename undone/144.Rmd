@@ -134,8 +134,10 @@ og derfor er vektoren i reflektion altid (1, hældningen)
 Den har to normalvektorer.
 
 ```
+
 En særlig udfordring er selvfølgelig at finde ud af hvilken af de to 
 normalvektorer der skal bruges...
+
 
 ```{r}
 
