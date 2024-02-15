@@ -1,29 +1,66 @@
 ---
-title: "Euler"
+title: "Euler 144"
 output: html_document
 date: '2023-05-27'
+params:
+  done: F
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+En celle med ligningen 4x^2 + y^2 = 100
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Hvis lyset rammer -0.01 <= x <= 0.01 - så undslipper det.
 
-```{r cars}
-summary(cars)
+lysest starter ved 0.0, 10.1, og rammer spejlet i positionen
+1.4, -9.6
+
+Lyset reflekteres, således at indfaldsvinklen i forhold til normalen på hældningen
+af spejlet er den samme som udfaldsvinklen
+
+Hældningen/tangenten m er for alle punkter m = -4x/y
+
+```{r}
+m <- function(x,y){
+  -4*x/y
+}
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+Jeg har en vektor, der er karakteriseret ved et start og et slutpunkt. 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Jeg har en anden vektor hvor jeg kender hældningen - fordi jeg kender slutpunktet.
+
+så skal vi have beregnet vinklen mellem de to vektorer. 
+
+```{r}
+points2vector <- function(x1,y1,x2,y2){
+  c(x2-x1,y2-y1)
+}
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+points2vector(0,10.1,1.4,-9.6)
+```
+Vi skal også bruge prikproduktet af de to vektorer.
+
+Og størrelsen af de to vektorer.
+
+Så kan vi beregne vinklen ved:
+cos(vinkel) = prikprodukt divideret med produktet af størrelserne.
+
+Det er indfaldsvinklen. Nu har vi så en indfaldsvektor, og en indfaldsvinkel.
+Så skal vi have beregnet udfaldsvinklen, og finde ud af hvordan vi finder 
+slutpunktet for det næste segment.
+
+
+Vi har nok også lyst til at visualisere...
+
+
+Så når det rammer 8 i 1.4, -9.6, er hældningen
+
+
+Hvordan finder jeg normalen til den?
