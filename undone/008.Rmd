@@ -1,10 +1,10 @@
 ---
 title: "Euler 8"
 author: "Christian Knudsen"
-date: "2022-10-19"
+date: "2015-07-23"
 output: html_document
 params:
-  done: F
+  done: T
 ---
 
 ```{r setup, include=FALSE}
