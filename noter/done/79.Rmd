@@ -1,0 +1,105 @@
+---
+title: "Project Euler 79"
+output: html_notebook
+---
+
+# Passcode derivation - Euler 79
+
+A common security method used for online banking is to ask the user for three random characters from a passcode. For example, if the passcode was 531278, they may ask for the 2nd, 3rd, and 5th characters; the expected reply would be: 317.
+
+The text file, keylog.txt, contains fifty successful login attempts.
+
+Given that the three characters are always asked for in order, analyse the file so as to determine the shortest possible secret passcode of unknown length.
+
+I am not so sure this is actually a very common method. It does not strike me as particularly safe. Anyway.
+
+These are the successful login attempts:
+```{r}
+digits <- c(319, 680,180,690,129,620,762,689,762,318,368,710,720,710,629,168,160,689,716,731,736,729,316,729,729,710,769,290,719,680,318,389,
+162,289,162,718,729,319,790,680,890,362,319,760,316,729,380,319,728,716)
+```
+
+We are going to need a couple of libraries:
+```{r}
+library(dplyr)
+library(tibble)
+```
+
+Some of the attempts are duplicated. And I am going to split up the digits:
+```{r}
+digits <- digits %>% 
+  unique() %>% 
+  enframe() %>% 
+  mutate(first = value%/%100) %>% 
+  mutate(second=value%/%10%%10) %>% 
+  mutate(third = value%%10) 
+
+```
+
+These are the digits that is in the secret number:
+```{r}
+sort(unique(c(digits$first, digits$second, digits$third)))
+
+```
+
+
+Is there any evidence of repeated digits?
+
+For each row in the dataframe, collect the first, second and third digit in a vector, get the unique values, and then the lenght.
+We need to ungroup. And then we can summarise the result of the logical test. If any row has a length of unique values, that is different from 3, there
+was a repeated digit.
+
+```{r}
+digits %>% 
+  rowwise() %>% 
+  mutate(gent = length(unique(c(first,second,third)))) %>% 
+  ungroup() %>% 
+  summarize(test = sum(as.numeric(gent!=3)))
+```
+
+That does not rule out the possibility of repeated digits. But we do not need them, and we are looking for the shortest possible passcode. Introducing a
+repeated digit would make it longer, and it is not needed.
+
+Inspecting the digits makes me suspect that 0 is the last digit. Looking at the third digit in the successful attempts, is there a digit that does not
+appear as the first or second digits?
+
+```{r}
+unique(digits$third[!digits$third %in% c(digits$first, digits$second)])
+```
+
+Yes. Of the digits at the third position of the attempts, and those are the candidates for the last digit in the passcode, the only one that does not appear at the first or second position of the attempts - is 0.
+
+What about the first digit?
+```{r}
+unique(digits$first[!digits$first %in% c(digits$second, digits$third)])
+```
+
+With the same reasoning, 7 is the first digit of the passcode.
+
+If we could locate a digit, that is only preceded by 7 in the attempts, that digit would be the second digit in the passcode.
+Such a digit exists. If we can find a digit, that is only preceded by 7 and the second digit we just found, that digit would be the third digit in the passcode.
+
+
+These are the digits preceding 9.
+
+```{r}
+
+library(magrittr)
+preceding <- function(i){
+sort(unique(c(digits %>% 
+  select(first, second, third) %>% 
+  filter(third==i)  %>% 
+  select(first, second) %$% 
+  c(first, second), 
+digits %>% 
+  select(first, second, third) %>% 
+  filter(second==i)  %>% 
+  select(first) %$% 
+  c(first))))}
+
+preceding(9)
+```
+
+If we use the function on 7, we get zero results. Using it on 0, we get all the different digits - except 4,5 and 0 itself.
+
+Now you just have to use that function repeatedly, and you will get the answer.

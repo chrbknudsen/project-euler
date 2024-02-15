@@ -1,0 +1,65 @@
+---
+title: "Project euler 209"
+output: html_notebook
+---
+
+# Project Euler 206, Concealed Square
+
+Find the unique positive integer whose square has the form 1_2_3_4_5_6_7_8_9_0,
+where each “_” is a single digit.
+
+All right. The largest square we can get is:
+
+```{r}
+largest <- 1929394959697989990
+```
+
+And the smallest: 
+
+```{r}
+smallest <- 1020304050607080900
+```
+
+That means, that the integer we are looking for is in this interval:
+```{r}
+sqrt(smallest)
+sqrt(largest)
+```
+
+We know that the square has to end on 0. That means, that the integer must also end on 0.
+
+Any integer with 0 as the last digit, will give us a square that ends with 00.
+
+From that we can conclude, that the square end with 900, and from that, that the integer must end with either 30 or 70.
+
+That trims the number of integers we need to check significantly.
+
+Although the range we are looking at, is reduced only a little:
+
+1010101030 to 1389026670.
+
+We are going to need a couple of libraries:
+```{r}
+library(tibble)
+library(dplyr)
+```
+
+And, thats it!
+Generate all the possible integers, filter out the ones not ending on 30 or 70, square them, and test if the third position of the square is 2, the fifth si 3 etc.
+
+```{r}
+result <- seq(1010101030,1389026670, by = 20) %>% 
+  enframe() %>% 
+  filter(value%%100 %in% c(30,70)) %>% 
+  mutate(square = (value)**2) %>% 
+  filter(square%/%10000000000000000%%10 == 2) %>% 
+  filter(square%/%100000000000000%%10 == 3) %>% 
+  filter(square%/%1000000000000%%10 == 4) %>% 
+  filter(square%/%10000000000%%10 == 5) %>% 
+  filter(square%/%100000000%%10 == 6) %>% 
+  filter(square%/%1000000%%10 == 7) %>% 
+  filter(square%/%10000%%10 == 8) %>% 
+  select(value)
+```
+
+Not very elegant. A more detailed analysis might have given the result without having to write any code.

@@ -1,0 +1,92 @@
+---
+title: "Project Euler 4 - Largest palindrome product"
+output: html_notebook
+---
+
+I solved this more than four years ago. So I have no idea if this was the way I did it originally.
+
+The problem is:
+
+A palindromic number is a number that reads the same both ways. Like "A man, a plan, a canal, Panama!" just with numbers.
+
+The problem informs us, that the largest palindrome made from the product of two two-digit numbers, is 9009.
+
+We get that from 91 × 99. We must now find the largest palindrome, made from the product of two three-digit numbers.
+
+First, we need to figure out how to test if a number is palindromic. There might be easier ways. But this is mine.
+
+Convert the number to a string. Split it in individual characters reverse the string, and compare to the original. 
+
+Like this, using the stringr library:
+
+```{r}
+library(stringr)
+rev(unlist(str_split("9009", ""))) == unlist(str_split("9009", ""))
+```
+
+Everything is TRUE, as it should be - lets make a function.
+```{r}
+is_palindromic <- function(x){
+  all(rev(unlist(str_split(x, ""))) == unlist(str_split(x, "")))
+}
+
+is_palindromic(9009)
+
+```
+
+Only problem is that it is not vectorized
+
+```{r}
+is_palindromic(c(991, 9009))
+```
+
+Just for the fun of it, lets write something vectorized. This is definitely not the way I did it originally.
+```{r}
+is_palindromic <- function(x){
+  unlist(lapply(lapply(str_split(x,""), rev),str_c, collapse="")) == as.character(x)
+}
+
+is_palindromic(c(991, 9009))
+
+```
+
+Nice.
+There are definitely faster ways of doing it.
+
+Now I just need to generate all products made up of two three-digit numbers, test if it is palindromic, and find the largest.
+
+I use expand.grid to generate all combinations of all three-digit numbers, transmute the product into existence, and filter out all the non-palindromic products. Then I arrange the product variable in descending order, and take the first.
+
+```{r, message=F}
+library(dplyr)
+answer <- expand.grid(100:999, 100:999) %>% 
+  transmute(product = Var1*Var2) %>% 
+  filter(is_palindromic(product)) %>% 
+  arrange(desc(product)) %>% 
+  slice(1)
+
+```
+
+Not very fast... The main problem is that I check all 810.000 products. There is no need for that. If I instead test the products in order, from the largest, to the smallest, the first palindromic number I find, is the largest.
+
+Let us generate a list of candidates, in descending order:
+```{r}
+cand <- expand.grid(100:999, 100:999) %>% 
+  transmute(product = Var1*Var2) %>% 
+  arrange(desc(product)) %>% 
+  .$product
+
+```
+
+And now, for each element in the candidate-vector, if it is palindromic, set that to be the answer, and break out of the for-loop.
+
+```{r}
+
+for(i in cand){
+  if(is_palindromic(i)){
+    answer <- i
+    break()
+  }
+}
+```
+Much faster.

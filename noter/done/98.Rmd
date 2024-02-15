@@ -1,0 +1,292 @@
+---
+title: "Anagramic squares"
+output: html_notebook
+---
+
+By replacing each of the letters in the word CARE with 1, 2, 9, and 6 respectively, we form a square number: 1296 = 36^2^. What is remarkable is that, by using the same digital substitutions, the anagram, RACE, also forms a square number: 9216 = 962. We shall call CARE (and RACE) a square anagram word pair and specify further that leading zeroes are not permitted, neither may a different letter have the same digital value as another letter.
+
+Using words.txt (right click and 'Save Link/Target As...'), a 16K text file containing nearly two-thousand common English words, find all the square anagram word pairs (a palindromic word is NOT considered to be an anagram of itself).
+
+What is the largest square number formed by any member of such a pair?
+
+NOTE: All anagrams formed must be contained in the given text file.
+
+
+Let us begin by getting the words into R:
+
+```{r}
+library(readr)
+library(tidyverse)
+test <- read_csv("p098_words.txt")
+test <- colnames(test)
+```
+
+Next, I'll need to be able to check if two words are anagrams. If I take two words, and split them into individual letters, sort those letters, and collapse them into a string, then, if those two words are anagrams of each other, the collapsed strings will be identical.
+
+Lets write a vectorized function to take words, and return those ordered words.
+
+```{r}
+sort_ana <- function(w){
+ require(magrittr)
+ require(stringr)
+  w  %>%  
+    str_split("") %>% 
+    lapply(sort) %>% 
+    lapply(paste0, collapse="") %>% 
+    unlist()
+}
+```
+
+Let us see what it does, because I dont think the description above was very clear:
+```{r}
+library(tidyverse)
+testing <- c("CARE", "RACE")
+sort_ana(testing)
+```
+See, "CARE" and "RACE" are both converted to the same "word", "ACER". That means that "CARE" and "RACE" are anagrams.
+
+Then I take the list of words, convert them to a tibble, and renames the column (as value).
+I make a new variable "ana" that is equal to the sorted words. 
+Then I group the tibble by those sorted words, and filter out all groups that have less than 2 words in it. I then ungroup, and sort the tibble by the sorted words.
+```{r}
+test %>% 
+  as.tibble() %>% 
+  rename(w = value) %>% 
+  mutate(ana = sort_ana(w)) %>% 
+  group_by(ana) %>% 
+  filter(n()>1) %>% 
+  ungroup() %>% 
+  arrange(ana)
+```
+
+There are the 85 sets of anagrams I need to handle.
+Of those are:
+```{r}
+test %>% 
+  as.tibble() %>% 
+  rename(w = value) %>% 
+  mutate(ana = sort_ana(w)) %>% 
+  group_by(ana) %>% 
+  filter(n()==2) %>% 
+  ungroup() %>% 
+  arrange(ana)
+```
+
+82 pairs. And:
+
+```{r}
+test %>% 
+  as.tibble() %>% 
+  rename(w = value) %>% 
+  mutate(ana = sort_ana(w)) %>% 
+  group_by(ana) %>% 
+  filter(n()==3) %>% 
+  ungroup() %>% 
+  arrange(ana)
+```
+
+3 a triplet.
+
+
+The distribution of lengths are:
+
+```{r}
+test %>% 
+  as.tibble() %>% 
+  rename(w = value) %>% 
+  mutate(ana = sort_ana(w)) %>% 
+  group_by(ana) %>% 
+  filter(n()>1) %>% 
+  ungroup() %>% 
+  mutate(len = nchar(ana)) %$% 
+  table(len)
+```
+
+I will have to find the highest square. If I begin with the longest words, I will probably not have to worry about the triplet "POST/STOP/SPOT"
+
+The squares I need to handle are not going to be longer than 9 digits. Or, no squares that are larger than:
+```{r}
+sqrt(999999999)
+```
+Squared.
+
+The list of possible squares can then be constructed:
+```{r}
+squares <- (1:31622)**2
+  
+```
+
+I'll probably need to be able to filter that list based on how many digits the numbers have. Lets write a function for that:
+
+```{r}
+ndigits <- function(i){
+  floor(log10(i))+1
+}
+```
+
+
+Lets look at the word "CAT", and the three digit square 169. How do I map those two?
+
+I start by splitting the word and the number in individual letters and digits.
+
+```{r}
+w <- "CAT"
+(w <- unlist(str_split(w,"")))
+
+n <- 169
+(n <- unlist(str_split(as.character(n),"")))
+
+
+```
+
+I take the first letter of the word, and get the positions of that letter in the word. 
+
+```{r}
+w %in% w[1]
+```
+
+Then I get the digits in the number, that corresponds to those positions:
+```{r}
+n[w %in% w[1]]
+```
+
+Those digits should be the same. If not, the C, that matches 1 in position 1, matches a different digit later in the word. And then the word cannot be matched correctly to the number, and the result would be false.
+
+```{r}
+if(!all(n[w %in% w[1]] == n[1])){res <- FALSE}
+```
+
+I'm not quite sure it is necessary, but I then do the same check, just reversed:
+```{r}
+if(!all(w[n %in% n[1]] == w[1])){res <- FALSE}
+```
+
+And of course I need to do that for all letters, not just the first. That translates into this function:
+
+```{r}
+map_pos <- function(w, n){
+  w <- trimws(w)
+  w <- unlist(str_split(w,""))
+  n <- unlist(str_split(as.character(n),""))
+  res <- TRUE
+  for(i in 1:length(w)){
+    if(!all(n[w %in% w[i]] == n[i])){res <- FALSE}
+    if(!all(w[n %in% n[i]] == w[i])){res <- FALSE}
+  }
+  return(res)
+}
+
+```
+
+Yes, I know I should check if the word and the number is the same lenght. I'm too lazy to do that here.
+
+Now I have a way to check if a given combination of word and number can be matched correctly. I can just try every combination, and keep the ones that are true.
+
+Next I will have to take such a combination, and apply the mapping to a new word, in order to get a new number. 
+I begin by making sure that the original word, w, is a character, and any whitespace is trimmed.
+The same goes for the new word, nw, that I want to map to a new number.
+
+Then both words and the number is split into individual letters and digits. And an new number vector, nn, is initialized.
+
+At the moment of writing I'm a bit tired. So excuse any lack of clarity. But for each position in the length of the words (again, I should, but dont, check that the words are of equal length), I extract the letter in the new word, use that letter as a name in the vector containing the original number, and add that to the vector containing the new number I'm trying to generate.
+
+When I have done that for the entire length, I have a vector that I can collapse, coerce as numeric, and return.
+```{r}
+map_tal <- function(w, n, nw){
+  w <- as.character(w)
+  w <- as.character(nytord)
+  w <- trimws(w)
+  nw <- trimws(nw)
+  w <- unlist(str_split(w,""))
+  n <- unlist(str_split(as.character(n),""))
+  nw <- unlist(str_split(nw,""))
+  nn <- numeric(length(nw))
+  names(w) <- n
+  names(n) <- w
+  for(k in 1:length(w)){
+    nn[k] <- n[nw[k]]
+  }
+  nn <- str_c(nn, collapse="")
+  nn <- as.numeric(nn)
+  return(nn)
+}
+```
+
+
+
+
+
+```{r}
+kandidater <- test %>% 
+  as.tibble() %>% 
+  rename(w = value) %>% 
+  mutate(ana = sort_ana(w)) %>% 
+  group_by(ana) %>% 
+  filter(n()>1) %>% 
+  group_by(ana) %>% 
+  summarise(ord = paste(w, collapse=", ")) %>% 
+  separate(ord, into=c("ord1", "ord2", "ord3"), sep=",")
+kandidater
+```
+
+
+
+der er par og firs par. og en enkelt triplet.
+
+mathblog skriver at det længste er på 8 karakterer. Det passer ikke, det er på 9. Introduce og reduction
+
+Nå. Det første ord i parret testes mod hver eneste kvadrattal. Der hvor tallet kan matches med et kvadrattal, skal jeg teste om det andet ord i parret, når det konverteres efter det mønster vi har fra det første tal - også er et kvadrattal. Det største af de tal der kan bruges gemmes.
+
+Nå. Vi tager nu kandidatlisten. Og får tilføjet en længde:
+```{r}
+kandidater <- kandidater %>% 
+  mutate(len = nchar(ord1)) %>% 
+  select(ord1, ord2, len)
+```
+
+Jeg antager at det ord vi søger, er længere end 4. Så det er lige meget med tripletten.
+
+```{r}
+l <- 5
+options(scipen = 42)
+
+mulige_ord <- kandidater %>% 
+  filter(len==l)
+
+mulige_tal <- kvadrater[ndigits(kvadrater)==l]
+
+
+for(i in 1:nrow(mulige_ord)){
+  for(j in 1:length(mulige_tal)){
+    if(map_pos(mulige_ord[i,1],mulige_tal[j])){
+        if(map_tal(mulige_ord[i,1], mulige_tal[j], mulige_ord[i,2]) %in% mulige_tal){
+          print(paste(mulige_ord[i,1], mulige_tal[j], mulige_ord[i,2],map_tal(mulige_ord[i,1], mulige_tal[j], mulige_ord[i,2]), sep=" "))}
+        
+    }
+  }
+  
+}
+i <- 2
+j <- 149
+
+
+map_tal("BOARD", 12769, "BROAD")
+
+View(mulige_ord)
+mulige_ord[i,1]
+mulige_ord[i,2]
+mulige_tal[j]
+map_tal(mulige_ord[i,1], mulige_tal[j], mulige_ord[i,2])
+
+as.character(mulige_ord[i,1] )
+mulige_tal[j]
+mulige_ord[i,2]
+
+61504
+str(map_tal("PHASE", 61504, "SHAPE") )
+mulige_tal[j]
+mulige_ord[i,1]
+
+1+1
+```
+

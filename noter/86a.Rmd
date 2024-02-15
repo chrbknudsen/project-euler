@@ -1,0 +1,138 @@
+---
+title: "Euler 86
+output: html_notebook
+---
+
+vi har et firkantet rum.
+
+Det har siderne a, b, c.
+Vi skal finde den korteste vej fra S til F.
+
+Vi ignorerer rotationer. Så vi kan definere at a < b < c
+Alle kuber hvor a > b kan ignoreres, det er blot en rotation.
+
+For en given kube skal vi finde den korteste rute, der er heltallig.
+
+Der er tre ruter. Og den korteste behøver ikke være heltallig.
+
+Når vi folder kassen ud, er der er defineret som hypotenusen til en retvinklet trekant, hvor kateterne er:
+
+a, b+c
+a+b, c
+a+c, b
+
+```{r}
+a <- 1
+b <- 3
+c <- 10
+a^2 + (b+c)^2
+(a+b)^2 + c^2
+(a+c)^2 + b^2
+```
+
+(a + b)^2 + c^2  vil altid være den korteste.
+
+Vi er nu interesserede i at finde alle retvinklede trekanter for M = 99 og M = 100, hvor M giver begrænsningen at 
+a,b,c højest er lig M.
+
+For en given M, hvor mange løsninger er der?
+
+Vi kan folde kassen ud på tre måder, hvor hver
+af disse tre sæt af to værdier, er kateterne i en retvinklet trekant. Det vi er ude efter er at finde den korteste rute, der har en hypotenuse der er et heltal.
+
+For eksemplet:
+6^2 + (5+3)^2
+giver 100, og det er et heltal.
+
+a, b+c    
+a+c, b
+a+b, c
+
+De andre er længere, og giver i øvrigt ikke integer.s
+
+der er 2060 af kuboider, der har en korteste rute der er heltallig ,for kuboider med sidelængder op til M = 100.
+For M = 99 er antallet 1975.
+
+Den meget primitive løsning. Alle kombinationer af alle tal op til 99.
+```{r}
+M <- 200
+M <- 1:M
+l <- list(a=M, b=M, c=M)
+filteret <- function(a,b,c){
+  !((a<=b)& (b <=c))
+}
+cross_df(l,.filter=filteret) %>% 
+  mutate(A = a^2 + (b+c)^2,
+         B = (a+b)^2 + c^2,
+         C = (a+c)^2 + b^2) %>% 
+  transmute(gæt = sqrt(B)) %>% 
+  filter(near(0,gæt%%1))
+
+```
+
+det er måske lettere at genere alle de primitive.
+m>n>0
+a = m^2 - n^2
+b = 2mn
+c = m^2 + n^2
+
+```{r}
+library(dplyr)
+library(purrr)
+m <- 100
+n <- 1:(m-1)
+m <- 1:m
+filteret <- function(m,n){
+  !(m>n)
+}
+  
+tripler <- cross_df(list(m=m,n=n), .filter=filteret) 
+
+ret_trip <- function(a,b,c){
+  resultat <- list(0)
+  res <- sort(c(a,b,c))
+  resultat[[1]] <- c(res[1], res[2], res[3])
+  return(resultat)
+}
+
+
+endelig <- tripler %>% 
+  mutate(a= m^2 - n^2,
+         b = 2*m*n,
+         c = m^2 + n^2) %>% 
+  rowwise() %>% 
+  mutate(trip = ret_trip(a,b,c)) %>% 
+  select(trip) 
+
+lapply(endelig$trip, FUN = function(x) x*1:100)
+  
+
+```
+
+
+
+Vi er ude i at der skal genereres pythagoræiske tripler.
+a = k(m^2 - n^2)
+b = k(2mn)
+c = k(m^2 + n^2)
+hvor m,n,k er positive heltal med m>n og m og n coprime (hvad end det betyder) og ikke begge ulige.
+
+```{r}
+library(dplyr)
+kombi %>% 
+  mutate(A = a^2 + (b+c)^2,
+         B = (a+b)^2 + c^2,
+         C = (a+c)^2 + b^2) %>% 
+  rowwise() %>% 
+  mutate(mindst = min(A,B,C)) %>% 
+  transmute(mindst = sqrt(mindst)) %>% 
+  filter(near(0, mindst%%1))
+  
+
+```
+
+
+Givet a = 6
+b=5
+c=3
+
