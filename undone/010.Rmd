@@ -3,6 +3,8 @@ title: "euler 10"
 author: "Christian Knudsen"
 date: "2022-10-24"
 output: html_document
+params:
+  done: F
 ---
 
 ```{r setup, include=FALSE}

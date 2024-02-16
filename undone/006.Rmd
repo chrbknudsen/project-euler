@@ -1,7 +1,7 @@
 ---
 title: "Euler 6"
 author: "Christian Knudsen"
-date: "2022-10-19"
+date: "2015-07-23"
 output: html_document
 params:
   done: T
@@ -12,9 +12,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+Eneste egentlige trick her er at kende pakken gmp, og de ekstra datatyper til
+meget store tal den giver adgang til.
 
-
-```{r}
+```{r eval  = F}
 library(gmp)
 t <- as.bigz(1:100)
 
