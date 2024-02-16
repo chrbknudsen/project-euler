@@ -1,100 +1,38 @@
 ---
 title: "Euler 144"
 output: html_document
-date: '2023-05-27'
+date: '2024-02-16'
 params:
-  done: F
+  done: T
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Vi har en eliptisk celle med en bestemt ligning. Vi får givet hældningen m for 
+alle punkter på elipsen. Den kan vi bruge til at få tangenten.
 
-En celle med ligningen 4x^2 + y^2 = 100
-
-Hvis lyset rammer -0.01 <= x <= 0.01 - så undslipper det.
-
-lysest starter ved 0.0, 10.1, og rammer spejlet i positionen
-1.4, -9.6
-
-Lyset reflekteres, således at indfaldsvinklen i forhold til normalen på hældningen
-af spejlet er den samme som udfaldsvinklen
-
-Hældningen/tangenten m er for alle punkter m = -4x/y
+Så vi starter med en funktion der giver os hældningen et givet sted.
 
 ```{r}
-m <- function(x,y){
+slope <- function(x,y){
   -4*x/y
 }
 ```
 
-
-Jeg har en vektor, der er karakteriseret ved et start og et slutpunkt. 
-
-Jeg har en anden vektor hvor jeg kender hældningen - fordi jeg kender slutpunktet.
-
-så skal vi have beregnet vinklen mellem de to vektorer. 
-
-```{r}
-points2vector <- function(x1,y1,x2,y2){
-  c(x2-x1,y2-y1)
-}
-```
-
-```{r}
-vektor1 <- points2vector(0,10.1,1.4,-9.6)
-
-```
-Vi skal også bruge prikproduktet af de to vektorer.
-
-Og størrelsen af de to vektorer.
-
-Så kan vi beregne vinklen ved:
-cos(vinkel) = prikprodukt divideret med produktet af størrelserne.
-
-Det er indfaldsvinklen. Nu har vi så en indfaldsvektor, og en indfaldsvinkel.
-Så skal vi have beregnet udfaldsvinklen, og finde ud af hvordan vi finder 
-slutpunktet for det næste segment.
-
-
-Vi har nok også lyst til at visualisere...
-
-
-Så når det rammer 8 i 1.4, -9.6, er hældningen
-
-
-Hvordan finder jeg normalen til den?
-
-
-
-# Definerer vektoren for den indkommende lysstråle og normalvektoren
-v <- c(1, 2, 3) # Eksempel på en indkommende vektor
-n <- c(0, 1, 0) # Eksempel på normalvektoren til overfladen
-
-# Normaliserer normalvektoren, hvis den ikke allerede er en enhedsvektor
-n <- n / sqrt(sum(n^2))
-
-# Beregner den reflekterede vektor
-r <- v - 2 * sum(v * n) * n
-
-# Udskriver den reflekterede vektor
-r
-
+Vi har et startpunkt, og det første sted lysstrålen rammer:
 
 ```{r}
 positioner <- data.frame(x = c(0,1.4), y = c(10.1,-9.6))
-
-
-positioner
-
 ```
 
+
+Det kan vi plotte - det går lettest hvis vi har en parametrisk fremstilling
+af elipsen:
+
 ```{r}
-x <- 3
-sqrt(100-4*x^2)
-```
-```{r}
+library(tidyverse)
 a <- 5
 b <- 10
 theta <- seq(0,2*pi,length.out = 100)
@@ -108,38 +46,247 @@ ellipse_df %>%
   geom_path(positioner, mapping = aes(x,y))
 ```
 
-Så skal vi have beregnet det næste punkt. 
+Vi har altså en vektor der rammer et bestemt sted. Og vi skal nu have 
+beregnet den vektor der beskriver reflektionen.
 
+Til det formål skal vi bruge selve vektoren for den indfaldende lysstråle. 
+
+Det kan denne funktion:
 ```{r}
-positioner
+points2vector <- function(x1,y1,x2,y2){
+  v <- c(x2-x1,y2-y1)
+  norm <- sqrt(sum(v^2))
+  v/norm
+}
+
 ```
 
-Vi skal bruge normalvektoren til tangenten til elipsen.
+Og vi skal bruge normalvektoren for tangenten til elipsen. Vi starter med at
+finde en vektor der beskriver tangenten. Det kan vi gøre hvis vi kender to punkter.
+Vi kender det punkt hvor lysstrålen rammer. Det er (1.4,-9.6). Hvis hældningen er
+m, kan vi finde et andet punkt ved (x+1, y+m) (fordi hældningen beskriver ændringen
+af y når vi ændrer x med 1). Og eftersom vi vi finder vektoren for liniestykket 
+beskrevet ved 
 
-Hældningen på den tangent kender vi. Så finder vi vektoren ved
+$$\overline{AB} = (B_x-A_x ; B_y-A_y)$$
+
+
+reducerer det hele til at vektoren kan beskrives som (1,m). 
+Det betyder også at normalvektorene kan beskrives som:
+
+(1,-1/m) og (-1,1/m)
+
+Vi har den udfordring, at den normalvektor vi er interesseret i, skal pege mod 
+(0,0). Så vi tager en anden vej. Ellipsen har halvakser a og b - det er dem 
+vi brugte ovenfor for at lave et parametrisk plot af den.
+
+Udtrykt ved dem, er ligningen givet ved:
+
+$$\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$$
+
+Hvor a = 5 og b = 10
+
+Gradienten er normal til kurven, og kan findes ved $\nabla F$ hvor F er elipsens 
+ligning. Det bliver så: 
+
+$$ n = (\frac{2x}{a^2}, \frac{2y}{b^2})$$ 
+
+
+
+
+Den er baseret på gradienten af funktionen, og peger derfor væk fra centrum. 
+Vi skal bruge den normalvektor der peger indad. Og det er så:
+
+$$ n = (-\frac{2x}{a^2}, -\frac{2y}{b^2})$$ 
+Igen med a = 5 og b = 10.
+
+Den skal vi have normaliseret. Og det vil være fint med en funktion der
+beregner den indadpegende normalvektor som funktion af x og y:
 
 ```{r}
-normalen <- function(x,y){
+normal_vektor <- function(x,y){
+  n_x <- 8*x
+  n_y <- 2*y
+  norm <- sqrt(n_x^2 + n_y^2)
+  norm_x <- n_x / norm
+  norm_y <- n_y / norm
+  
+  return(c(norm_x, norm_y))
+}
+```
+
+
+Har vi en indfaldende vektor, og en normalvektor til den flade indfaldet 
+sker på, kan vi beregne den reflekterede vektor ved:
+indfaldende_vektor - 2* prikproduktet_af_normalvektoren_og_den_indfaldende * normalvektoren.
+
+```{r}
+refleks_vektor <- function(x1,y1,x2,y2){
+  indfald <- points2vector(x1,y1,x2,y2)
+  norm_vektor <- normal_vektor(x2,y2)
+  prik_prod <- sum(indfald*norm_vektor)
+  indfald - 2*prik_prod*norm_vektor
+}
+
+```
+Nu kan vi, med start og slutkoordinater for den indfaldende lysstråle, beregne
+udfaldsvektoren. Vi har slutkoordinaten. Og så skal vi have beregnet hvor 
+den rammer ellipsen.
+
+Mon ikke vi skal starte med at beregne en linie.
+
+Den kan vi finde som:
+
+$$x = x_0 + t*v_x$$ 
+
+og
+
+$$y = y_0 + t*v_y$$
+
+Hvor v er vektoren, x_0 og y_0 er punktet, og t en parameter, der beregner afstanden
+fra startpunktet.
+
+Den kan vi indsætte i ligningen for ellipsen. Det giver:
+
+$$\frac{(x_0 + tv_x)^2}{a^2} + \frac{(y_0 + tv_y)^2}{b^2} = 1 $$
+
+Den kan omskrives til:
+
+$$At^2 + Bt + C = 0$$
+A, B og C skal vi så finde ved at omskrive ligningen lige før:
+
+$$A = \frac{v_x^2}{a^2} $$
+$$B = 2 * (\frac{x_0 v_x}{a^2} + \frac{y_0 v_y}{b^2})$$
+$$C = \frac{x_0^2}{a^2} + \frac{y_0^2}{b^2} - 1$$
+
+Vi kender x, a og b. Og v beregner vi ovenfor, det er refleksvektoren.
+
+Det er en andengradsligning, og den lærte vi at løse i 9. klasse:
+
+
+$$x = \frac{-B \pm \sqrt{B^2 - 4AC}}{2A} $$ 
+
+Indfalds-lysstrålens start og slut kender vi. Har vi den, kan vi få v i ovenstående
+med funktionen refleks_vektor() fra før. a og b er givet som hhv 5 og 10.
+
+Så nu kan vi skrive en funktion der giver os t:
+
+```{r}
+t_cut <- function(x1,y1,x2,y2){
+  a <- 5
+  b <- 10
+  x0 <- x2
+  y0 <- y2
+  vx <- refleks_vektor(x1,y1,x2,y2)[1]
+  vy <- refleks_vektor(x1,y1,x2,y2)[2]
+  
+  A <- (vx^2/a^2) + (vy^2/b^2)
+  B <- 2*((x0*vx/a^2)+ y0*vy/b^2)
+  C <- x0^2/a^2 + y0^2/b^2 - 1
+  D <- B^2 - 4*A*C  # diskriminanten Her bør der altid være to reelle løsninger!
+  
+  t1 <- (-B + sqrt(D)) / (2*A)
+  t2 <- (-B - sqrt(D)) / (2*A)
+  
+  # den ene af løsningerne skal altid være (meget tæt på) 0
+  res <- c(t1,t2)
+  
+  res[abs(res) > 1e-6]
+}
+
+```
+
+Dette t kan vi nu bruge til at beregne det nye punkt. Det skal "bare" sættes ind 
+i formlen fra tidligere:
+
+$$x = x_0 + t*v_x$$ 
+
+
+$$y = y_0 + t*v_y$$ 
+
+Så en ny funktion, der beregner det nye punkt:
+
+
+```{r}
+next_point <- function(x1,y1,x2,y2){
+  t <- t_cut(x1,y1,x2,y2)
+  v <- refleks_vektor(x1,y1,x2,y2)
+  c(x2,y2) + t*v
+}
+
+next_point(0,10.1,    1.4,-9.6)
+
+```
+Og der er tydeligvis en regnefejl et eller andet sted...
+Fejlen var at t*v skulle lægges til. Ikke trækkes fra... Suk.
+
+
+Nå. Men nu har vi en funktion, der kan tage to punkter, og forhåbentligt beregne det næste korrekt.
+
+```{r}
+next_position <- function(df){
+  gl_pos <- df %>% tail(2)
+  x1 <- gl_pos[1,1]
+  x2 <- gl_pos[2,1]
+  y1 <- gl_pos[1,2]
+  y2 <- gl_pos[2,2]
+
+  næste <- next_point(x1,y1,x2,y2)
+
+  df %>% add_row(x=næste[1], y = næste[2])
   
 }
-punktet er:
-(1.4, -9.6)
+positioner <- data.frame(x = c(0,1.4), y = c(10.1,-9.6))
 
-hældningen er
+gl_pos <- positioner %>% tail(2)
+  x1 <- gl_pos[1,1]
+  x2 <- gl_pos[2,1]
+  y1 <- gl_pos[1,2]
+  y2 <- gl_pos[2,2]
 
-m(1.4, -9.6) # 0.5833333
+  næste <- next_point(x1,y1,x2,y2)
+næste
 
-det nye punkt er derfor (2.4, -9.6+0.5833333) 
-og derfor er vektoren i reflektion altid (1, hældningen)
-Den har to normalvektorer.
+between(x, 1,2)
+nyeste_x <- 5
+nyeste_y <- 5
+while(!(between(nyeste_x, -0.01, 0.01) & nyeste_y > 9.9)){
+  positioner <- next_position(positioner)
+  nyeste_x <<- positioner %>% 
+    tail(1) %>% 
+    pull(x)
+  nyeste_y <<- positioner %>% 
+    tail(1) %>% 
+    pull(y)
+  }
 
 ```
+Hvad skal y være mellem?
 
-En særlig udfordring er selvfølgelig at finde ud af hvilken af de to 
-normalvektorer der skal bruges...
+4x2 + y2 = 100
+```{r}
+x <- 0.01
+sqrt(100-4*x^2)
+
+9.99998
+```
+
 
 
 ```{r}
+ellipse_df %>% 
+  ggplot(aes(x,y))+
+  geom_path() +
+  coord_fixed() +
+  geom_path(positioner, mapping = aes(x,y))
+```
+Ok. Det første punkt er selvfølgelig ikke et hit.
+Det sidste hitter heller ikke. Det forlader jo netop ellipsen.
 
+Så. 
+nrow(positioner) - 2
+
+```{r}
+nrow(positioner) - 2
 ```
 
