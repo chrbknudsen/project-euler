@@ -13,13 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Vi har en eliptisk celle med en bestemt ligning. Vi får givet hældningen m for 
 alle punkter på elipsen. Den kan vi bruge til at få tangenten.
 
-Så vi starter med en funktion der giver os hældningen et givet sted.
 
-```{r}
-slope <- function(x,y){
-  -4*x/y
-}
-```
 
 Vi har et startpunkt, og det første sted lysstrålen rammer:
 
