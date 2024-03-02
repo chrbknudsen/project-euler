@@ -22,8 +22,7 @@ positioner <- data.frame(x = c(0,1.4), y = c(10.1,-9.6))
 ```
 
 
-Det kan vi plotte - det går lettest hvis vi har en parametrisk fremstilling
-af elipsen:
+Det kan vi plotte - det går lettest hvis vi har en parametrisk fremstilling af elipsen:
 
 ```{r}
 library(tidyverse)
