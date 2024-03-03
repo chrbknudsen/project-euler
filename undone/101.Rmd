@@ -1,7 +1,7 @@
 ---
 title: "Euler 101"
 output: html_document
-date: '2023-05-27'
+date: '2024-03-02'
 params:
   done: T
 ---
