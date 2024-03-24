@@ -1,10 +1,10 @@
 ---
 title: "Euler 9"
 author: "Christian Knudsen"
-date: "2022-10-24"
+date: "2015-07-23"
 output: html_document
 params:
-  done: F
+  done: T
 ---
 
 ```{r setup, include=FALSE}
@@ -15,10 +15,10 @@ knitr::opts_chunk$set(echo = TRUE)
 31875000
 
 ```{r}
-t <- expand.grid(a = 1:1000, b = 1:1000)
-class(t)
-
 library(dplyr)
+t <- expand.grid(a = 1:1000, b = 1:1000)
+
+
 answer <- t %>% 
   mutate(sum = a + b) %>% 
   filter(sum < 1000) %>% 

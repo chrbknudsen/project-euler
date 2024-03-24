@@ -2,7 +2,6 @@
 title: "Euler 145"
 output: html_document
 date: '2024-02-13'
-output: html_document
 params:
   done: T
 ---
