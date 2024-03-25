@@ -1,29 +1,124 @@
 ---
-title: "Euler"
+title: "Euler 666"
 output: html_document
 date: '2023-05-27'
+params:
+  done: F
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+Det må være en simuleringsøvelse.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Vi skal til en start have genereret rækken defineret ved:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+$$r_0 = 306$$
 
-```{r cars}
-summary(cars)
+$$r_{n+1} = r_n^2 mod 10007$$
+
+
+Create the first sequence:
+```{r}
+sekvens <- numeric(10000)
+  sekvens[1] <- 306
+  i <- 1
+  stop <- FALSE
+  while(TRUE){
+    i <- i + 1
+    b <- (sekvens[i-1]^2) %% 10007
+    if(b %in% sekvens){stop <- TRUE}
+    sekvens[i] <- b
+    if(stop) break  
+  }
+
+sekvens <- sekvens[2:(i-1)]
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+make function to return element r_n:
+```{r}
+r_n <- function(n){
+  if(n == 0) return(306)
+  index <- (n-1) %% length(sekvens) +1
+  sekvens[index]
+  
+}
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+For hver generation, vil hver bakterie vælge et tilfældigt tal j mellem 0 og m:
+```{r}
+rand_j <- function(m){
+  sample(0:(m-1), 1)
+}
+```
+
+baseret på rand_j, sekvensen og i, får vi så en funktion q der returnerer et tal:
+```{r}
+q_i <- function(i, m){
+  r_n(i*m+rand_j(m)) %% 5
+}
+```
+
+Handlinger afhænger af dette tal.
+
+Lad os lave en funktion der for en given generation i, muterer en bakterie:
+
+```{r}
+muter <- function(type=0, i, k, m){
+  handling <- r_n(i*m+rand_j(m)) %% 5
+  #handling <- q_i(i,m)
+  #print(handling)
+  res <- dplyr::case_when(
+    handling == 0 ~ list(c()),
+    handling == 1 ~ list(rep(type, 2)),
+    handling == 2 ~ list((2*type)%%k),
+    handling == 3 ~ list(rep((type^2+1)%%k, 3)),
+    handling == 4 ~ list(c((type+1) %% k, type))
+    )
+  unlist(res)
+  }
+
+
+
+```
+
+
+
+```{r}
+test <- c(0)
+```
+
+
+```{r}
+i <- 0
+```
+
+
+```{r}
+test <- map(test, muter, i = i, m = 2, k= 500) 
+i <- 1 + 1
+(test <- test %>% unlist())
+```
+
+```{r}
+table(test)
+
+populationer <- replicate(10,0, simplify = F)
+populationer
+```
+```{r}
+population <-  replicate(10000,0, simplify = F)
+
+# Anvend muter funktionen på hvert element i listen
+j <- 0
+population <- lapply(population, function(x) {
+  map(x, muter, i = j, k = 2, m = 2) %>% unlist()
+})
+j <- j + 1
+
+sum(sapply(population, is.null))/1000
+is.null(c()) 
+
+muter(1, i = 3, k = 2, m =2)
+```
