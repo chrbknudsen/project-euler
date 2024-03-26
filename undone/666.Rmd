@@ -80,7 +80,34 @@ muter <- function(type=0, i, k, m){
   }
 
 
+# alternativ hvor det er iterations-iet og ikke bakterie i der optræder i 
+# case_when
+muter <- function(type=0, i, k, m){
+  handling <- r_n(i*m+rand_j(m)) %% 5
+  #handling <- q_i(i,m)
+  #print(handling)
+  res <- dplyr::case_when(
+    handling == 0 ~ list(c()),
+    handling == 1 ~ list(rep(type, 2)),
+    handling == 2 ~ list((2*i)%%k),
+    handling == 3 ~ list(rep((i^2+1)%%k, 3)),
+    handling == 4 ~ list(c((i+1) %% k, type))
+    )
+  unlist(res)
+  }
 
+
+
+```
+
+det ser ikke ud til at vi faktisk får tilfældige tal...
+```{r}
+test <- sample(c(0,1), 10, replace = TRUE)
+```
+
+
+```{r}
+(test <- muter(test, 1, k = 2, m = 2)) 
 ```
 
 
@@ -96,8 +123,9 @@ i <- 0
 
 
 ```{r}
-test <- map(test, muter, i = i, m = 2, k= 500) 
+test <- map(test, muter, i = i, m = 2, k= 2) 
 i <- 1 + 1
+test
 (test <- test %>% unlist())
 ```
 
@@ -108,7 +136,7 @@ populationer <- replicate(10,0, simplify = F)
 populationer
 ```
 ```{r}
-population <-  replicate(10000,0, simplify = F)
+population <-  replicate(100,0, simplify = F)
 
 # Anvend muter funktionen på hvert element i listen
 j <- 0
@@ -117,7 +145,11 @@ population <- lapply(population, function(x) {
 })
 j <- j + 1
 
-sum(sapply(population, is.null))/1000
+
+
+sum(sapply(population, is.null))/100
+
+
 is.null(c()) 
 
 muter(1, i = 3, k = 2, m =2)
