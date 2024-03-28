@@ -1,12 +1,78 @@
 ---
 title: "Euler 187"
 output: html_document
-date: '2023-05-27'
+date: '2018-05-28'
 params:
-  done: F
+  done: TRUE
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+Number of numbers that can be expressed as the product of just two
+primes. Below $10^8$
+
+
+```{r}
+library(numbers)
+n <- 10**8
+numbers <- primes(n)
+length(numbers)
+```
+
+
+2 times all the primes below n/2 will give all the semiprimes that have 2 as one 
+of the primefactors (smaller than n).
+
+3 times all the primes below n/3 will in the same way give all the semiprimes, 
+that have 3 as one of the primefactors.
+
+If I can figure out how many primes there are below n/2, I get the number of semiprimes that has 2 as one of the two primefactors. The same for the number of primes below n/3. If continue 
+that to $\sqrt{n}$, and add them all together, I should get the total number of semiprimes below n.
+
+The number of primes below n/2 is:
+
+```{r}
+length(numbers[numbers<n/2])
+```
+
+And the number of primes below n/3 is:
+```{r}
+length(numbers[numbers<n/3])
+```
+
+
+
+I do want to multiply 3 by 3. But I need to exclude 2.
+
+```{r}
+length(numbers[numbers<n/3 & numbers>=3])
+```
+
+
+I just need to do it for all of them.
+
+```{r}
+n_semi_primes <- function(x){
+  counter <- 0
+  for(i in numbers[numbers<=sqrt(x)]){
+    counter <- counter + length(numbers[numbers<x/i & numbers>=i])
+  }
+  return(counter)
+}
+
+```
+
+
+Testing:
+```{r}
+n_semi_primes(30)
+```
+
+Getting the answer:
+```{r}
+answer <- n_semi_primes(10**8)
+```
+
 
