@@ -9,3 +9,18 @@ params:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+```{r}
+library(numbers)
+test <- 1
+noget <- 1:28
+length(noget[(28 %% noget)==0])
+result <- FALSE
+while(!result){
+  test <- test + 1
+  testing <- 1:test
+  result <- length(testing[(test %% testing)==0]) > 500
+}
+test
+```
+

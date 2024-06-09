@@ -1,12 +1,67 @@
 ---
 title: "Euler 14"
 output: html_document
-date: '2023-05-27'
+date: '2018-02-12'
 params:
   done: F
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+We have a starting number n, and calculate the next. 
+If n is even, the next number is n/2
+If n is odd, the next number is 3n+1
+
+Continuing we will always (although that is not proved), finish at 1.
+
+Which starting number, below 1.000.000 give us the longest chain.
+
+The example is:
+
+13 -> 40 -> 20 -> 10 -> 5 -> 16 -> 8 -> 4 -> 2 -> 1
+
+So, starting with n = 13, we get at chain with length 10.
+
+From that, we can conclude, that if we start with 13, a chain starting with
+40, will be shorter. Therefore, there is no reason to test the starting numbers
+40, 20, 10, 5, 16, 8, 4, 2 or 1. Because they will all lead to a chain that
+is shorter than the chain beginning with 13.
+
+```{r}
+as.logical(4%%2)
+library(tidyverse)
+next_step <- function(n){
+  if_else(as.logical(n%%2), 3*n+1, n/2)
+}
+
+get_chain <- function(n){
+  res <- n
+  while(n != 1){
+    n <- next_step(res[length(res)])
+    res <- c(res, n)}
+  res
+  }
+
+
+```
+
+Because of that, we can generate a chain for a given starting number,
+and not only get the length, but also eliminate all the numbers in the chain
+as possible candiates (except the first in the chain of course)
+
+```{r}
+candidates <- data.frame(candidate = 1:1000000, length = NA_integer_)
+
+while(nrow(candidates)>1){
+  test_value <- sample(candidates[is.na(candidates$length),]$candidate, size = 1)
+  chain <- get_chain(test_value)
+  candidates[candidates$candidate == test_value,2] <- length(chain)
+  candidates <- candidates[!(candidates$candidate %in% chain[-1]),]
+  candidates <- candidates[(!(candidates$length < max(candidates$length))) | is.na(candidates$length), ]
+}
+
+
 ```
 
