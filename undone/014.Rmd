@@ -52,14 +52,14 @@ and not only get the length, but also eliminate all the numbers in the chain
 as possible candiates (except the first in the chain of course)
 
 ```{r}
-candidates <- data.frame(candidate = 1:1000000, length = NA_integer_)
+candidates <- data.frame(candidate = 1:1000000, length = 0)
 
 while(nrow(candidates)>1){
-  test_value <- sample(candidates[is.na(candidates$length),]$candidate, size = 1)
+  test_value <- sample(candidates[(candidates$length==0),]$candidate, size = 1)
   chain <- get_chain(test_value)
   candidates[candidates$candidate == test_value,2] <- length(chain)
-  candidates <- candidates[!(candidates$candidate %in% chain[-1]),]
-  candidates <- candidates[(!(candidates$length < max(candidates$length))) | is.na(candidates$length), ]
+  candidates <- candidates[!(candidates$candidate %in% c(chain[-1],NA)),]
+  candidates <- candidates[(!(candidates$length < max(candidates$length))) | (candidates$length ==0), ]
 }
 
 
