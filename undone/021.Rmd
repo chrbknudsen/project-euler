@@ -1,12 +1,33 @@
 ---
 title: "Euler 21"
 output: html_document
-date: '2023-05-27'
+date: '2018-02-15'
 params:
   done: F
 ---
 
+Ku godt bruge lidt forklaring. Der er også mere elegante måder at 
+få summen end at skulle have den forbi en dataframe.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+Let d(n) be the sum of divisors of n (nunbers less than n)
+
+If d(a) = b and d(b) = a, where a is not equal to b, a and b are amicable.
+Find the sum of amicable numbers under 10000.
+
+
+```{r eval = FALSE}
+a <- c(1:10000)
+library(numbers)
+
+b <- unlist(lapply(a, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
+c <- unlist(lapply(b, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
+d <- data.frame(opr=a, summen=b, anden = c)
+e <- d[which(d$opr==d$anden),]
+e <- e[which(e$opr != e$summen),]
+sum(e$opr)
 ```
 

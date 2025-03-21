@@ -3,10 +3,26 @@ title: "Euler 13"
 output: html_document
 date: '2023-05-27'
 params:
-  done: F
+  done: T
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+What are the first 10 digits of the sum of 100 numbers, each with 50 digits.
+Trivial in Python, requires a library in R.
+
+Strictly speaking we do not need to actually add all the numbers, it is enough
+to add the first 11 digits of each number.
+
+
+
+```{r eval  = FALSE}
+library(gmp)
+load("../data/013.RData")
+the_sum <- sum(as.bigz(data))
+n_digits <- ceiling(log10(the_sum))
+the_sum %/% 10^(n_digits-10)
 ```
 

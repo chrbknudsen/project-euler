@@ -8,4 +8,103 @@ date: '2023-05-27'
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+We are looking for all products where the digits 1 to 9 is included 
+exactly once in the multiplicant, the multiplier and the products
+et pandigitalt n-cifret tal bruger alle cifrene 1 til n præcist en gang.
+15234 er 1 til 5 pandigitalt.
 
+produktet 7254 er specielt, fordi 39*186=7254 bruger tallene 1 til 9 præcist 
+en gang. Og derfor kan betrates som pandigitalt.
+
+Find summen af alle produnkter, hvis multiplikanter og produkt kan skrives som
+1 til 9 pandigitalt.
+
+Nogen produkter kan opnås på mere end en måde. De skal kun inkluderes en gang.
+
+
+
+Project Euler 32
+
+More pandigitality. Or whatever it’s called.
+
+39 x 186 = 7254
+
+And that is interesting, because 39 186 7254 is pandigital. As in all the digits 1 to 9 is represented exactly once.
+
+The task is: Find all the products, where multiplicand (39), multiplier (186) and product (7254) is 1 through 9 pandigital.
+
+First question I need to answer is:
+
+How many digits can there be in the multiplicand and multiplier?
+
+If there is 1 digit in the multiplicand, there has to be 4 digits in the multiplier, and 4 in the product.
+
+If there is only 3 in the multiplier, we would have to have 5 digits in the product, which is impossible when we multiply a 1 digit number with a 3 digit number.
+
+And if there was 5 digits in the multiplier, we would get 5 digits in the product, bringing the total number of digits in the identity to 11.
+
+Therefore: If there is 1 digit in the multiplicand, there has to be 4 digits in the multiplier. We will get some products with 5 digits, but we’ll filter them out.
+
+What if there are 2 digits in the multiplicand?
+
+Then there has to be 3 digits in the multiplier, and 4 in the the product.
+
+If there are 2 digits in the multiplier, the highest number of digits we can get in the product, is 4. And then we would only have 8 digits in total.
+
+If on the other hand we have 2 digits in the multiplicand, and 4 digits in the multiplier, we would get 5 digits in the product, bringing the total number of digits to 11.
+
+So. There must be 1 or 2 digits in the multiplicand. And 4 or 3 digits respectively in the multiplier.
+
+And there must never be more than 4 digits in the product.
+
+Lets begin by making all possible combinations of multiplicands and multipliers.
+
+multiplicand <- 1:9
+multiplier <- 1023:9876
+res1 <- expand.grid(multiplicand,multiplier)
+
+multiplicand <- 10:98
+multiplier <- 102:987
+res2 <- expand.grid(multiplicand,multiplier)
+
+testcases <- rbind(res1,res2)
+
+All possibilities for 1 digit in the multiplicand, combined with all possibilities for a 4-digit multiplier.
+
+Combined (rbind) with all possibilities for 2-digit multiplicands, and all possibilites for 3-digit multipliers.
+
+Next I’ll need a function that returns TRUE if its input it 1 throug 9 pandigital:
+
+isPan <-  function(x){ (length(unique(setdiff(unlist(strsplit(x,split="")),0)))==9)&&(nchar(x)==9) }
+isPan <- Vectorize(isPan)
+
+I also need it to be vectorized. This is not at perfect way to do it. But I can’t figure out another way.
+
+And now we’ll use the lovely pipes to pass all the test cases through a series of functions:
+
+library(dplyr)
+
+answer <- testcases %>%
+  mutate(product= Var1*Var2) %>%
+  filter(product <= 9999) %>%
+  mutate(concat = paste(Var1, Var2, product, sep="")) %>%
+  filter(isPan(concat)) %>%
+  select(product) %>%
+  unique() %>%
+  sum()
+
+First I make a new column with the mutate() function, called product, that is the multiplication of Var1 and Var2 (multiplicand and multiplier respectively)
+
+Next I filter out all the product that has more than 4 digits.
+
+Next I make another new column, where I paste together the multiplicand, the multiplier and the product.
+
+I filter, using my isPan() function. If the concatenation is pandigital, I keep it. Otherwise I throw the row away.
+
+Now I only have rows where the concatenation of multiplicand, multiplier and product is pandigital.
+
+But I’m actually only interested in the product, so I select the column “product”
+
+Some of the products are repeated, unique takes care of that.
+
+And then I just need to sum them.
