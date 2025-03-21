@@ -1,8 +1,0 @@
----
-title: "Euler 1"
-author: "Christian Knudsen"
-format: html
-date: "Fri Mar 21 10:14:16 2025"
-params:
-  done: T
----
