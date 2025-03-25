@@ -220,3 +220,9 @@ formatMpfr(x, digits = 500000000)
 
 1/729
 
+L <- mpfr(799949, precBits = 10000)
+x <- 1/L
+formatMpfr(x , digits = 30)
+library(numbers)
+
+Primes(800000) %>% tail()
