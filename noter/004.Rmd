@@ -1,0 +1,33 @@
+---
+title: '4'
+output: html_document
+date: '2023-05-27'
+params:
+  done: T
+---
+
+
+Largest palindrome number made from the product of two three-digit numbers
+
+First a function that tests i a number is palindromic. Vectorized!
+
+```{r}
+is_palindromic <- function(x){
+  y <- as.character(x)
+  y <- strsplit(y, "")
+  y <- lapply(y, rev)
+  y <- lapply(y, paste, collapse = "")
+  y == x
+}
+```
+
+
+```{r}
+t <- expand.grid(100:999, 100:999)
+t <- t[,"Var1"] * t[,"Var2"]
+answer <- max(t[is_palindromic(t)])
+```
+
+
+
+

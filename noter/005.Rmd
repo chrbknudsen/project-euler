@@ -1,0 +1,40 @@
+---
+title: "Euler 5"
+author: "Christian Knudsen"
+date: "2015-07-23"
+output: html_document
+params:
+  done: T
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Den nedre grænse for svaret er produktet af primtallene under x.
+
+Det beregner vi - og finder de tal i range fra 1 til x, der ikke går op i vores
+tentative svar.
+
+Det mindste af de tal i ranget der ikke går op i det foreløbige svar identificeres.
+
+Den laveste primfaktor i det tal ganges på det foreløbige svar, og processen
+gentages til alle tal i ranget går op i svaret.
+
+```{r eval  =F}
+library(numbers)
+
+answer <- function(x){
+  lower <- prod(numbers::Primes(1,x))
+  range <- 1:x
+  while(!all(lower %% range == 0)){
+    kand <- min(range[lower %% range != 0])
+    kand <- min(primeFactors(kand)) 
+    lower <- lower * kand
+  }
+  lower
+}
+
+answer(20)
+
+```
