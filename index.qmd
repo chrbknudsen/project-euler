@@ -1,13 +1,38 @@
 ---
-title: "oversigt"
+title: "Oversigt"
 format: html
-editor: source
 ---
 
-
 ```{r}
-library(tidyverse)
-library(gt)
+# Parametre
+folder <- "."  # sti til mappen
+n <- 20        # hvor mange numre skal vises?
+cols <- 4      # antal kolonner i tabellen
 
+library(tibble)
+library(dplyr)
+library(knitr)
+
+# Hent filnavne og udtræk både originalnavn og numerisk værdi
+files <- list.files(path = folder, pattern = "^\\d+\\.(rmd|qmd)$", ignore.case = TRUE)
+file_info <- tibble(
+  file = files,
+  num = as.integer(gsub("^0+", "", sub("\\..*$", "", files)))  # fjern foranstillede nuller
+)
+
+# Byg hovedoversigten
+oversigt <- tibble(num = 1:n) %>%
+  left_join(file_info, by = "num") %>%
+  mutate(link = ifelse(!is.na(file),
+                       paste0("[", num, "](", file, ")"),
+                       as.character(num))) %>%
+  pull(link)
+
+# Udfyld med tomme felter, så tabellen går op
+total_cells <- ceiling(length(oversigt) / cols) * cols
+oversigt <- c(oversigt, rep("", total_cells - length(oversigt)))
+
+# Formater til matrix og vis uden kolonnenavne
+mat <- matrix(oversigt, ncol = cols, byrow = TRUE)
+knitr::kable(mat, col.names = NULL)
 ```
-
