@@ -3,8 +3,6 @@ title: "Euler 1"
 author: "Christian Knudsen"
 format: html
 date: "2022-10-17"
-params:
-  done: TRUE
 ---
 
 ## Sum of multiples of numbers

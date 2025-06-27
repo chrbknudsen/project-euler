@@ -1,0 +1,13 @@
+---
+title: "oversigt"
+format: html
+editor: source
+---
+
+
+```{r}
+library(tidyverse)
+library(gt)
+
+```
+
