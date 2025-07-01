@@ -10,3 +10,42 @@ params:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# 68
+
+
+1 til 10.
+
+ACE, BEH, IHG, JGD, XDC
+
+Der er 15 ialt. Eftersom 10 skal være der, kan 10 optræde en eller to gange.
+Og eftersom vi kun er interesserede i de 16-cifre lange strenge, kan 10 kun optræde en gang.
+10 er også det højeste tal. Så roterer vi så A er det laveste, og går rundt, skal 10 være i F.
+
+
+combn(1:10, 10)
+combn(letters[1:4], 2)
+
+library(iterpc)
+I <- iterpc(10,10, ordered=TRUE, replace=FALSE)
+I <- getall(I)
+libary(dplyr)
+I %>% 
+  as_tibble() %>% 
+  rename(A = V1, B = V2, C = V3, D = V4, E = V5, X = V6, G = V7, H = V8, I=V9, J = V10) %>% 
+  mutate(ACE=A+C+E, BEH=B+E+H, IHG=I+H+G, JGD=J+G+D, XDC = X+D+C) %>% 
+  filter(ACE==BEH) %>% 
+  filter(BEH==IHG) %>% 
+  filter(IHG==JGD) %>% 
+  filter(JGD==XDC) %>% 
+  mutate(streng = paste(A,C,E, B,E,H, I,H,G, J,G,D, X,D,C, sep="")) %>% 
+  mutate(streng_num=as.numeric(streng)) %>% 
+  filter(16==nchar(streng)) %>% 
+  filter(A<B) %>% 
+  filter(A<I) %>% 
+  filter(A<J) %>% 
+  filter(A<X) %>% 
+  View()
+
+Jeg mangler sådan set bare at sikre mig at A er den mindste af de ydre
+De ydre er A, B, I, J, X
+
