@@ -1,7 +1,7 @@
 ---
 title: "Euler 55"
 output: html_document
-date: '2023-05-27'
+date: '2018-03-09'
 ---
 ## Lychrel Numbers
 ```{r setup, include=FALSE}
