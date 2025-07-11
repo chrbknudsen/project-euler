@@ -38,3 +38,90 @@ answer <- function(x){
 answer(20)
 
 ```
+
+
+det er ikke en specielt tilfredsstillende løsning. Den engelske jeg har 
+produceret er således::
+
+
+What is the smallest, positive, number that can be divided by all numbers from 1 to 20 without any remainder?
+
+We are given that 2520 is the smallest that can be divided by all numbers from 1:10.
+
+One number that can definitely be divided by all numbers from 1:20 is:
+
+factorial(20)
+
+## [1] 2.432902e+18
+
+
+But given that
+
+factorial(10)
+
+## [1] 3628800
+
+
+is rather larger than 2520, it is definitely not the answer.
+
+The answer must be a multiple of all the primes smaller than 20. A number that is divisible by 15, will be divisible by
+3 and 5.
+
+The library “numbers” have a lot of useful functions. Primes(20) returns all primes smaller than 20, and prod() returns the product of all those primes
+
+library(numbers)
+prod(Primes(20))
+
+## [1] 9699690
+
+
+Could that be the answer?
+
+What we are looking at is the modulo-operator. 9699690 modulo 2 - what is the remainder? We know that all the remainders, dividing by 1 to 20 must be 0.
+
+prod(Primes(20)) %% 2
+
+## [1] 0
+
+
+And our large product is divisible by 2 without a remainder.
+
+Thankfully the operator is vectorized, so we can do all the divisions in one go:
+
+9699690 %% 1:20
+
+##  [1]  0  0  0  2  0  0  0  2  3  0  0  6  0  0  0 10  0 12  0 10
+
+
+Nope.
+
+9699690 %% 4
+
+## [1] 2
+
+
+Leaves a remainder.
+
+(2*9699690) %% 4
+
+## [1] 0
+
+
+Now I just need to find the number to multiply 9699690 with, in order for all the divisions to have a remainder of 0.
+That is, change i in this code until the answer is true.
+
+i <- 2
+all((i*9699690) %% 1:20 == 0)
+
+## [1] FALSE
+
+
+Starting with 1*9699690, I test if all the remainders of the divisions by all numbers from 1 to 20 is zero.
+As long as they are not, I increase i by 1, save i*9699690 as the answer, and test again.
+If the test is TRUE, that is all the remainders are 0, the while-loop quits, and I have the answer.
+
+i <- 1
+while(!all((i*9699690) %% 1:20 == 0)){
+ i <- i + 1
+ answer <- i*9699690
+}

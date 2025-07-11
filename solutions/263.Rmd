@@ -1,0 +1,155 @@
+---
+title: "Euler 263"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Project Euler, problem 263 - An engineers' dream come true
+
+This is, at the time of coding, the highest numbered Project Euler problem I've tried to tackle. With a difficulty rating of 75% it is also the most difficult. At least on paper. But An engineers' dream come true? How can I not, as an engineer, not try to solve it?
+
+We har looking for an n, for which it holds that:
+
+n-9 and n-3 must be consecutive primes
+n-3 and n+3 must also be consecutive primes
+n+3 and n+9 must also be consecutive primes.
+
+These are primepairs that are “sexy”, that is that have differences of 6.
+
+Also, n, n-8, n-4, n+4 and n+8 must be practical numbers, that is numbers where the numbes 1:n can be written as sums of distinct divisors of n.
+
+So if a number n gives sexy prime pairs, and are very practical - that is what an engineer dreams of - hence the paradise.
+
+The fastest way seems to be to generate a list of primes, sieve those out that conforms to the requirements for consecutive primes, and then test those numbers for practicality.
+
+Lets get started!
+
+The trusty numbers library provides the primes, up to 1000000. Then for each of those primes, return the n-value, if the differences between the sets of primes, are 6.
+
+library(numbers)
+
+primenumbers <- Primes(1000000)
+primecandidates <- numeric()
+for(i in 1:(length(primenumbers)-4)){
+if((primenumbers[i+1] - primenumbers[i] == 6) & (primenumbers[i+2] - primenumbers[i+1]== 6) & (primenumbers[i+3] - primenumbers[i+2]== 6)){
+  primcandidates <- c(primecandidates,(primenumbers[i]+9))
+  }
+}
+
+
+What we get from this, is not primenumbers, but values of n, that gives the consecutive primes we need.
+
+Now I have a list of candidate n's based on the requirements for primes. Next I need to check for practicality.
+
+First I tried a naive way. Generate the list of numbers that I need to sum to using distinct divisors, for a given x.
+Then get the divisors of x. I dont need to check if I can sum to the numbers that are themselves divisors, so excluding them leaves me with at slightly smaller set. Then I get all the ways I can take two divisors from the set of divisors. Sum them, and exclude them from the list of numbers. I continue until I have taken all the possible combinations of 2, 3, 4 etc divisors, based on how many there are. If there are no numbers left in the vector of numbers that I need to be able to sum to, I was able to express all those numbers as sums of distinct divisors. And then x was a practical number.
+
+practical <- function(x){
+  test <- 1:x
+  divs <- divisors(x)
+  test <- setdiff(test,divs)
+  for(i in 2:length(divs)){
+    test <- setdiff(test,combn(divs,i,sum))
+  }
+  !as.logical(length(test))
+}
+
+
+Two problems. One that can be fixed. I continue to generate combinations of divisors and summing them, even if I have already found ways to sum all the numbers. The second problem is more serious. When I have to test a number with really many divisors - it takes a long time. Also, handling a vector containing all numbers 1:1000000 takes a lot of time.
+
+I need a faster way of checking for practicality.
+
+Wikipedia to the rescue. There exists a way of checking. I have no idea why it works. But it does.
+
+For a number x, larger than 1, and where the first primefactor is 2. All primefactors are ordered. Taking each primefactor, that has to be smaller than or equal to the sum of the divisors of the product of all the smaller primefactors. Plus one. Oh! And that sum - if 3 is a primefactor twice, that is if 32 is a factor, I should square 3 in the product.
+
+That sounds simple.
+
+For a number x, get the primefactors. Use table to get the counts of the primefactors, ie that 3 is there twice. Those are the values of the result from the table function. The names of the table function are the primefactors.
+
+For each factor from number 2 to the end of the number of factors, get the names of the primefactors from number 1 to just before that factor we are looking at (as numeric). Exponentiate with the values from the table - that is how many times a primefactor is a primefactor. Generate the product, get the divisors of that product, sum them, and add 1. If the factor we were looking at is larger that that, we have determined that x is not practical - and can return FALSE. If x gets through that process, it is practial.
+
+I need to handle the case where there is only one primefactor - 2. Those numbers are practial, but the way I have done the check breaks when there is only one primefactor. Its simple enough, just check if there is only one distinct primefactor, and return TRUE in that case.
+
+practical <- function(x){
+  all_factors <- factors(x)
+  all_factors <- table(all_factors)
+  n_factors <- length(all_factors)
+  res <- TRUE
+    if(n_factors ==1){
+    return(TRUE)
+    break()
+  }
+
+  for(i in 2:n_factors){
+    if((as.numeric(names(all_factors)[i]))>(sum(divisors(prod(as.numeric(names(all_factors)[1:i-1])**as.numeric(all_factors)[1:i-1])))+1)){
+      return(FALSE)
+      break()
+      }
+  }
+  return(TRUE)
+}
+
+
+So, quite a bit faster!
+
+Now I can take my candidate n's based on the requirements for primepairs, and just keep the n's that are themselves practical. And where n-8, n-4, n+4 and n+8 are also practial:
+
+eng_numbers <- primecandidates %>%
+  keep(function(x) practical(x-8)) %>%
+  keep(function(x) practical(x-4)) %>%
+  keep(function(x) practical(x)) %>%
+  keep(function(x) practical(x+4)) %>%
+  keep(function(x) practical(x+8))
+
+eng_numbers
+
+## numeric(0)
+
+
+OK. There was no n's in this set.
+
+This is kinda problem. The n we are looking for are actually pretty large. I know this, because this writeup is written after I found the solution. So it is not because the code is flawed.
+
+Nu har vi så den udfordring, at vi skal have fat i ret høje tal.
+
+primenumbers <- primes(500000000)
+
+primecandidates <- numeric()
+for(i in 1:(length(primenumbers)-4)){
+if((primenumbers[i+1] - primenumbers[i] == 6) & (primenumbers[i+2] - primenumbers[i+1]== 6) & (primenumbers[i+3] - primenumbers[i+2]== 6)){
+  primecandidates <- c(primecandidates,(primenumbers[i]+9))
+  }
+}
+
+eng_numbers <- primecandidates %>%
+  keep(function(x) practical(x-8)) %>%
+  keep(function(x) practical(x-4)) %>%
+  keep(function(x) practical(x))   %>%
+  keep(function(x) practical(x+4)) %>%
+  keep(function(x) practical(x+8))
+
+length(eng_numbers)
+
+## [1] 3
+
+
+That gives us three. We need four.
+
+Now - I could just test larger and larger sets of primes. I run into memory problems when I try that. Then I could write some code, that generates primenumbers between some two numbers, and increse those numbers until I get number four.
+
+I have not. Instead I just tried again and again, until I found number 4. We need to have an upper limit for primes that are some four times larger than the one I just used. Anyway, I found number four. And got the green tickmark.
+
+Lesson learned
+
+Sometimes you really need to look into the math. This would have been impossible if I had not found a quicker way to check for practicality.
+
+Also, I should refactor this code. The check for practicality could certainly be optimised a bit.
+
+And - I should probably check for primality, rather than generating the list of primes.
