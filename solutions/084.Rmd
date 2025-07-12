@@ -1,0 +1,167 @@
+---
+title: "Euler 84"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Monopoly - Project Euler problem 84
+
+This is basically a question of building a Monopoly simulator.
+
+We begin at square GO. Roll two six-sided dice, and advance.
+
+If we land on the “Go to jail” (G2J) square, we go to the JAIL square.
+
+If we land on a CC square, we draw a card from the “community chest” stack of cards. There are 16 cards there, only two changes the position of the player: “Advance to GO” and “Go to Jail”
+
+If we land on a CH square, we draw a card from the Chance-stack. There are 16 cards here, only ten changes the position:
+
+Advance to GO
+Go to JAIL
+Go to C1
+Go to E3
+Go to H2
+Go to R1
+Go to next R (railway company)
+Go to next R
+Go to next U (utility company)
+Go back 3 squares.
+
+There are three CH squares, and three CC.
+
+A player being sent to jail, is assumed to buy himself out immediately. And if a player rolls three consecutive doubles, he does not advance the result of the third roll, but goes directly to jail.
+
+The two stacks of cards are shuffled at the beginning.
+
+Find the probability of landing on a given square, and return the three squares that are most likely to land on.
+
+Numbering the squares from 00 to 39, the answer is the concatenated string representing these three squares. For 6 sided dice, the most likely squares to end on after a roll of the dice, are squares 10, 24 and 00. The answer is 102400.
+
+I am going to need some dice:
+
+dice <- function() sample(1:6, 2, replace=TRUE)
+
+
+I'm gonna need a community chest function. And I am going to take a chance. That is, I am going to asume that the whole “shuffle the deck at the start, and place drawn card at bottom” is going to be equivalent to just picking a random card:
+
+pool <- rep(0,14)
+pool <- c(pool,1,11)
+cc <- function(cs){
+  res <- sample(pool,1)
+  ifelse(res==0,cs,res)
+}
+
+
+It takes the current square, builds a vector containing 14 repetitions of 0, one instance of “1” corresponding to GO, and one of “11”, corresponding to jail. Then it returns one of the values.
+
+And a chance function. Again, I am going to make the same assumption as with the community chest function:
+
+ch_pool <- rep(0,6)
+ch_pool <- c(ch_pool,1:10)
+ch <- function(cs){
+ chance <- sample(ch_pool,1) 
+ if(chance==0) res <- cs
+ if(chance==1) res <- 1
+ if(chance==2) res <- 11
+ if(chance==3) res <- 12
+ if(chance==4) res <- 25
+ if(chance==5) res <- 40
+ if(chance==6) res <- 6
+ if(chance==7&cs==8) res <- 16
+ if(chance==7&cs==23) res <- 26
+ if(chance==7&cs==37) res <- 6
+ if(chance==8&cs==8) res <- 16
+ if(chance==8&cs==23) res <- 26
+ if(chance==8&cs==37) res <- 6
+ if(chance==9&cs==8) res <- 13
+ if(chance==9&cs==23) res <- 29
+ if(chance==9&cs==37) res <- 13
+ if(chance==10) res <- cs-3
+ return(res)
+}
+
+
+This is basically the same as the community function. Just a bit longer.
+
+I am also going to need a structure for the playing board:
+
+hit <- numeric(40)
+
+
+A third chance I'm taking. That the part about hitting three doubles in a row, and then going to jail, will also disappear if I just run this long enough:
+
+curr_square <- 1
+
+for(i in 1:10000000){
+  curr_square <- ((curr_square + sum(dice())-1)%%40 + 1) 
+  if(curr_square == 31) curr_square <- 11
+  if(curr_square %in% c(2,18,34)) curr_square <- cc(curr_square)
+  if(curr_square %in% c(8,23,37)) curr_square <- ch(curr_square)
+  hit[curr_square] <- hit[curr_square] + 1
+}
+
+
+I begin at square 1. And then I am going to repeat the following 1.000.000 times:
+Roll the dice, add the result to the current square. If the result is more than 40, do some simple math to continue from square 1.
+
+If the square I'm landing on is square 31, set new square to 11 - that is the jail.
+
+If it is 2, 18 or 34, run the cc - community chest function. That will return the square that we land on after drawing a card from that stack.
+
+If it is 8, 23 or 37, we have landed on a chance square. Run the ch - chance function. That will return the square that we land on after drawing a card from that stack.
+
+That should give me the frequencies with which the player have landed on each square.
+
+Now I can rank the results:
+
+freq <- rank(hit)
+
+
+That gives me the rank. Number 40 is the square that was hit most times.
+
+I need to translate that to the numbering of the squares that is used for the result.
+
+squares <- c("00","01","02","03","04","05","06","07","08","09",10:39)
+paste(squares[freq %in% c(40,39,38)], collapse="")
+
+## [1] "001024"
+
+
+pasting together the squares hit most, second most, and third-most times. That is fortunately the result given in the problem.
+
+Now lets try with a new set of dice:
+
+dice <- function() sample(1:4, 2, replace=TRUE)
+
+
+And the same code:
+
+hit <- numeric(40)
+curr_square <- 1
+
+for(i in 1:10000000){
+  curr_square <- ((curr_square + sum(dice())-1)%%40 + 1) 
+  if(curr_square == 31){ curr_square <- 11}
+  if(curr_square %in% c(2,18,34)) curr_square <- cc(curr_square)
+  if(curr_square %in% c(8,23,37)) curr_square <- ch(curr_square)
+  hit[curr_square] <- hit[curr_square] + 1
+}
+
+freq <- rank(hit)
+
+answer <- paste(squares[freq %in% c(40,39,38)], collapse="")
+
+
+
+And we are rewarded with the nice green tickmark.
+
+This was not as difficult as I thought. But maybe it would be wise to look at the forum for the problem, and study some of the non-brute force solutions.
+
+Oh - another lesson learned. In the code above, I run through 10.000.000 throw with the dice. I actually wanted to throw the dice 1.000.000 times. Always count your zeroes!
+
+Also - 100.000 thow is enough to get the right result.

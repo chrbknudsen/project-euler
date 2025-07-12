@@ -1,0 +1,98 @@
+---
+title: "Euler 39"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Project Euler 39
+
+We're looking at Pythagorean triplets, that is equations where a, b and c are integers, and:
+
+a2 + b2 = c2
+
+The triangle defined by a,b,c has a perimeter.
+
+The triplet 20,48,52 fulfills the equation, 202 + 482 = 522. And the perimeter of the triangle is 20 + 48 + 52 = 120
+
+Which perimeter p, smaller than 1000, has the most solutions?
+
+So, we have two equations:
+
+a2 + b2 = c2
+
+p = a + b + c
+
+We can write
+
+c = p - a - b
+
+And substitute that into the first equation:
+
+a2 + b2 = (p - a -b)2
+
+Expanding the paranthesis:
+
+a2 + b2 = p2 - ap - bp - ap + a2 + ab - bp + ab + b2
+
+Cancelling:
+
+0 = p2 - 2ap - 2bp + 2ab
+
+Isolating b:
+
+0 = p2 - 2ap - b(2p - 2a)
+
+b(2p - 2a) = p2 - 2ap
+
+b = (p2 - 2ap)/(2p - 2a)
+
+So. For a given value of p, we can run through all possible values of a and get b. If b is integer, we have a solution that satisfies the constraints.
+
+The smallest value of a we need to check is 1. But what is the largest value of a for a given value of p?
+
+We can see from the pythagorean equation, that a =< b < c. a might be larger than b, but we can then just switch a and b. So it holds. What follows from that, is that a =< p/3.
+
+What else? If a and b are both even, a2 and b2 are also even, then c2 is even, and then c is even, and therefore p = a + b + c is also even.
+
+If a and b are both uneven, a2 and b2 are also uneven, and c2 is then even. c is then even. And therefore p = a + b + c must be even.
+
+If either a or b are uneven, either a2 or b2 is uneven. Then c2 is uneven, and c is then uneven. Therefore p = a + b + c must be even.
+
+So. I only need to check even values of p. That halves the number of values to check.
+
+Allright, time to write some code:
+
+current_best_number_of_solutions <- 0
+
+for(p in seq(2,1000,by=2)){
+  solutions_for_current_p <- 0
+  for(a in 1:ceiling(p/3)){
+    if(!(p**2-2*a*p)%%(2*p-2*a)){
+      solutions_for_current_p <- solutions_for_current_p + 1
+    }
+  }
+  if(solutions_for_current_p > current_best_number_of_solutions){
+    current_best_p <- p
+    current_best_number_of_solutions <- solutions_for_current_p
+   }
+}
+
+answer <- current_best_p
+
+
+current_best_number_of_solutions is initialized to 0.
+
+For every p from 2 to 1000, in steps of 2 (only checking even values of p), I set the number of solutions_for_current_p to 0.
+
+For every value a from 1 to p/3 - rounded to to an integer: If !(p2-2*a*p)%%(2*p-2*a) is true, that is, if the remainder of (p2-2*a*p)/(2*p-2*a) is 0, I increment the solutions_for_current_p.
+
+After running through all possible values of a for the value of p we have reached in the for-loop:
+
+If the number of solutions for this value of p is larger, than the previous current_best_number_of_solutions, we have found a value of p that has a higher number of solutions than any previous value of p we have examined. In that case, set the current_best_p to the current value of p. And the current_best_number_of_solutions to the number of solutions we have found for the value of p.
+
+If not, dont change anything, reset solutions_for_current_p and check a new value of p.

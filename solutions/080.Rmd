@@ -1,0 +1,91 @@
+---
+title: "Euler 80"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Problem 80 from Project Euler.
+
+The problem tells us that if the square root of a natural number is not an integer, it is irrational.
+Project Euler also claims that it is well known. I did not know it.
+
+We are then told that the square root of 2 is 1.4142135623730950… And that the digital sum of the first 100 digits is 475.
+
+The task is now to take the first 100 natural numbers. And find the total of the digital sums for the first 100 digits for all the irrational square roots.
+
+Lets begin by figuring out how to handle that many digits. R does not support more than around 15 places after the decimal point.
+
+The library Rmpfr can handle arbitrary precision:
+
+library(Rmpfr)
+a <- sqrt(mpfr(2,500))
+
+
+The variable a now contains the square root of 2 with a precision of 500 bytes. I'm not quite sure how many decimal places that actually translates to. But testing the following code allows me to conclude with confidence that it is at least 100.
+
+A thing to note here is, that
+
+a <- mpfr(sqrt(2),500)
+
+
+and
+
+a <- sqrt(mpfr(2,500))
+
+
+are not equal. In the first exampel sqrt(2) is evaluated before saving the value with the high precision. Start by converting the number 2 to a high precision representation, before doing math on it.
+
+Next is writing a function that will return the digital sum of the first 100 digits of a number.
+
+digitsum <- function(x){
+  s <- 0
+  for(i in 1:100){
+    s <- s + floor(x)
+    x <- (x - floor(x))*10
+  }
+  s
+}
+
+
+First s is initialized to 0. Then floor(x) gives us the first digit in x. We add that to s, and subtract it from x, and multiply by 10. Repeat that 100 times, and you get the sum of the first 100 digits in x.
+
+Let us test that it works. Project Euler told us what the result for sqrt(2) is:
+
+digitsum(a)
+
+## 1 'mpfr' number of precision  500   bits 
+## [1] 475
+
+
+Nice, the correct result (not that that guarantees that I've done everything correctly).
+
+Now, lets find all the irrational square roots we need to look at:
+
+library(purrr)
+t <- 1:100
+s <- t %>%
+  keep(~as.logical(sqrt(.x)%%1))
+
+
+I need to practice this way of coding a bit more. t contains the first 100 natural numbers. I pass that to the keep()-function, and the predicate function takes the square root of each number, take the modulus 1, and convert it to a logical value. If the modulus of the square root is 0, the square root is an integer, and 0 i false. So we're keeping all the non-integer squareroots.
+
+Now I'll convert all the natural numbers to the mpfr-class. The next line takes the square root. The third line calculate the digitalsum. And the final line gives us the result.
+
+s <- mpfr(s,500)
+r <- sqrt(s)
+r <- digitsum(r)
+sum(r)
+
+## 1 'mpfr' number of precision  500   bits 
+## [1] censored
+
+
+Lessons learned:
+Rmpfr allows us to work with (more or less) arbitrary precision.
+But we need to convert numbers to the relevant class before doing math on it.

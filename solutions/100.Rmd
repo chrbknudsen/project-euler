@@ -1,0 +1,111 @@
+---
+title: "Euler 100"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Project Euler - problem 100
+
+Back to the hopeless examples of probabilities from school.
+In a bag there are 15 black balls and six white ones. Project Euler talks about discs, math-teachers has always used balls as examples, and they where always white and black. So I'll stick with that.
+
+It you draw two balls from the bag, there is a 50/50 chance of drawing 2 black balls:
+
+(15/21)*(14/20)
+
+## [1] 0.5
+
+
+I'm told that the next set of balls in the bag with that property, is 85 black balls and 35 white ones:
+(85/120)
+
+(85/120)*(84/119)
+
+## [1] 0.5
+
+
+Find the mix of black and white balls, that gives a probability of 50/50 of drawing 2 black balls, given that there should be more than 10¹² = 1000000000000 balls in the rather large bag.
+
+That should be straight-forward.
+Lets call the number of black balls b and the number of white balls w. And lets define the total number of balls in the back as n=w+b
+The probability of drawing two black balls is:
+
+(b/n)((b-1)/(n-1)) = ½
+
+n = w + b > 10¹²
+
+Two equations with two unknowns.
+The probability can be rearranged:
+
+(b/n)((b-1)/(n-1)) = ½ <=>
+
+b(b-1) / n(n-1) = ½ <=>
+
+(b² - b) / (n² - n) = ½ <=>
+
+b² - b = ½(n² - n) <=>
+
+2b² - 2b = n² - n <=>
+
+2b² - 2b - n² + n = 0
+
+Hm. Maybe it is not that simple after all. First of all I don't know if n is 100000000000 or 100000000001. That actually makes a pretty big difference:
+
+1000000000001**2 - 1000000000000**2
+
+## [1] 1.999978e+12
+
+
+Second of all, I need to find integer solutions. An analytical solution might not give integer results. And I can't have one third of a ball in the bag.
+
+Googling “finding integer solutions to equations” give, as the first result, a link to the wikipedia article on “Diophantine equations”.
+Which apparently are equations that should have integer solutions.
+
+All right, a couple of the problems I've tackled earlier, and quite a lot of Project Euler problems I've given up on appears to be about solving these Diophantine equations.
+
+So. Nice. The last link of the wikipedia page is to https://www.alpertron.com.ar/QUAD.HTM.
+I should probably read up on the methods. But that will have to wait.
+
+The point is, that this Diophantine equation can be solved by:
+
+b~n+1~ = 3b~n~ + 2n~n~ -2
+
+n~n+1~ = 4b~n~ + 3n~n~ -3
+
+The idea is that we have a solution (b~n~, n~n~). And these two equations allows us to calculate the next solution, (b~n+1~, n~n+1~)
+
+Lets try that, we was given that (15,21) was a solution. The next should be (85,120). Do we get that?
+
+b <- 15
+n <- 21
+b_n <- 3*b + 2*n -2
+n_n <- 4*b + 3*n -3
+print(paste(b_n, n_n, sep=","))
+
+## [1] "85,120"
+
+
+Qap'la, it works. Nice. Now I just need to run through this until n~n+1~ gets above 10¹².
+
+b <- 15
+n <- 21
+while(n<10**12){
+  b_n <- 3*b + 2*n -2
+  n_n <- 4*b + 3*n -3
+  b <- b_n
+  n <- n_n
+}
+answer <- b
+
+
+Lessons learned:
+
+Solving Diophantine equations is at the heart of a lot of these problems. I've learned a new tools to handle them!
+If you want to subscript stuff in RMarkdown, you place a ~ on each side of what you want subscripted.
+
+Other stuff to note: Maybe it is time someone wrote a new solver for Diophantine equations. The one I found is 19 years old. Something to do in Shiny perhaps?
