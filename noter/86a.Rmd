@@ -1,5 +1,5 @@
 ---
-title: "Euler 86
+title: "Euler 86"
 output: html_notebook
 ---
 

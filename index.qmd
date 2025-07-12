@@ -36,3 +36,7 @@ oversigt <- c(oversigt, rep("", total_cells - length(oversigt)))
 mat <- matrix(oversigt, ncol = cols, byrow = TRUE)
 knitr::kable(mat, col.names = NULL)
 ```
+
+Det er lidt voldsomt at skulle generere alle siderne igen. For 
+nogen af løsningerne tager ret lang tid. man kan selvfølgelig argumentere
+for at det er et udtryk for at jeg ikke har kodet en tilstrækkelig god løsning...

@@ -1,0 +1,3 @@
+project:
+  type: website   # eller "website" eller "book" hvis relevant
+output-dir: solutions

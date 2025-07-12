@@ -17,7 +17,7 @@ primes. Below $10^8$
 ```{r}
 library(numbers)
 n <- 10**8
-numbers <- primes(n)
+numbers <- Primes(n)
 length(numbers)
 ```
 
