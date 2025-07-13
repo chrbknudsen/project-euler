@@ -1,0 +1,139 @@
+---
+title: "Euler 58"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Project Euler 58 - Spiral Primes
+
+All right. Lets make a square, by jotting down all numbers from 1 in a spiral like this:
+
+matrix(c(37, 36, 35, 34, 33, 32, 31,38, 17, 16, 15, 14, 13, 30,39, 18,  5,  4,  3, 12, 29,40, 19,  6,  1,  2, 11, 28,41, 20,  7,  8,  9, 10, 27,42, 21, 22, 23, 24, 25, 26,43, 44, 45, 46, 47, 48, 49),7,7,byrow=TRUE)
+
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7]
+## [1,]   37   36   35   34   33   32   31
+## [2,]   38   17   16   15   14   13   30
+## [3,]   39   18    5    4    3   12   29
+## [4,]   40   19    6    1    2   11   28
+## [5,]   41   20    7    8    9   10   27
+## [6,]   42   21   22   23   24   25   26
+## [7,]   43   44   45   46   47   48   49
+
+
+We're going anti-clockwise.
+
+What Project Euler thinks is interesting, is that 8 out of the 13 numbers lying on the two diagonals, are prime.
+
+That gives a primal ratio of 8/13, or about 62%
+
+We can continue adding layers to the spiral, and make squares with increasing side length.
+
+We are now tasked with finding the side length of a the square spiral for which the ratio of primes along the two diagonals falls below 10% (for the first time).
+
+The task boils down to: Figure out what numbers are on the diagonals of a square with a given side length. What is the proportion of primes in that set of numbers.
+
+The final number in the spiral of a nxn square is, nxn. That number is in the south-eastern corner of the square.
+
+The number in the south-wester corner is n2 - (n-1). The number in the north-wester corner is n2 - 2(n-1). And the one in the north-eastern corner is n2 - 3(n-1).
+
+The numbers on the diagonals are all corner-numbers in a square. If I want all the numbers on the diagonals in the 7x7 square above, I calculate the corner-numbers for n = 3, n = 5 and n = 7, and collect them all in a vector, along with the center piece, 1.
+
+I'm going to define a numbers-vector containing the numbers on the diagonal, and add 1 to it.
+
+numbers <- numeric()
+numbers <- c(1, numbers)
+
+
+Having that vector, I need to calculate the fraction of the elements in it, that are prime. The numbers library is handy for that:
+
+library(numbers)
+
+prime_fraction <- function(v){
+  sum(isPrime(v))/length(v)
+}
+
+
+The function takes a vector as input, runs isPrime() on it. That function returns a logical vector, with TRUE where the element is prime. The sum of that vector is the number of primes in the input vector. Dividing that with the number of elements in the vector, length(), returns the fraction of primes in the input vector.
+
+Now all that remains is adding diagonal numbers to the vector, check the fraction of primes, and continue until that fraction is below 0.1. I'm going to run the first iteration by hand. The fraction of primes in the initial numbers vector is 0, and that is of course less than 0.1, but not the answer I'm looking for.
+
+i <- 3
+numbers <- c(numbers, i*i, i*i-(i-1), i*i-2*(i-1), (i*i-3*(i-1)))
+i <- i + 2
+while(prime_fraction(numbers)>0.1){
+  numbers <- c(numbers, i*i, i*i-(i-1), i*i-2*(i-1), i*i-3*(i-1))
+  i <- i + 2
+}
+answer <- i - 2
+
+
+OK. That gives me the correct answer. One problem: It takes forever. Well, not forever. But too long. The problem is the isPrime() function. A small test tells me that checking the primality of a vector containing 5385 elements, takes about 70 milliseconds. That is pretty quick. But when I do that several thousand times, it adds up.
+Also I'm destined to spend eternity in the first circle of R-hell for growing the vector in perhaps the most inefficient way.
+
+Is there a simpler way?
+
+What I'm really looking for is two numbers. The number of primes in the diagonals. And the total number of numbers in the diagonals.
+
+Each diagonal in an nxn square contains n numbers. The center is counted twice, so the total number is given by 2*n - 1.
+
+What about the number of primes? If I instead of adding the four corners to the numbers vector, and testing that for primes, just test the four numbers, and add the number of primes among them to a counter. That should be quicker, as I'm only checking each number for primality once. What should make it even faster, is that I only have to check three numbers. The south-eastern number is always a square, so definitely not prime.
+
+Lets try again. As before, I'm priming the pump, and beginning with the 5x5 square:
+
+i <- 5
+primes <- 3
+
+while(primes/(2*i - 1) > 0.1){
+  primes <- primes +sum(isPrime(c(i*i-(i-1), i*i-2*(i-1), i*i-3*(i-1))))
+  i <- i + 2
+}
+answer <- i
+
+
+Much, much faster!
+
+Lessons learned
+
+There usually is a faster way to do things. Also, and that was a surprise. Getting the length of a 5385-element long vector is not that slower than evaluating 2*2693 - 1.
+
+test <- runif(5385)
+leng <- function(){
+  length(test)
+}
+
+i <- 2693
+mult <- function(){
+  2*i - 1
+}
+
+library(microbenchmark)
+mbm <- microbenchmark(mult, leng, times = 10000)
+
+## Warning in microbenchmark(mult, leng, times = 10000): Could not measure a
+## positive execution time for 71 evaluations.
+
+mbm
+
+## Unit: nanoseconds
+##  expr min lq     mean median uq    max neval
+##  mult   0  0 193.7454      1  1 373167 10000
+##  leng   0  0 197.7259      0  1 767366 10000
+
+
+Depending on what else is happening on the computer, it might even be faster to take the length than to do simple arithmetic.
+
+library(ggplot2)
+autoplot(mbm)
+
+## Warning: Transformation introduced infinite values in continuous y-axis
+
+## Warning: Removed 9946 rows containing non-finite values (stat_ydensity).
+
+
+Not that it makes that much of a difference. But I find it interesting.

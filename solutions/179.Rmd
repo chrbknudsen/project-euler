@@ -1,0 +1,70 @@
+---
+title: "Euler 179"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Project Euler 179
+
+14 has four divisors: 1, 2, 7 and 14.
+
+14+1, ie. 15, also has four divisors: 1, 3, 5 and 15.
+
+How many integers, n, where 1 < n < 107, has the same number of divisors as n + 1?
+
+That is surprisinly simple. Start by figuring out how many divisors all the numbers have.
+
+n <- 10000000
+t <- integer(n)
+
+
+
+for(s in 1:n){
+  t[seq(s,n, by=s)] <- t[seq(s,n, by=s)] + 1
+}
+
+
+First I make a vector with the length 107 containing only zeroes.
+
+Element 1 coresponds to n = 1, element 47 to n = 47.
+
+Every single element in that vector has 1 as a divisor.
+
+Every other element has 2 as a divisor.
+
+Every third element has 3 as a divisor, and so on.
+
+So for every element, in the sequence 2 to 107, in steps of 2, I add 1.
+
+The same for every element in the sequence 3 to 107 in steps of 3.
+
+And so on.
+
+That takes a loooong time to do.
+
+Now I have a vector t, where the value in t[n] is the number of divisors in n.
+
+I now need to compare them.
+
+If I have two identical vectors q and r. And add a 0 to the beginning of one of them, and a 0 at the end of the other. I will have two vectors, where element i+1 in the first is the same as element i in the second (or the other way around). So when I compare q[47] with r[47], I actually compare q[47] with q[48]. That is the comparison I need. When these to values are identicial, I have an iteger with the same number of divisors as the following integer.
+
+Apoligies for the not so fluent prose. It's pretty warm and I'm rather tired.
+
+Anyway:
+
+q <- c(0,t)
+r <- c(t,0)
+
+
+I now just need to compare them, and sum the result of that comparison:
+
+answer <- sum(q==r)
+
+Lesson learned
+
+Just because a problem has a high number, doesn't mean that it is particularly difficult.

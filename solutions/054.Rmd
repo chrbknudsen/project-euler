@@ -1,0 +1,1001 @@
+---
+title: "Euler 54"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Deal 5 playing cards 1000 times to two players. How many hands does player 1 win?
+
+We use this notation:
+
+2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K, A
+
+Where T is ten, J is Jack, Q is Queen, K is King and A is Ace.
+
+And the suits:
+
+H, C, S, D
+
+There are a number of different hands:
+
+*    High Card: Highest value card.
+*    One Pair: Two cards of the same value.
+*    Two Pairs: Two different pairs.
+*    Three of a Kind: Three cards of the same value.
+*    Straight: All cards are consecutive values.
+*    Flush: All cards of the same suit.
+*    Full House: Three of a kind and a pair.
+*    Four of a Kind: Four cards of the same value.
+*    Straight Flush: All cards are consecutive values of same suit.
+*    Royal Flush: Ten, Jack, Queen, King, Ace, in same suit.
+
+If a given hand is a Flush, it gets the rank of 6. Which means it beat a Straight, which has the rank of 5.
+
+
+That should be simple. Write a function that returns the rank of a given hand, and determine if one hand beats another hand.
+
+However, two hands with the rank 2, are not necessarily equal. One pair of fours is better than one pair of twos.
+
+So the function should also return some value that can be used for discriminating between different hands with the same rank.
+
+A hand comes on the form:
+
+5H 5C 6S 7S KD
+
+I think it might be useful to have a function that returns the suits and the values.
+
+library(dplyr)
+suits <- function(s){
+  delres <- unlist(strsplit(s, split = " "))
+  sapply(delres, function(x) substr(x,2,2), USE.NAMES = FALSE)
+}
+
+values <- function(s){
+  delres <- unlist(strsplit(s, split = " "))
+  sapply(delres, function(x) substr(x,1,1), USE.NAMES = FALSE)
+}
+
+Testing for a Royal Flush. All values of suits should be identical. And the values should be T, J, Q, K, A. That is simple. Check if all the values that should be in the hand, if it is a Royal Flush are there. Then check if the suit is the same for all cards in the hand. If both are true, return TRUE.
+
+is_royal_flush <- function(testhand){
+  testvalue <- c("T", "J", "Q", "K", "A")
+  value_match <- all(testvalue %in% values(testhand))
+  suits_match <- length(unique(suits(testhand)))==1
+  return(as.logical(value_match*suits_match))
+}
+
+Straight Flush: All cards are consecutive values of same suit.
+
+Testing for the same suit is copy-paste from above. Testing for consecutive values is a little bit more tricky. I cant just sort the values, since K is before Q in the alphabet. So I’m using dplyr::recode() to recode the T, J, Q, K, A values to numbers. The I can convert them to numeric and sort them. And I’ll just have to figure out if the values are consecutive.
+
+I had to google a bit. But diff() does it. It calculates the difference between the elements. It is possible to define a lag, but here the default of 1 does the trick. It returns the second element in the vector, minus the first element. And the third element minus the second.
+
+When I have five elements, and they have consecutive values, diff() will return a vector of 4 ones.
+
+is_straight_flush <- function(testhand){
+  suits_match <- length(unique(suits(testhand)))==1
+  testvalues <- values(testhand)
+  testvalues <- recode(testvalues, T = "10", J = "11", Q = "12", K = "13", A = "14")
+  testvalues <- as.numeric(testvalues)
+  testvalues <- sort(testvalues)
+  value_match <- all(diff(testvalues) == c(1,1,1,1))
+  return(as.logical(value_match*suits_match))
+}
+
+Four of a Kind: Four cards of the same value.
+
+We are not interested in the suits here. First I get the values. Then I use table() to get the counts of the different values. Passing that to max() returns 4, if there are four identical values.
+
+is_four_of_a_kind <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  return(max(testvalues)==4)
+}
+
+Full House: Three of a kind and a pair. I use the same functionality as in is_four_of_a_kind. The trick here is, that the max of the tabulation of values should be 3. But the minimum should also be 2.
+
+is_full_house <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  (max(testvalues)==3)&(min(testvalues)==2)
+}
+
+Flush: All cards of the same suit. In is_straight_flush I test if the suits are the same. That is what I need here, I just skip the part where I test if the values are consecutive.
+
+is_flush <- function(testhand){
+  suits_match <- length(unique(suits(testhand)))==1
+  return(as.logical(suits_match))
+}
+
+Straight: All cards are consecutive values. This is more or less the same function is_straight_flush(). I just skip the test for suits.
+
+is_straight <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- recode(testvalues, T = "10", J = "11", Q = "12", K = "13", A = "14")
+  testvalues <- as.numeric(testvalues)
+  testvalues <- sort(testvalues)
+  value_match <- all(diff(testvalues) == c(1,1,1,1))
+  return(as.logical(value_match))
+}
+
+Three of a Kind: Three cards of the same value. That is basically the same as the function is_four_of_a_kind() above. The maximum value from the table should just be 3 instead of 4:
+
+is_three_of_a_kind <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  return(max(testvalues)==3)
+}
+
+Two Pairs: Two different pairs. First I use values() to get the values of the hand. I’m not interested in the suits.
+Then I tabulate the testvalues. I get a count of the number each value occurs in the hand.
+But I’m no interested in that number. If there are two pairs in the hand, I will get two values, that occurs two times.
+
+So if I run table() on the result again, I get a count of how many times the count 2 occurs. If the count 2 occurs twice, there are two hands.
+
+is_two_pairs <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  testvalues <- table(testvalues)
+  2 %in% testvalues
+}
+
+One Pair: Two cards of the same value. Again, basically the same as is_three_of_a_kind(), with 2 instead of 3 in the test:
+
+is_pair <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  return(max(testvalues)==2)
+}
+
+It will return FALSE if there are three of a kind. I’m interested in the highest rank a hand can get, so that should not be a problem.
+
+High Card: Highest value card. I don’t need to test for this. If a hand has not gotten a higher rank, it will always have this.
+
+Nice. I now have a set of functions that I can use to figure out what hand has the highest rank.
+
+Lets put that together:
+
+rank <- function(testhand){
+  res <- 1 # The hand will never get a rank lower than 1.
+  if(is_pair(testhand)){res <- 2}
+  if(is_two_pairs(testhand)){res <- 3}
+  if(is_three_of_a_kind(testhand)){res <- 4}
+  if(is_straight(testhand)){res <- 5}
+  if(is_flush(testhand)){res <- 6}
+  if(is_full_house(testhand)){res <- 7}
+  if(is_four_of_a_kind(testhand)){res <- 8}
+  if(is_straight_flush(testhand)){res <- 9}
+  if(is_royal_flush(testhand)){res <- 10}
+  return(res)
+}
+
+That should solve a lot of the cases. However. What if the rank of two hands are the same?
+
+If both hands have rank 9, that is if they are both straight flush, the hand with the highest card wins. There is no reason to test for the rest of the cards.
+
+For all the others, I need functions that breaks the tie. It it should be broken.
+
+Most of those determinations will be based on the value of the cards. So I might as well have a function that recodes ace to 14 etc.
+
+recode_value <- function(values){
+  as.numeric(recode(values, T = "10", J = "11", Q = "12", K = "13", A = "14"))
+}
+
+I’m probably going to need the reverse function:
+
+rev_recode_value <- function(values){
+  recode(as.character(values), "10" = "T", "11" = "J", "12" = "Q", "13" = "K", "14" = "A")
+}
+
+For High Card, the hand with the highest value card wins. If the highest value card in both hand 1 and hand 2 is equal, we look at the second highest card in each hand. Etc. Only if the values are identical in the two hands is there a tie.
+
+break_high_card <- function(hand1, hand2){
+  v1 <- values(hand1)
+  v2 <- values(hand2)
+  v1 <- sort(recode_value(v1))
+  v2 <- sort(recode_value(v2))
+  if((identical(v1,v2))){
+    return(0)
+    break()
+  } else{
+  while(v1[length(v1)]==v2[length(v2)]){
+    v1 <- v1[-length(v1)]
+    v2 <- v2[-length(v2)]
+  }  
+  }
+  if(max(v1)>max(v2)){
+    return(1)
+  } else {
+    return(2)
+  }
+}
+
+All right. That was not easy… First I get the values for the two hands. Then I recode them to numerical values, and sort them.
+
+If the two hands have equal values, it is a tie. Otherwise, while the last element in the first vector containing the values is equal to the last element in the second vector, I get rid of the last element in both vectors.
+
+When that is done, the last element in the two vectors is compared. The hand with the highest value wins.
+The funcion returns 0 if it is a tie, 1 if hand1 wins, and 2 if hand2 wins.
+
+This was actually the hardest part to write.
+
+Next. Breaking the tie between two hands each having one pair.
+
+break_one_pair <- function(hand1, hand2){
+  v1 <- values(hand1)  
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- table(v1)
+  v2 <- table(v2)
+  v1_pair <- as.numeric(names(v1)[v1==2])
+  v2_pair <- as.numeric(names(v2)[v2==2])
+  if(v1_pair>v2_pair){
+    return(1)
+    break()
+  }
+  if(v2_pair>v1_pair){
+    return(2)
+    break()
+  }
+  if(v2_pair==v1_pair){
+    v1 <- names(v1)[!v1==2]
+    v2 <- names(v2)[!v2==2]
+    v1 <- rev_recode_value(v1)
+    v2 <- rev_recode_value(v2)
+    return(break_high_card(v1,v2))
+    break()
+  }
+}
+
+First I’m picking out the values of the pairs in the two hands. If hand1 has a pair of 8’s and hand2 has a pair of 7’s, hand1 wins.
+
+If the pairs are of the same value. Then I pick out the values of the rest of the cards. I am making a dangerous assumption here. This will only work if the two hands actually only have one pair. I hope it works, but this is one of the places where it could go wrong.
+
+Two Pairs: Two different pairs.
+
+The hand with the highest value pair wins. If those values are identical, the value of the second pair determines the winner. If that is also equal, the value of the fifth remaining card, determines the winner.
+Only if that is also equal, is there a tie. Therefore, there can only be a tie, if all values of all cards are equal.
+
+break_two_pairs <- function(hand1, hand2){
+  v1 <- values(hand1)  
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- table(v1)
+  v2 <- table(v2)
+  v1_pair <- sort(as.numeric(names(v1)[v1==2]))
+  v2_pair <- sort(as.numeric(names(v2)[v2==2])) # now v1_pair and v2_pair contains the values of each of the pairs in each of the hands.
+  if(identical(v1_pair,v2_pair)){        # If the pairs have the same value, pick out the fifth value, and compare them.
+    v1 <- as.numeric(names(v1)[!v1==2])
+    v2 <- as.numeric(names(v2)[!v2==2])
+    if(v1>v2){
+      return(1)
+      break()
+    }
+    if(v2>v1){
+      return(2)
+      break()
+    }
+    if(v1==v2){
+      return(0)
+      break()
+    }
+  } else {
+    v1 <- rev_recode_value(v1_pair)
+    v2 <- rev_recode_value(v2_pair)
+    return(break_high_card(v1,v2))
+  }
+}
+
+Kinda the same as for one pair. v1_pair and v2_pair ends up with vectors containing the values of the two pairs in the two hands.
+
+If these two vectors are identical, we need to look at the fifth value.
+
+If not, I reverse_recode the values of the pairs, and use break_high_card, to determine which is larger.
+
+Three of a Kind: Three cards of the same value.
+
+Again I’m making the assumption that the two hands passed to this function have three of a kind. And nothing better than that.
+
+This is a bit simpler. There is no way that both hands can have three of a kind with the same value. So I don’t need to consider the remaining cards. The assumption here is that there is only on deck of cards involved. This is another place where things can go wrong. But lets try!
+
+break_three_of_a_kind <- function(hand1, hand2){
+  v1 <- values(hand1)
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- table(v1)
+  v2 <- table(v2)
+  v1 <- as.numeric(names(v1)[v1==3])
+  v2 <- as.numeric(names(v2)[v2==3])
+  if(v1>v2){
+    return(1)
+    break()
+  } else {
+    return(2)
+    break()
+  }
+}
+
+I convert to values, recode them, tabulates them. And pick out the values that occur three times. Then I just compare them.
+
+Straight: All cards are consecutive values.
+
+Once more I assume that the two hands passed to this function actually only contains a straigth. It is rather simple. As the values must be consecutive, the highest value in each hand determines the winner.
+
+break_straigth <- function(hand1,hand2){
+  v1 <- values(hand1)
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- max(v1)
+  v2 <- max(v2)
+  if(v1>v2){
+    return(1)
+    break()
+  } 
+  if(v2>v1){
+    return(2)
+    break()
+  }
+  if(v2==v1){
+    return(0)
+    break()
+  }
+}
+
+Flush: All cards of the same suit.
+
+Again – I assume that flush is the highest combination in these hands. This is basically the same as high card.
+
+break_flush <- function(hand1, hand2){
+  return(break_high_card(hand1,hand2))
+}
+
+Full House: Three of a kind and a pair.
+
+The same assumption applies. These two hands both have Full House as the highest rank.
+
+The winner is determined by the higher value of the three of a kind.
+
+break_full_house <- function(hand1,hand2){
+  return(break_three_of_a_kind(hand1,hand2))
+}
+
+Four of a Kind: Four cards of the same value.
+
+Same as for the full house. The winner is determined by the higher value of the four of a kind.
+
+break_four_of_a_kind <- function(hand1,hand2){
+  v1 <- values(hand1)  
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- table(v1)
+  v2 <- table(v2)
+  v1 <- sort(as.numeric(names(v1)[v1==4]))
+  v2 <- sort(as.numeric(names(v2)[v2==4]))
+  if(v1>v2){
+    return(1)
+    break()
+  } else {
+    return(2)
+    break()
+  }
+}
+
+Straight Flush: All cards are consecutive values of same suit.
+
+Again I’m making dangerous assumptions. But, this is functionally the same as high card.
+
+break_straight_flush <- function(hand1,hand2){
+  return(break_high_card(hand1,hand2))
+}
+
+Royal Flush: Ten, Jack, Queen, King, Ace, in same suit.
+
+If both hand are royal flush – it will always be a tie.
+
+break_royal_flush <- function(hand1,hand2){
+  return(0)
+}
+
+Phew…
+
+I now have a function that will return the rank of a given hand.
+
+If I compare the rank of two hands, I will either get a clear winner, or need to run one of the break functions to determine the result.
+
+winner <- function(hand1, hand2){
+  if(rank(hand1)>rank(hand2)){
+    return(1)
+    break()
+  }
+  if(rank(hand2)>rank(hand1)){
+    return(2)
+    break()
+  }
+  if(rank(hand2)==rank(hand1)){
+    rang <- rank(hand2)
+    if(rang==1){
+      return(break_high_card(hand1,hand2))
+      break()
+    }
+    if(rang==2){
+      return(break_one_pair(hand1,hand2))
+      break()
+    }
+    if(rang==3){
+      return(break_two_pairs(hand1,hand2))
+      break()
+    }
+    if(rang==4){
+      return(break_three_of_a_kind(hand1,hand2))
+      break()
+    }
+    if(rang==5){
+      return(break_straigth(hand1,hand2))
+      break()
+    }
+    if(rang==6){
+      return(break_flush(hand1,hand2))
+      break()
+    }
+    if(rang==7){
+      return(break_full_house(hand1,hand2))
+      break()
+    }
+    if(rang==8){
+      return(break_four_of_a_kind(hand1,hand2))
+      break()
+    }
+    if(rang==9){
+      return(break_straight_flush(hand1,hand2))
+      break()
+    }
+    if(rang==10){
+      return(break_royal_flush(hand1,hand2))
+      break()
+    }
+  }
+}
+
+Phew… Again.
+
+What should be left now, is to load the hands, and test them.
+
+data <- read.csv("https://projecteuler.net/project/resources/p054_poker.txt", header=FALSE, stringsAsFactors = FALSE)
+library(tidyr)
+library(stringr)
+
+answer <- data %>%
+  mutate("h1" = str_sub(V1, 1,14)) %>%
+  mutate("h2" = str_sub(V1, 16,30)) %>%
+  rowwise() %>%
+  mutate("w" = winner(h1,h2)) %>%
+  filter(w==1) %>%
+  nrow()
+
+I read in the file to data, make a column h1 containing the first 14 characters of each line in the datafile, and a column h2 containing the rest of the line.
+
+rowwise() groups the dataframe by row – so it doesn’t matter that my winner() function is not that vectorized. For each set of hands I calculate the winner, filter the result so I only have the rows where hand 1 wins. And then I get the number of rows – which are the answer.
+
+
+## Herunder fra nusse.dk
+
+Poker hands. Project Euler number 54
+
+Given 1000 random hands of 5 playing cards dealt to two players, how many hands does player 1 win?
+
+We have the following notation for the cards:
+
+2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K, A
+
+Where T is ten, J is Jack, Q is Queen, K is King and A is Ace.
+
+And the suits:
+
+H, C, S, D
+
+We have a number of different combinations:
+
+High Card: Highest value card.
+One Pair: Two cards of the same value.
+Two Pairs: Two different pairs.
+Three of a Kind: Three cards of the same value.
+Straight: All cards are consecutive values.
+Flush: All cards of the same suit.
+Full House: Three of a kind and a pair.
+Four of a Kind: Four cards of the same value.
+Straight Flush: All cards are consecutive values of same suit.
+Royal Flush: Ten, Jack, Queen, King, Ace, in same suit.
+
+If a given hand is a Flush, it gets the rank of 6. Which means it beat a Straight, which has the rank of 5.
+
+That should be simple. Write a function that returns the rank of a given hand, and determine if one hand beats another hand.
+
+However, two hands with the rank 2, are not necessarily equal. One pair of fours is better than one pair of twos.
+
+So the function should also return some value that can be used for discriminating between different hands with the same rank.
+
+A hand comes on the form:
+
+5H 5C 6S 7S KD
+
+I think it might be useful to have a function that returns the suits and the values.
+
+library(dplyr)
+suits <- function(s){
+  delres <- unlist(strsplit(s, split = " "))
+  sapply(delres, function(x) substr(x,2,2), USE.NAMES = FALSE)
+}
+
+values <- function(s){
+  delres <- unlist(strsplit(s, split = " "))
+  sapply(delres, function(x) substr(x,1,1), USE.NAMES = FALSE)
+}
+
+
+Testing for a Royal Flush. All values of suits should be identical. And the values should be T, J, Q, K, A. That is simple. Check if all the values that should be in the hand, if it is a Royal Flush are there. Then check if the suit is the same for all cards in the hand. If both are true, return TRUE.
+
+is_royal_flush <- function(testhand){
+  testvalue <- c("T", "J", "Q", "K", "A")
+  value_match <- all(testvalue %in% values(testhand))
+  suits_match <- length(unique(suits(testhand)))==1
+  return(as.logical(value_match*suits_match))
+}
+
+
+Straight Flush: All cards are consecutive values of same suit.
+
+Testing for the same suit is copy-paste from above. Testing for consecutive values is a little bit more tricky. I cant just sort the values, since K is before Q in the alphabet. So I'm using dplyr::recode() to recode the T, J, Q, K, A values to numbers. The I can convert them to numeric and sort them. And I'll just have to figure out if the values are consecutive.
+
+I had to google a bit. But diff() does it. It calculates the difference between the elements. It is possible to define a lag, but here the default of 1 does the trick. It returns the second element in the vector, minus the first element. And the third element minus the second.
+
+When I have five elements, and they have consecutive values, diff() will return a vector of 4 ones.
+
+is_straight_flush <- function(testhand){
+  suits_match <- length(unique(suits(testhand)))==1
+  testvalues <- values(testhand)
+  testvalues <- recode(testvalues, T = "10", J = "11", Q = "12", K = "13", A = "14")
+  testvalues <- as.numeric(testvalues)
+  testvalues <- sort(testvalues)
+  value_match <- all(diff(testvalues) == c(1,1,1,1))
+  return(as.logical(value_match*suits_match))
+}
+
+
+Four of a Kind: Four cards of the same value.
+
+We are not interested in the suits here. First I get the values. Then I use table() to get the counts of the different values. Passing that to max() returns 4, if there are four identical values.
+
+is_four_of_a_kind <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  return(max(testvalues)==4)
+}
+
+
+Full House: Three of a kind and a pair. I use the same functionality as in is_four_of_a_kind. The trick here is, that the max of the tabulation of values should be 3. But the minimum should also be 2.
+
+is_full_house <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  (max(testvalues)==3)&(min(testvalues)==2)
+}
+
+
+Flush: All cards of the same suit. In is_straight_flush I test if the suits are the same. That is what I need here, I just skip the part where I test if the values are consecutive.
+
+is_flush <- function(testhand){
+  suits_match <- length(unique(suits(testhand)))==1
+  return(as.logical(suits_match))
+}
+
+
+Straight: All cards are consecutive values. This is more or less the same function is_straight_flush(). I just skip the test for suits.
+
+is_straight <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- recode(testvalues, T = "10", J = "11", Q = "12", K = "13", A = "14")
+  testvalues <- as.numeric(testvalues)
+  testvalues <- sort(testvalues)
+  value_match <- all(diff(testvalues) == c(1,1,1,1))
+  return(as.logical(value_match))
+}
+
+
+Three of a Kind: Three cards of the same value. That is basically the same as the function is_four_of_a_kind() above. The maximum value from the table should just be 3 instead of 4:
+
+is_three_of_a_kind <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  return(max(testvalues)==3)
+}
+
+
+Two Pairs: Two different pairs. First I use values() to get the values of the hand. I'm not interested in the suits.
+Then I tabulate the testvalues. I get a count of the number each value occurs in the hand.
+But I'm no interested in that number. If there are two pairs in the hand, I will get two values, that occurs two times.
+
+So if I run table() on the result again, I get a count of how many times the count 2 occurs. If the count 2 occurs twice, there are two hands.
+
+is_two_pairs <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  testvalues <- table(testvalues)
+  2 %in% testvalues
+}
+
+
+One Pair: Two cards of the same value. Again, basically the same as is_three_of_a_kind(), with 2 instead of 3 in the test:
+
+is_pair <- function(testhand){
+  testvalues <- values(testhand)
+  testvalues <- table(testvalues)
+  return(max(testvalues)==2)
+}
+
+
+It will return FALSE if there are three of a kind. I'm interested in the highest rank a hand can get, so that should not be a problem.
+
+High Card: Highest value card. I don't need to test for this. If a hand has not gotten a higher rank, it will always have this.
+
+Nice. I now have a set of functions that I can use to figure out what hand has the highest rank.
+
+Lets put that together:
+
+rank <- function(testhand){
+  res <- 1 # The hand will never get a rank lower than 1.
+  if(is_pair(testhand)){res <- 2}
+  if(is_two_pairs(testhand)){res <- 3}
+  if(is_three_of_a_kind(testhand)){res <- 4}
+  if(is_straight(testhand)){res <- 5}
+  if(is_flush(testhand)){res <- 6}
+  if(is_full_house(testhand)){res <- 7}
+  if(is_four_of_a_kind(testhand)){res <- 8}
+  if(is_straight_flush(testhand)){res <- 9}
+  if(is_royal_flush(testhand)){res <- 10}
+  return(res)
+}
+
+
+That should solve a lot of the cases. However. What if the rank of two hands are the same?
+
+If both hands have rank 9, that is if they are both straight flush, the hand with the highest card wins. There is no reason to test for the rest of the cards.
+
+For all the others, I need functions that breaks the tie. It it should be broken.
+
+Most of those determinations will be based on the value of the cards. So I might as well have a function that recodes ace to 14 etc.
+
+recode_value <- function(values){
+  as.numeric(recode(values, T = "10", J = "11", Q = "12", K = "13", A = "14"))
+}
+
+
+I'm probably going to need the reverse function:
+
+rev_recode_value <- function(values){
+  recode(as.character(values), "10" = "T", "11" = "J", "12" = "Q", "13" = "K", "14" = "A")
+}
+
+
+For High Card, the hand with the highest value card wins. If the highest value card in both hand 1 and hand 2 is equal, we look at the second highest card in each hand. Etc. Only if the values are identical in the two hands is there a tie.
+
+break_high_card <- function(hand1, hand2){
+  v1 <- values(hand1)
+  v2 <- values(hand2)
+  v1 <- sort(recode_value(v1))
+  v2 <- sort(recode_value(v2))
+  if((identical(v1,v2))){
+    return(0)
+    break()
+  } else{
+  while(v1[length(v1)]==v2[length(v2)]){
+    v1 <- v1[-length(v1)]
+    v2 <- v2[-length(v2)]
+  }  
+  }
+  if(max(v1)>max(v2)){
+    return(1)
+  } else {
+    return(2)
+  }
+}
+
+
+All right. That was not easy… First I get the values for the two hands. Then I recode them to numerical values, and sort them.
+
+If the two hands have equal values, it is a tie. Otherwise, while the last element in the first vector containing the values is equal to the last element in the second vector, I get rid of the last element in both vectors.
+
+When that is done, the last element in the two vectors is compared. The hand with the highest value wins.
+The funcion returns 0 if it is a tie, 1 if hand1 wins, and 2 if hand2 wins.
+
+This was actually the hardest part to write.
+
+Next. Breaking the tie between two hands each having one pair.
+
+break_one_pair <- function(hand1, hand2){
+  v1 <- values(hand1)  
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- table(v1)
+  v2 <- table(v2)
+  v1_pair <- as.numeric(names(v1)[v1==2])
+  v2_pair <- as.numeric(names(v2)[v2==2])
+  if(v1_pair>v2_pair){
+    return(1)
+    break()
+  }
+  if(v2_pair>v1_pair){
+    return(2)
+    break()
+  }
+  if(v2_pair==v1_pair){
+    v1 <- names(v1)[!v1==2]
+    v2 <- names(v2)[!v2==2]
+    v1 <- rev_recode_value(v1)
+    v2 <- rev_recode_value(v2)
+    return(break_high_card(v1,v2))
+    break()
+  }
+}
+
+
+First I'm picking out the values of the pairs in the two hands. If hand1 has a pair of 8's and hand2 has a pair of 7's, hand1 wins.
+
+If the pairs are of the same value. Then I pick out the values of the rest of the cards. I am making a dangerous assumption here. This will only work if the two hands actually only have one pair. I hope it works, but this is one of the places where it could go wrong.
+
+Two Pairs: Two different pairs.
+
+The hand with the highest value pair wins. If those values are identical, the value of the second pair determines the winner. If that is also equal, the value of the fifth remaining card, determines the winner.
+Only if that is also equal, is there a tie. Therefore, there can only be a tie, if all values of all cards are equal.
+
+break_two_pairs <- function(hand1, hand2){
+  v1 <- values(hand1)  
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- table(v1)
+  v2 <- table(v2)
+  v1_pair <- sort(as.numeric(names(v1)[v1==2]))
+  v2_pair <- sort(as.numeric(names(v2)[v2==2])) # now v1_pair and v2_pair contains the values of each of the pairs in each of the hands.
+  if(identical(v1_pair,v2_pair)){        # If the pairs have the same value, pick out the fifth value, and compare them.
+    v1 <- as.numeric(names(v1)[!v1==2])
+    v2 <- as.numeric(names(v2)[!v2==2])
+    if(v1>v2){
+      return(1)
+      break()
+    }
+    if(v2>v1){
+      return(2)
+      break()
+    }
+    if(v1==v2){
+      return(0)
+      break()
+    }
+  } else {
+    v1 <- rev_recode_value(v1_pair)
+    v2 <- rev_recode_value(v2_pair)
+    return(break_high_card(v1,v2))
+  }
+}
+
+
+Kinda the same as for one pair. v1_pair and v2_pair ends up with vectors containing the values of the two pairs in the two hands.
+
+If these two vectors are identical, we need to look at the fifth value.
+
+If not, I reverse_recode the values of the pairs, and use break_high_card, to determine which is larger.
+
+Three of a Kind: Three cards of the same value.
+
+Again I'm making the assumption that the two hands passed to this function have three of a kind. And nothing better than that.
+
+This is a bit simpler. There is no way that both hands can have three of a kind with the same value. So I don't need to consider the remaining cards. The assumption here is that there is only on deck of cards involved. This is another place where things can go wrong. But lets try!
+
+break_three_of_a_kind <- function(hand1, hand2){
+  v1 <- values(hand1)
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- table(v1)
+  v2 <- table(v2)
+  v1 <- as.numeric(names(v1)[v1==3])
+  v2 <- as.numeric(names(v2)[v2==3])
+  if(v1>v2){
+    return(1)
+    break()
+  } else {
+    return(2)
+    break()
+  }
+}
+
+
+I convert to values, recode them, tabulates them. And pick out the values that occur three times. Then I just compare them.
+
+Straight: All cards are consecutive values.
+
+Once more I assume that the two hands passed to this function actually only contains a straigth. It is rather simple. As the values must be consecutive, the highest value in each hand determines the winner.
+
+break_straigth <- function(hand1,hand2){
+  v1 <- values(hand1)
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- max(v1)
+  v2 <- max(v2)
+  if(v1>v2){
+    return(1)
+    break()
+  } 
+  if(v2>v1){
+    return(2)
+    break()
+  }
+  if(v2==v1){
+    return(0)
+    break()
+  }
+}
+
+
+Flush: All cards of the same suit.
+
+Again - I assume that flush is the highest combination in these hands. This is basically the same as high card.
+
+break_flush <- function(hand1, hand2){
+  return(break_high_card(hand1,hand2))
+}
+
+
+Full House: Three of a kind and a pair.
+
+The same assumption applies. These two hands both have Full House as the highest rank.
+
+The winner is determined by the higher value of the three of a kind.
+
+break_full_house <- function(hand1,hand2){
+  return(break_three_of_a_kind(hand1,hand2))
+}
+
+
+Four of a Kind: Four cards of the same value.
+
+Same as for the full house. The winner is determined by the higher value of the four of a kind.
+
+break_four_of_a_kind <- function(hand1,hand2){
+  v1 <- values(hand1)  
+  v2 <- values(hand2)
+  v1 <- recode_value(v1)
+  v2 <- recode_value(v2)
+  v1 <- table(v1)
+  v2 <- table(v2)
+  v1 <- sort(as.numeric(names(v1)[v1==4]))
+  v2 <- sort(as.numeric(names(v2)[v2==4]))
+  if(v1>v2){
+    return(1)
+    break()
+  } else {
+    return(2)
+    break()
+  }
+}
+
+
+Straight Flush: All cards are consecutive values of same suit.
+
+Again I'm making dangerous assumptions. But, this is functionally the same as high card.
+
+break_straight_flush <- function(hand1,hand2){
+  return(break_high_card(hand1,hand2))
+}
+
+
+Royal Flush: Ten, Jack, Queen, King, Ace, in same suit.
+
+If both hand are royal flush - it will always be a tie.
+
+break_royal_flush <- function(hand1,hand2){
+  return(0)
+}
+
+
+Phew…
+
+I now have a function that will return the rank of a given hand.
+
+If I compare the rank of two hands, I will either get a clear winner, or need to run one of the break functions to determine the result.
+
+winner <- function(hand1, hand2){
+  if(rank(hand1)>rank(hand2)){
+    return(1)
+    break()
+  }
+  if(rank(hand2)>rank(hand1)){
+    return(2)
+    break()
+  }
+  if(rank(hand2)==rank(hand1)){
+    rang <- rank(hand2)
+    if(rang==1){
+      return(break_high_card(hand1,hand2))
+      break()
+    }
+    if(rang==2){
+      return(break_one_pair(hand1,hand2))
+      break()
+    }
+    if(rang==3){
+      return(break_two_pairs(hand1,hand2))
+      break()
+    }
+    if(rang==4){
+      return(break_three_of_a_kind(hand1,hand2))
+      break()
+    }
+    if(rang==5){
+      return(break_straigth(hand1,hand2))
+      break()
+    }
+    if(rang==6){
+      return(break_flush(hand1,hand2))
+      break()
+    }
+    if(rang==7){
+      return(break_full_house(hand1,hand2))
+      break()
+    }
+    if(rang==8){
+      return(break_four_of_a_kind(hand1,hand2))
+      break()
+    }
+    if(rang==9){
+      return(break_straight_flush(hand1,hand2))
+      break()
+    }
+    if(rang==10){
+      return(break_royal_flush(hand1,hand2))
+      break()
+    }
+  }
+}
+
+
+Phew… Again.
+
+What should be left now, is to load the hands, and test them.
+
+data <- read.csv("https://projecteuler.net/project/resources/p054_poker.txt", header=FALSE, stringsAsFactors = FALSE)
+library(tidyr)
+library(stringr)
+
+answer <- data %>%
+  mutate("h1" = str_sub(V1, 1,14)) %>%
+  mutate("h2" = str_sub(V1, 16,30)) %>%
+  rowwise() %>%
+  mutate("w" = winner(h1,h2)) %>%
+  filter(w==1) %>%
+  nrow()
+
+
+I read in the file to data, make a column h1 containing the first 14 characters of each line in the datafile, and a column h2 containing the rest of the line.
+
+rowwise() groups the dataframe by row - so it doesn't matter that my winner() function is not that vectorized. For each set of hands I calculate the winner, filter the result so I only have the rows where hand 1 wins. And then I get the number of rows - which are the answer.
+
+Lessons learned
+
+Some. rowwise() is a usefull function. I'm certain I dont understand everything about it, but it would seem to solve a fair number of the problems I've had using non-vectorized functions.
+
+I should probably also learn to set aside some time for re-factoring my code before publishing it.

@@ -1,0 +1,61 @@
+---
+title: "Euler 203"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Project Euler 203
+
+Squarefree Binomial Coefficients. Building Pascals triangle to 51 rows (look it up - its a bloody nightmare to write out here): Locate all distinct numbers in that triangle, that does not divide by a square of a prime.
+
+OK. First step is to get all the numbers in 51 rows of Pascals triangle.
+
+R has a built in function, choose(i,j) that returns the number for row i, position j.
+
+We can use that to iterate through all the possible positions in a 51 row triangle:
+
+numbers <- 1
+for(i in 0:50){
+  for(j in 0:i){
+    numbers <- c(numbers, choose(i,j))
+  }
+}
+
+
+Next step is to make sure that we only have unique, distinct, values:
+
+numbers <- unique(numbers)
+
+
+We now need to divide each number by the square of a prime. My first instinct was to generate all primes smaller than the squareroot of the largest number in numbers.
+
+That would be all primes lower than 11,243,247.
+
+I would then square all those primes, and see if one of them divided neatly into the numbers in the triangel.
+
+Thats an awfull lot of primes.
+
+Much easier would be to note, that if the square of a prime divides neatly into a number, then the prime does as well. And is in fact a prime factor in that number.
+
+And since we have a nice library that makes it easy to get the primefactors, thats the way to do it.
+
+library(numbers)
+library(purrr)
+
+res <- numbers %>%
+    discard(function(x) any(x%%(factors(x)**2)==0))
+
+answer <- sum(res)+1
+
+
+Passing the numbers vector to the discard function. Discard the element, if the element, modulo the primefactors in that element squared, has one (or more) results that are equal to 0.
+
+The answer is the sum of the elements that are left. Plus 1, since 1 is discarded by the function. factors(1) - for some reason - returns 1.
+
+Nice and simple really.

@@ -1,0 +1,89 @@
+---
+title: "Euler 35"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Project Euler 35 - Circular primes
+
+197 is an example of a circular prime. It is itself a prime. And if we rotate the digits, 971 and 719 are also primes.
+
+Given that 2, 3, 5 and 7 are by definition circular primes - not that we rotate that much, how many circular primes are there below one million?
+
+Lets begin by generating a vector containing all primes below 1000000:
+
+library(numbers)
+prim <- Primes(1000000)
+length(prim)
+
+## [1] 78498
+
+
+That is 78498 numbers. Is there any way to reduce that number?
+
+There is. Any prime containg an even digit, will rotate to a number ending in an even digit. That number cannot be a prime.
+
+The same applies to primes containing the digit 5.
+
+Of course there are two special cases, 2 and 5.
+
+Lets reduce the number of primes we need to consider. First make a function checking if there are any “illegal” digits in the number:
+
+poss <- function(x){
+  !any(unlist(strsplit(as.character(x),"")) %in% c(0,2,4,5,6,8))  
+}
+
+
+The function splits the number in individual digits, checks if they are in the list of forbidden digits, and return fals if any of the digits of the number is in the list of forbidden digits.
+
+Now paring down the list of primes:
+
+prim <- prim[sapply(prim,poss)]
+
+
+That leaves us with 1111 possible primes.
+
+Now we need to figure out how to rotate the numbers:
+
+rotate <- function(x){
+  res <- integer()
+  while(length(res)<as.integer(log10(x)+1)){
+    x <- x%/%10 + x%%10*(10**(as.integer(log10(x)+1)-1))
+    res <- c(res,x)
+  }
+  all(res %in% prim)
+}
+
+
+Lets take a four digit number, 1234, as an example.
+
+I begin by initializing a variable res to keep the rotated numbers.
+
+as.integer(log10(x)+1) gives me the length of the number. Here, 4.
+
+Rotating a four digit number will yield four numbers. As long as there are less than four numbers in the result-vector res, I need to rotate at least once more.
+
+I want the first rotation to give the number 4123.
+
+Performing an integer division by 10 gives me the first three digits of the number, here 123. Modulo 10 gives me the last, here 4.
+
+I get the rotation by adding the first three digits of the number to the last number multiplied by 10 to the power of the number of digits in the original number minus 1.
+
+103 is 1000, multiplying by 4 is 4000, adding that to 123 returns 4123. Repeat until there are four numbers in the result-vector.
+Then check if all the elements of the result-vector are in the list of primes. If they all are, return TRUE, otherwise return FALSE.
+
+Now it is simply a question of getting rid of all the remaining candidate primes that does not rotate to primes:
+
+prim <- prim[sapply(prim,rotate)]
+
+
+The lenght is the number of primes that are circular as defined above. I just need to add the two special cases 2 and 5, and I have the answer:
+
+answer <- length(prim) + 2
