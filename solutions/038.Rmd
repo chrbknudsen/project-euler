@@ -1,0 +1,108 @@
+---
+title: "Euler 38"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# fra nusse.dk
+
+Multiplying 192 with 1, 2 and 3:
+
+192 x 1 = 192
+
+192 x 2 = 384
+
+192 x 3 = 576
+
+Concatenating the products, we get 192384576. That number is 1-9 pandigital (as in all digits 1 to 9 is represented in the number exactly one time).
+
+The same can be achieved by multiplying 9 with 1, 2, 3, 4 and 5. That gives us the pandigital concatenation 918273645.
+
+We should now find the largest 1-9 pandigital number, formed as a concatenation in the described way, by multiplying an integer with 1, 2,…n, where n > 1.
+
+Testing with 918273645. Nope, that is not the solution. That would be too easy :)
+
+OK. Lets call the integer we're multiplying, m.
+
+And as we're using R, lets call the numbers we are multiplying it with, for n, as in the vector 1:n.
+
+The concatenated product will have to have 9 as its first digit. The first digits comes from multiplying m with 1. Therefore, the first digit in m must be 9.
+
+We need to end up with a total of 9 digits in the concatenated product. If m has two digits, multiplying with 1 will give us two digits in the result. Multiplying with 2 will give us 3 digits in the result (any two digit number larger than 50 will, multiplied by 2, give a three digit result. And we know that m should begin with 9).
+
+Multiplying with 3 will give another 3 digits in the result, bringing us to at total of 8. Multiplying with 4 brings the total number of digits in the concatenated result to 11. There can be only 9.
+
+Chosing a three digit m gives similar problems.
+
+But a four digit m, with 9 as the first digit, gives us four digits multiplying by 1 and five when we multiply by 2. Giving us a total of 9 digits in the result.
+
+What we know so far:
+
+The integer we have to multiply has four digits, and begins with 9.
+We will have to multiply it by 1 and 2. Or 1:2.
+
+That should be possible to brute-force.
+
+Multiply all four digit integers where the first digit is 9 by 1:2.
+
+Collapse the results to a single string.
+
+Keep all the mumbers that are pandigital.
+
+Take the maximum of it.
+
+I don't need to check all the numbers. I know that the first four digits must be larger than 9182, since this is the first four digits in the example. The highest number is not 9999, it is 9876.
+
+t <- 9183:9876
+
+
+Using the purrr library:
+
+library(purrr)
+answer <- t %>%
+  keep(function(x) length(unique(setdiff(unlist(strsplit(paste(x*1:2,collapse=""),split="")),0)))==9)
+
+
+Ok, lets stop there. What am I doing?
+
+I pass all the possible four digit integers to keep(). keep() applies a function to each of the integers, and keeps the ones where the function evaluates to true.
+
+The function in question is an anonymous function of x:
+
+length(unique(setdiff(unlist(strsplit(paste(x*1:2,collapse=“”),split=“”)),0)))==9
+
+x, the integer from t, is multiplied wiht 1:2. That results in a vector where the first element is x multiplyed by 1, and the second x multiplied by 2.
+
+That is then put into the paste() function, with the parameter collapse=“”. The result is that the vector from just before, is concatenated to just one string.
+
+That string is splitted by strsplit into individual characters. The result is a list. Which is bloody annoying to work with.
+So I put everything into unlist(), that returns a vector.
+
+Setdiff(x,0) removes any zeroes from that vector.
+
+Having removed the zeroes, unique() returns all the unique values in the vector. If there is 9, the number is 1 to 9 pandigital.
+
+And if it is, the integer is kept by keep.
+
+It doesn't really give me the result. It returns the four digit integers beginning with 9, that, multiplied by 1:2 and concatenated gives a pandigital result.
+
+But the largest of them is the integer I should multiply by 1:2. So lets expand the code a bit:
+
+answer <- t %>%
+  keep(function(x) length(unique(setdiff(unlist(strsplit(paste(x*1:2,collapse=""),split="")),0)))==9) %>%
+  max() %>%
+  (function(x) x*1:2) %>%
+  (function(x) paste(x, collapse="")) %>%
+  as.numeric()
+
+
+max() gives me the largest of the four digit integers. The next function mulitplies it by 1:2. After that, the result is collapsed. And finally converted to numeric by as.numeric(). Not really necessary, but I'm doing it anyway.
+
+Lessons learned
+
+When using pipes to do stuff, anonymous functions are useful. But should be put into parantheses.
