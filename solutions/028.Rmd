@@ -1,0 +1,60 @@
+---
+title: "Euler 28"
+output: html_document
+date: '2023-05-27'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Number spiral diagonals
+
+We can make squares of numbers, by starting with 1, and add numbers in a spiral.
+
+It is easier to show than descripe:
+
+square <- matrix(c(21, 22, 23, 24, 25,20,  7,  8,  9, 10,19,  6,  1,  2, 11,18,  5,  4,  3, 12,17, 16, 15, 14, 13), 5,5,byrow=T)
+square
+
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,]   21   22   23   24   25
+## [2,]   20    7    8    9   10
+## [3,]   19    6    1    2   11
+## [4,]   18    5    4    3   12
+## [5,]   17   16   15   14   13
+
+
+This is a 5 by 5 square. Start at 1, add the 2 to the right of that, and add numbers in a clockwise spiral.
+
+If we look at all the numbers in the diagonals, we can see that the sum of those numbers, is 101. Ie, 21 + 7 + 1 + 3 + 13 + 25 + 9 + 5 + 17 = 101
+
+We are now asked: What is the sum of the numbers in the diagonals in a 1001 by 1001 square?
+
+Looking at an n by n square, where n is uneven, we can see that the north-eastern corner of the square will always be n2.
+
+We know that the side is n. So the value of the north-western corner will always be n2 - (n-1).
+
+Similar the south-western corner is n2 - 2(n-1). And the south-eastern is n2 - 3(n-1).
+
+The first “square” is a special case. But I can now calculate the corners in all the squares with unequal n.
+
+The sum of those corners is:
+
+n2 + n2 -(n-1) + n2 - 2(n-1) + n2 - 3(n-1)
+
+Which reduces to:
+
+4*n2 - 6n + 6
+
+If I calculate that for all unequal n from 3 to 1001, sum them, and add 1, I have my answer.
+
+library(purrr)
+answer <- seq(3,1001,by=2) %>%
+  map(function(x) 4*x*x - 6*x + 6) %>%
+  unlist() %>%
+  sum() 
+answer <- answer + 1
+
+Lessons learned
+
+Not really.

@@ -1,9 +1,0 @@
----
-title: "Euler 28"
-output: html_document
-date: '2023-05-27'
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
