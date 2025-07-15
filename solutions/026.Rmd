@@ -1,0 +1,82 @@
+---
+title: "Euler 26"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Reciprocal cycles.
+
+Yeah.
+1/6 = 0.1(6)
+
+And
+1/7 = 0.(142857)
+
+Where (6) indicates that 6 is repeated.
+
+Find the number d where 1/d has the longest recurring cycle.
+
+Ok. So how to do this. One challenge is to calculate the decimal fraction to arbitrary precision. The recurring cycle might turn up after 7 digits. Or after 1000.
+The other challenge is to figure out when the recurring cycle is actually recurring.
+
+If I had to do this with paper and pen, I would take 1/7. The result is 0, and a remainder of 1. My first approximation of 1/7 would be 0. Then I would multiply the remainder by 10, and divide that result with 7:
+10/7. The result is 1, with a remainder of 3. The approximation is now 0.1. The remainder is multiplied and divided: 30/7 = 4 and a remainder of 2. The approximation is now 1/7 = 0.14. Lets put that in a table:
+
+Step Division made Result Remainder Approximation
+
+ 1      1/7               0            1             0
+ 2      10/7              1            3             0.1
+ 3      30/7              4            2             0.14
+ 4      20/7              2            6             0.142
+ 5      60/7              8            4             0.1428
+ 6      40/7              5            5             0.14285
+ 7      50/7              7            1             0.142857
+
+
+And the I can stop. Because the next digit in the approximation is determined by the remainder of the previous division. And now I have a remainder that I have seen before. The first step where I have a remainder of 1 is step one. The next is step 7, and the cycle is 7-1 long.
+
+I now have the structure of how to solve this.
+Take a number d. Calculate 1 %% d. Save that result, lets call it X~1~, somewhere. Calculate X~2~ = X~1~*10 %% d, and save X~2~. Continue calculating X~n+1~ = 10 X~n~ %% d, until X~n+1~ has been seen before.
+Do that for all positive integers d < 1000.
+
+Lets write a function for that:
+
+recurr <- function(d){
+  res <- numeric()
+  new_remainder <- 0.1
+  while(length(res)==length(unique(res))){
+    new_remainder <- (new_remainder*10) %% d
+    res <- c(res, new_remainder)
+  }
+  which(res==res[length(res)])[2] - which(res==res[length(res)])[1]
+}
+
+
+The function takes d as input.
+An empty vector, res, is defined, and a variable new_remainder is set to 0.1.
+I'm using the res vector to store the consecutive list of remainders from the divisions. The moment that there are duplicate values in that vector, I have added a remainder to it that was already there. That indicates that a recurring cycle has been reached.
+The next remainder that should be entered to the result vector, is found by multiplying the previous remainder by 10 and do the integer division by d. By setting the new_remainder variable to 0.1 from the beginning, I'm making sure that the first division is 1 %% d.
+The new remainder is added to the result vector at the end. This is not an efficient method of growing that vector. I'll think I'll live with it.
+The while-loop stops when a remainder has been added that was already in the result vector. That remainder will be in the last position of the vector. The length of the recurring cycle is the distance between the to instances of the last remainder added. That is length of the cycle.
+
+What now remains is to run this function on all numbers d < 1000, and get the d, that has maximum recurr(d).
+
+I pipe the vector 1:999 to map(), which simply applies a function on all elements of the vector.
+The result is a list, so that is piped to unlist.
+The order of that vector is unchanged. So the value in position 42, will be the length of the recurring cycle in 1/42. which.max() returns the position of the largest element in a vector, which is just what I need.
+
+library(purrr)
+answer <- 1:999 %>%
+  map(recurr) %>%
+  unlist %>%
+  which.max()
+
+Lessons learned
+Probably most of all that I should not shy away from a problem just because it seems a bit difficult. Not that this a difficult problem, it's only a 5 percenter. But I passed it over more than once, because I could not get min brain around how to get those fractions.
+There might be a better way to see if something has occured before in a sequence of numbers. But this is working, and I think there is at least one other Euler problem that can be solved using similar logic.

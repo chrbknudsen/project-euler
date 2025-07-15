@@ -1,0 +1,67 @@
+---
+title: "Euler 37"
+output: html_document
+date: '2023-05-21'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Project Euler 37
+
+3797 is a prime. What is interesting about this prime, is that if we truncate it one digit at a time from left, ie:
+3797, 797, 97, 7 every step is also prime. And if we do the same from the right, we see the same property:
+3797, 379, 37, 3.
+
+There are 11 primes with this property. What is the sum of them?
+
+2, 3, 5 and 7 are not considered to be truncatable primes.
+
+And that gives us a hint. The first digit of a truncatble prime must be either 2, 3, 5 or 7. And the last digit must be 3, 5 or 7.
+
+Lets begin by loading the package numbers:
+
+library(numbers)
+
+
+That gives us couple of useful functions. isPrime(x) returns true if x is prime. And Primes(x,y) returns all primes between x and y.
+
+I am going to need a couple of functions. One that repeatedly truncates a number from the left, and returns true if all the steps in the sequence are prime. And another that does the same, just from the rigth.
+
+truncleft <- function(x){
+  res <- TRUE
+  while(x>9){
+    x <- x %/% 10
+    res <- isPrime(x)*res
+  }
+  return(as.logical(res))
+}
+
+truncright <- function(x){
+  res <- TRUE
+  while(x>9){
+    x <- x - (x %/% 10**floor(log10(x)))*(10**floor(log10(x)))
+    res <- isPrime(x)*res
+  }
+  return(as.logical(res))
+}
+
+
+Now I can determine if a given number is truncatable prime from both left and right. Next, finding all 11 primes with that property.
+
+Lets take a chance, and see if not number 11 is found before we reach 1000000
+
+library(purrr)
+answer <- Primes(9,1000000) %>%
+  keep(truncleft) %>%
+  keep(truncright) %>%
+  sum()
+
+
+Yep. The difficult part is finding number 11. The first four primes with this property have two digits - you can find them manually. The next four are a bit more difficult. Number 10 is the example Project Euler provides.
+
+Lessons learned
+
+Well - purrr is pretty useful. But I already knew that.

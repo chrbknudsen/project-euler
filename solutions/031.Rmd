@@ -1,0 +1,52 @@
+---
+title: "Euler 31"
+output: html_document
+date: '2023-05-27'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+How many ways can you make 2 pounds given these sizes of coins:
+
+1p, 2p, 5p, 10p, 20p, 50p, 1£ and 2£
+
+Where 1£ is 100p.
+
+We can take either 0 or 1 2£ coin.
+
+answer <- 0
+
+for(a in seq(0,200,by=200)){
+  for(b in seq(0,(200-a),by=100)){
+    for(c in seq(0,(200-a-b), by=50)){
+      for(d in seq(0,(200-a-b-c),by=20)){
+        for(e in seq(0,(200-a-b-c-d), by=10)){
+          for(f in seq(0,(200-a-b-c-d-e), by=5)){
+            for(g in seq(0,(200-a-b-c-d-e-f),by=2)){
+              answer <- answer + 1
+            }
+          }
+        }
+      }
+    }
+ }
+}
+
+
+How to explain it…
+
+I need to count up to 200p total.
+
+a is the part of the 200p that is made up by a 2£ coint. That is either 0 or 200. Or the sequence from 0 to 200 taken in increments of 200.
+
+What is left after considering 2£ coins, is 200 minus the value of a. The number of 1£ coins we can use to make up that amount is all the values from 0 to what is left. Ie 0 to 200-a in increments of 100. The part of the total 200p that is made up by 1£ coins is b.
+
+After adding some 1£ coins, there are 200-a-b left. That can be made by 50p coins. The part of what is left i c, and that is values from 0 to 200-a-b in increments of 50, ie seq(0,(200-a-b), by=50)
+
+Etc.
+
+The trick is to make sure that the ranges of the inner loops is controlled by what happened in previous loops.
+
+Otherwise I will loop over far too many values.

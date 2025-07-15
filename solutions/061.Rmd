@@ -1,0 +1,258 @@
+---
+title: "Euler 61"
+output: html_document
+date: '2018-04-19'
+params:
+  done: T
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Four-digit triangle-numbers:
+
+```{r}
+P3 <- function(x){
+  x*(x+1)/2
+}
+L3 <- P3(45:140)
+```
+
+
+Square numbers:
+```{r}
+P4 <- function(x){
+  x*x
+}
+L4 <- P4(32:99)
+
+```
+
+
+Pentagonal:
+```{r}
+P5 <- function(x){
+  x*(3*x -1)/2
+}
+L5 <- P5(26:81)
+
+```
+
+
+Hexagonal
+```{r}
+P6 <- function(x){
+  x*(2*x-1)
+}
+L6 <- P6(23:70)
+
+```
+
+
+Heptagonal:
+```{r}
+P7 <- function(x){
+  x*(5*x-3)/2
+}
+L7 <- P7(21:63)
+
+```
+
+
+Octagonal:
+```{r}
+P8 <- function(x){
+  x*(3*x-2)
+}
+L8 <- P8(19:58)
+
+```
+
+
+Lets get them all into a list:
+```{r}
+values <- list(L8, L7, L6, L5, L4, L3)
+```
+
+
+
+A lot of nested for-loops. There has to be a better way:
+```{r}
+for(i in values[[1]]){
+  for(b in 2:6){
+    if(length(values[[b]][(values[[b]] %/% 100) == (i %% 100)])==0){
+        next()
+      }
+    for(j in values[[b]][(values[[b]] %/% 100) == (i %% 100)]){
+      for(c in setdiff(2:6, b)){
+       if(length( values[[c]][(values[[c]] %/% 100) == (j %% 100)]  )==0){
+         next()
+       }
+       for(k in values[[c]][(values[[c]] %/% 100) == (j %% 100)]){
+         for(d in setdiff(2:6, c(b,c))){
+           if(length( values[[d]][(values[[d]] %/% 100) == (k %% 100)]  )==0){
+         next()
+       }
+           for(l in values[[d]][(values[[d]] %/% 100) == (k %% 100)]){
+             for(e in setdiff(2:6, c(b,c,d))){
+               if(length( values[[e]][(values[[e]] %/% 100) == (l %% 100)]  )==0){
+         next()
+       }
+               for(m in values[[e]][(values[[e]] %/% 100) == (l %%100)]){
+                  for(f in setdiff(2:6, c(b,c,d,e))){
+                    if(length( values[[f]][(values[[f]] %/% 100) == (m %% 100)]  )==0){
+                    next()
+                     } else{
+                    for(n in values[[f]][(values[[f]] %/% 100) == (m %% 100)]){
+                          if((n %% 100) == (i %/% 100)){
+                        answer <- sum(i,j,k,l,m,n)
+                        break()
+                      }}
+                    }
+                  }   
+               }
+             } 
+
+           }
+          }
+       }
+     }
+    }
+  }
+}
+
+```
+
+
+
+# fra nusse.dk
+
+Project Euler 61
+
+OK, this was a bit of a challenge.
+
+Find six four-digit numbers that are cyclical. As in: The last two digits of the first number is equal to the first two digits of the second number, the last two digits for the second number is equal to the first two digits in the second number. Etc. The last two digits in the final sixth number must be equal to the first two digits in the first number.
+
+Also, one number must be triangle, one square, one pentagonal, one hexagonal, one heptagonal and on octagonal.
+
+Lets begin by making lists of the different kinds of numbers:
+
+Four-digit triangle-numbers:
+
+P3 <- function(x){
+  x*(x+1)/2
+}
+L3 <- P3(45:140)
+
+
+Square numbers:
+
+P4 <- function(x){
+  x*x
+}
+L4 <- P4(32:99)
+
+
+Pentagonal:
+
+P5 <- function(x){
+  x*(3*x -1)/2
+}
+L5 <- P5(26:81)
+
+
+Hexagonal
+
+P6 <- function(x){
+  x*(2*x-1)
+}
+L6 <- P6(23:70)
+
+
+Heptagonal:
+
+P7 <- function(x){
+  x*(5*x-3)/2
+}
+L7 <- P7(21:63)
+
+
+Octagonal:
+
+P8 <- function(x){
+  x*(3*x-2)
+}
+L8 <- P8(19:58)
+
+
+Lets get them all into a list:
+
+values <- list(L8, L7, L6, L5, L4, L3)
+
+
+And this is where it gets complicated.
+
+I take each value in L8, which is now values[[1]]
+
+For each of them, I run through each of the other elements of values, 2:6.
+
+For each values[[i]], I check if there are any of the numbers, where the first two digits is equal to the last two in the element in L8 I've come to.
+
+If there is, I run through all of them (the ones where the first two digits is equal to the last two in the element in L8 I've come to.)
+
+For each of these, I run through each of the remaining list elements, setdiff(2:6, b), where b is the iterator in 2:6
+
+For each of those, I check that there are numbers where the first two digits etc etc etc.
+
+When I get to the last number, I check that the last two digits are the same as the first two digits in the number in the first loop. Then I sum the numbers I've found, and get the answer.
+
+It is not difficult. As such. But there are a lot of nested for-loops, and I have to check that there is a possible next number, and, if not, go to the next element.
+
+It took quite a lot of time to get it right…
+
+for(i in values[[1]]){
+  for(b in 2:6){
+    if(length(values[[b]][(values[[b]] %/% 100) == (i %% 100)])==0){
+        next()
+      }
+    for(j in values[[b]][(values[[b]] %/% 100) == (i %% 100)]){
+      for(c in setdiff(2:6, b)){
+       if(length( values[[c]][(values[[c]] %/% 100) == (j %% 100)]  )==0){
+         next()
+       }
+       for(k in values[[c]][(values[[c]] %/% 100) == (j %% 100)]){
+         for(d in setdiff(2:6, c(b,c))){
+           if(length( values[[d]][(values[[d]] %/% 100) == (k %% 100)]  )==0){
+         next()
+       }
+           for(l in values[[d]][(values[[d]] %/% 100) == (k %% 100)]){
+             for(e in setdiff(2:6, c(b,c,d))){
+               if(length( values[[e]][(values[[e]] %/% 100) == (l %% 100)]  )==0){
+         next()
+       }
+               for(m in values[[e]][(values[[e]] %/% 100) == (l %%100)]){
+                  for(f in setdiff(2:6, c(b,c,d,e))){
+                    if(length( values[[f]][(values[[f]] %/% 100) == (m %% 100)]  )==0){
+                    next()
+                     } else{
+                    for(n in values[[f]][(values[[f]] %/% 100) == (m %% 100)]){
+                          if((n %% 100) == (i %/% 100)){
+                        answer <- sum(i,j,k,l,m,n)
+                        break()
+                      }}
+                    }
+                  }   
+               }
+             } 
+
+           }
+          }
+       }
+     }
+    }
+  }
+}
+
+
+Neat. But there must be an easier way.

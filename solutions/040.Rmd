@@ -1,0 +1,201 @@
+---
+title: "Euler 40"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+We construct a decimal fraction, by concatenating all positive integers:
+0.123456789101112 etc.
+
+We define Dx as the digit on position x. Eg D1 = 1, D2 = 2 etc.
+
+What is the product:
+D1 * D10 * D100 * D1000 * D10000 * D100000 * D1000000
+
+Just looking at the fraction, we can see that D1 = 1 and D10 = 1.
+Let's quickly save those variables:
+
+D1 <- 1
+D10 <- 1
+
+
+But what about D100?
+
+Adding all one-digit integers gives us 9 digits in the fraction.
+Adding all two-digit integers gives us 90 * 2 digits in the fraction.
+
+Given that we have the first 9 digits from the one-digit integers, we need to add 90 two-digit integers to get to D99.
+That is 45 integers. The first is 10, the second is 11 etc. So number 45 is 54.
+
+If you want convincing:
+
+9 + length(10:54)*2
+
+## [1] 99
+
+
+D99 is equal to 4. 54 was the two-digit integer we had to add to get to a total of 99 digits, and the last digit in 54 is 4.
+The next two-digit integer we can add is 55. Therefore D100 = 5. Lets save that:
+
+D100 <- 5
+
+
+Now we'll find D1000.
+
+Adding all two-digit integers brings us to a total of:
+
+9 + 90*2
+
+## [1] 189
+
+
+The last integer we add is 99. So D189 = 9.
+
+We now have to add:
+
+999-189
+
+## [1] 810
+
+
+digits to the fraction. Doing that with three-digit integers, means that we should add:
+
+810/3
+
+## [1] 270
+
+
+Integer number 270 we add is 369. That will give us D999 = 9.
+The next integer we add to the fraction will be 370. So:
+
+D1000 <- 3
+
+
+Next - D10000
+
+Adding all three-digit integers gives at total of:
+
+9*1 + 90*2 + 900*3
+
+## [1] 2889
+
+
+We have to at a total of:
+
+10000-2889
+
+## [1] 7111
+
+
+digits, and do it by adding four-digit integers.
+
+7111/4
+
+## [1] 1777.75
+
+
+of them to be precise.
+
+Adding 1777 four digit integers brings us to:
+
+2889 + 1777*4
+
+## [1] 9997
+
+
+The four-digit integer we add to get to that is 2776. D9997 = 6
+The next integer we add to it is 2777. Leading to:
+
+D10000 <- 7
+
+
+D100000
+
+All four-digit integers gets us to:
+
+9*1 + 90*2 + 900*3 + 9000*4
+
+## [1] 38889
+
+
+We need to add
+
+100000-38889
+
+## [1] 61111
+
+
+digits. We are now getting to five-digit integers, so we need to add
+
+61111/5
+
+## [1] 12222.2
+
+
+of those.
+Når vi har tilføjet 12222 tal er vi nået op på:
+
+9 + 90*2 + 900*3 + 9000*4 + 12222*5
+
+## [1] 99999
+
+
+Integer number 12222 we add (of the five-digit variety) is 22221. D99999 = 1
+The next we add is 22222 and:
+
+D100000 <- 2
+
+
+Finally D1000000
+
+All integers up to and including five-digit integers:
+
+9+90*2+900*3+9000*4 + 90000*5
+
+## [1] 488889
+
+
+We need to add:
+
+1000000-488889
+
+## [1] 511111
+
+
+And do it by adding six-digit integers.
+
+511111/6
+
+## [1] 85185.17
+
+
+The final six-digit integer we concatenate to the fraction before reaching the million is 185184.
+
+When we have done that we have:
+
+9 + 90*2 + 900*3 + 9000*4 + 90000*5 + 85185*6
+
+## [1] 999999
+
+
+digits (D999999=5).
+The next six-digit integer we add is 185185. And:
+
+D1000000 <- 1
+
+
+Giving the result:
+
+D1 * D10 * D100 * D1000 * D10000 * D100000 * D1000000
+
+## [1] Censored
+
+
+Lessons learned:
+1. Sometimes you don't have to code all that much.
+2. I should practise explaining these sort of things without using quite as many words.

@@ -1,0 +1,62 @@
+---
+title: "Euler 36"
+output: html_document
+date: '2023-05-27'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Some numbers are palindromic, ie they are the same read in both directions.
+Some numbers are palindromic in more than one base.
+The problem mentions 585, which is palindromic. In binary 585 is 1001001001. And that is palindromic as well.
+Find all numbers below 1000000 that are palindromic in both base 10 and base 2.
+What is their sum?
+
+First I'm going to need a function that checks if a number is palindromic.
+
+palindromic <- function(x){
+  paste(rev(unlist(strsplit(as.character(x),""))), collapse="")==as.character(x)
+}
+
+
+This function converts the input to character, splits it in individual characters, and unlists it. Because strsplit() returns a list. Then that vector is reversed with rev(), and pasted together to a single string. That string is then compared to the input - converted to character.
+It returns TRUE if the input is palindromic. And what is nice is that it doesn't care if the input is a number or a string.
+
+Next I'm going to need a function that converts a number to it's binary representation.
+There is one, intToBits(). But it returns all the individual bits. And in reverse order. Also, it returns the bits as characters. So. intToBits(x) to get the bits. as.integer() to convert them to integers. Then the vector is reversed. And collapsed with paste().
+One more detail - leading zeroes are not allowed. Therefore I remove all leading zeroes with a regular expression.
+
+binary <- function(x){
+  unlist(map(x, function(x) sub("^[0]+", "", paste(rev(as.integer(intToBits(x))), collapse="")))         )
+}
+
+
+This is a bit annoying. paste() pastes everything together. When I pass a vector to it, it will not only split the individual elements apart, convert them, and then paste them together individually. It will also paste together every single element in the vector, and just return a very long string.
+map() solvse this. I define the “split, convert, paste-together” part as an anonymous functtion, which is then passed to map along with the vector. map() applies the function to each element in the vector, and as if by magic, stuff is no longer pasted together. map() returns a list, so I'll have to wrap it in unlist().
+
+Now I have all the elements. I just need find a way to convert a binary number to its decimal representation.
+strtoi() does that. It takes a character vector, and converts it to integer - given a certain base, in this case 2.
+I'll just use that as an anonymous function.
+
+Piping everything together:
+
+t <- 1:1000000
+s <- t %>%
+  keep(palindromic) %>%
+  binary() %>%
+  keep(palindromic) %>%
+  (function(x) strtoi(x, base=2)) %>%
+  sum()
+
+
+Passing all numbers from 1 to a million to keep(), with the predicate function palindromic. There are faster ways to generate palindromes, I know.
+Piping the result of that to binary, converting every palindromic number (decimal) to binary.
+Then, once more, through keep, only keeping the binary numbers which are palindromic.
+Now we have the numbers which are palindromic in both decimal and binary. They are converted to integers, and summed.
+
+Lessons learned.
+1. map() is good to know - The alternative here would be to use Vectorize().
+2. How to convert from decimal to binary, and back.
