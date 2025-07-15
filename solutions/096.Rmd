@@ -1,0 +1,480 @@
+---
+title: "Euler 96"
+output: html_document
+date: '2018-04-06'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This problem is basically about making a sudoku solver, that can be automated. If you don't know what a sudoku is - google it and come back.
+
+I have solved a LOT of sudokus. Manually. There are several techniques, but some of them are not that easy to code. And of course I'll need a method that guarantees a solution.
+
+Fortunately a brute force solution exists:
+
+https://en.wikipedia.org/wiki/Sudoku_solving_algorithms
+
+
+It is called backtracking. The process is to look at all the empty cells.
+
+In the first one - insert the lowest allowed value, and progress to the next empty cell. Insert the lowest allowed value in it. Continue until you reach a cell with no allowed values. When you do that, go back to the previous cell, and insert the next-lowest allowed value. And then go back (forward?) to the next cell. If the cell you went back to also have no allowed values, you go one step futher back. Continue until you reach the last cell in the puzzle.
+
+So. We'll need a few things.
+
+First of all we'll need a matrix in which to keep the sudoku.
+
+I'm going with a matrix rather than a dataframe after reading the R Inferno (https://www.burns-stat.com/pages/Tutor/R_inferno.pdf), that suggests that there is no reason to work with a dataframe if a matrix will do.
+
+I'll need a couple, or three (actually more like five) functions to figure out what values are allowd for a given cell in a given sudoku.
+
+And I'll need a way to keep track of which cells that are “frozen”, and which cells should be filled out.
+
+Lets begin by making a matrix to keep the puzzle in. Project Euler provides us with a puzzle and the matching solution. And a file with 50 puzzles that needs to be solved.
+
+Lets read in that file.
+
+problems <- read.csv("p096_sudoku.txt",header=FALSE, stringsAsFactors = FALSE)
+
+
+The structure is rather simple. 500 rows. First one row with an identifier, eg “Grid 01”. And then 9 rows with just the rows of digits, 0 for the empty cells.
+
+We'll need to pick out first the rows 1 to 10, then rows 11 to 20 etc.
+
+Lets make a dataframe, and read it in:
+
+start <- seq(1,500,by=10)
+end <- seq(10,500,by=10)
+prob_df <- data.frame(id=character(),problem=character(), stringsAsFactors = FALSE)
+for(i in 1:50){
+  prob_df[i,2] <- paste(problems[start[i]:end[i],][-1], collapse="")
+}
+prob_df[1,2]
+
+## [1] "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
+
+
+Nice and simple, 50 rows with an 81 character long string of digits. This is the first puzzle in the file. It is also the puzzle where we are provided with a solution.
+
+We now need to convert that to a matrix.
+
+Or - we don't need to. There are certainly techniques that would allow me to handle it as-is. But I think it is more intuitive to get it into a matrix.
+
+So, lets do that.
+
+mat <- matrix(as.numeric(unlist(strsplit(prob_df[1,2],""))),9,9,byrow=TRUE)  
+mat
+
+##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+##  [1,]    0    0    3    0    2    0    6    0    0
+##  [2,]    9    0    0    3    0    5    0    0    1
+##  [3,]    0    0    1    8    0    6    4    0    0
+##  [4,]    0    0    8    1    0    2    9    0    0
+##  [5,]    7    0    0    0    0    0    0    0    8
+##  [6,]    0    0    6    7    0    8    2    0    0
+##  [7,]    0    0    2    6    0    9    5    0    0
+##  [8,]    8    0    0    2    0    3    0    0    9
+##  [9,]    0    0    5    0    1    0    3    0    0
+
+
+Neat. Split the string in individual characters. Unlist it, and cast it to numeric. Then pass it all to matrix(), noting that we want 9 rows and 9 columns. And that the matrix should be filled by row.
+
+Depending on where you count from, the first empty cell is 1,2. Given the values that are already filled in, what values are allowed in that cell?
+
+First, what values are allowed based on the row? From inspection it is obvious that only the values 1, 4, 5, 6, 7, 8 and 9 are allowed. Lets write a function for that:
+
+rowall <- function(x,mat){
+  setdiff(1:9, mat[x,])
+}
+rowall(1,mat)
+
+## [1] 1 4 5 7 8 9
+
+
+The function takes a row-number, in this example 1, and a matrix. mat[x,] returns the values in that row. And setdiff returns the values that are in 1:9 but not in the list of values already in the row.
+
+More or less the exact same thing for the column:
+
+# returnerer tilladte værdier i kolonne y i en matrix mat
+colall <- function(y,mat){
+  setdiff(1:9, mat[,y])
+}
+colall(2, mat)
+
+## [1] 1 2 3 4 5 6 7 8 9
+
+
+What about the frame, the 3x3 set of numbers?
+
+I need a subset of the matrix. For our example, cell 1,2, I need the columns 1, 2 and 3. And the rows 1, 2 and 3. Or a vector 1:3. Thankfully there is symmetry, so column 1 gives the same vector as row 1. I need a function that returns 1:3 when I pass it 1, 2 or 3. 4:6 for the values 4, 5 or 6. and 7:9 for the values 7, 8 or 9.
+
+My good colleague Henrik has tried to solve the same problem using Python. And he suggested that the way to do it is by integer division. In this way:
+
+framelookup <- list(a=c(1,2,3),b=c(4,5,6),c=c(7,8,9))
+
+getint <- function(x){
+  x <- (x -1)%/%3+1
+  unlist(framelookup[x])
+}
+
+Take the value x.
+Substract 1 and divide the result by 3.
+Then add 1. For x = 1,2 or 3, the result is 1, for x = 4, 5 or 6, the result is 2. And for 7 through 9, we get 3.
+We can then use that to look up the vector we need in a list, and return the unlisted number.
+
+At first I had done it with three if-statements. This solution is a bit more elegant, and Henrik thinks that if-statements should be outlawed. So in the interest of keeping the peace in our office, I'm going with that.
+
+Now I can write a function that returns the values allowed in a given cell in a given matrix, given the values that are already filled out in the frame that cell is in:
+
+fraall <- function(x,y,mat){
+  res <- mat[getint(x),getint(y)]
+  setdiff(1:9, res)
+}
+
+
+The function takes the coordinates of the cell, and a matrix. Based on that, getint() returns the vectors describing the frame, and saves that subframe in res. Then I use the setdiff() function in the same way I've done previously.
+
+That gives me all the constraints. What values are allowed based on row, column and frame. The intersection between these three vectors gives me the allowed values for the cell. It is now simple to write a function that returns the values allowed for a given cell in a given matrix:
+
+allowed <- function(x,y,mat){
+  res <- intersect(rowall(x,mat), colall(y,mat))
+  res <- intersect(res, fraall(x,y,mat))
+  return(res)
+}
+
+
+Actually this is all I need for solving quite a lot of sudokus. Go through all the empty cells. Figure out what values are allowed. If only one value is allowed, plot it into the cell. Repeat until there are no more empty cells where only one value is allowed. A lot of sudokus can be solved with only that method.
+
+The ones that cannot be solved in this way can be solved by the backtracking algorithm. But that is slow, so it might be a good idea to simplify the those puzzles by filling out what can be filled out with this method first.
+So let's write a function that does exactly that.
+
+First I'll need a list of the empty cells. The which() function can help me.
+
+test <- which(mat ==0, arr.ind=T)
+nrow(test)
+
+## [1] 49
+
+
+Which parts of the matrix is equal to 0? and arr.ind tells that what we want returned (when which is used on an array) is the array indeces. There are 56 0'es in the puzzle.
+
+The matrix test has this structure:
+
+head(test)
+
+##      row col
+## [1,]   1   1
+## [2,]   3   1
+## [3,]   4   1
+## [4,]   6   1
+## [5,]   7   1
+## [6,]   9   1
+
+
+The first pair of values is 2,1, the next is 4,1 etc. And if I take each one of those, looks at the allowed values for those positions in the matrix, and, if there is only one value allowed, place that value in that position, I get a step closer to the solution.
+
+This does exactly that:
+
+for(i in 1:nrow(test)){
+  all <- allowed(test[i,1],test[i,2],mat)
+  if(length(all)==1){
+    mat[test[i,1],test[i,2]] <- all
+  }
+}
+nrow(which(mat ==0, arr.ind=T))
+
+## [1] 43
+
+
+And, hey presto, 6 empty cells were filled. The logic is: Find the list of allowed values based on the values in the list of empty cells. If the length is 1, set the current cell to that value.
+
+Now I need to get a new list of empty cells:
+
+test <- which(mat ==0, arr.ind=T)
+
+
+And I could do it again:
+
+for(i in 1:nrow(test)){
+  all <- allowed(test[i,1],test[i,2],mat)
+  if(length(all)==1){
+    mat[test[i,1],test[i,2]] <- all
+  }
+}
+nrow(which(mat ==0, arr.ind=T))
+
+## [1] 29
+
+
+14 previously empty cells filled!
+
+Lets make a function that does that again and again, until there is no more improvement.
+
+We'll start by writing a function that does it one time:
+
+singlevalues <- function(mat){
+  test <- which(mat ==0, arr.ind=T)
+  for(i in 1:nrow(test)){
+    all <- allowed(test[i,1],test[i,2],mat)
+  if(length(all)==1){
+    mat[test[i,1],test[i,2]] <- all
+  }
+  }
+  return(mat)
+}
+
+
+Then I need to run that several times. When the number of empty cells after running it is the same as the number of empty cells before, stop. No more values can be filled in.
+
+repsinglevalues <- function(mat){
+  oldlen <- 1
+  newlen <- 0
+  while(oldlen > newlen){
+  oldlen <- length(which(mat == 0))
+  mat <- singlevalues(mat)
+  newlen <- length(which(mat == 0))
+  if(newlen==0) break()
+  }
+  return(mat)
+}
+
+
+Take a matrix. Set oldlen to 1, and newlen to 0. As long ans oldlen is larger than newlen, do this:
+Set oldlen to the number of 0'es in the matrix. Run the singlevalues function from above. Find out how many empty cells, or zeroes there are now, and set newlen to that. If newlen is equal to 0, stop everything, otherwise repeat. And finally return the changed matrix.
+
+Lets test it:
+
+repsinglevalues(mat)
+
+##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+##  [1,]    4    8    3    9    2    1    6    5    7
+##  [2,]    9    6    7    3    4    5    8    2    1
+##  [3,]    2    5    1    8    7    6    4    9    3
+##  [4,]    5    4    8    1    3    2    9    7    6
+##  [5,]    7    2    9    5    6    4    1    3    8
+##  [6,]    1    3    6    7    9    8    2    4    5
+##  [7,]    3    7    2    6    8    9    5    1    4
+##  [8,]    8    1    4    2    5    3    7    6    9
+##  [9,]    6    9    5    4    1    7    3    8    2
+
+
+Yeah! The sudoku is solved!
+
+But not every puzzle can be solved in that way. Now for the brutish way…
+
+First of all, lets get a fresh copy of the original puzzle read in. And a fresh list of empyt cells.
+
+All righty! Nu kan jeg løse en del sudokuer alene ved denne metode. Så er der resten…
+
+mat <- matrix(as.numeric(unlist(strsplit(prob_df[1,2],""))),9,9,byrow=TRUE)  
+test <- which(mat ==0, arr.ind=T)
+nrow(test)
+
+## [1] 49
+
+
+Back to the 49 empty cells.
+
+The algorithm is as follows.
+
+Set i <- 1
+Get the row and column indeces from test[i,1] and test[i,2] respectively.
+Identify the list of allowed values for that cell.
+Set the value of the cell to the lowest of the allowed values.
+Increment i <- i + 1.
+Get the row and column indeces again.
+Get the list of allowed values for that cell. If there are no allowed values, decrement i <- i -1.
+If there are allowed values, set the value of the cell to the lowest of the allowed values.
+When we return to a cell that already has a value, we should not set it to the lowest allowed value. We should set it to the next lowest. That is the lowest of the allowed values, excluding the value that was already there.
+If we get to a cell with no allowed values (excluding the one that might already be there), the value of the cell should be set to 0, and i should be decrementet.
+
+This function does that.
+
+solve <- function(mat){
+  i <- 1
+  test <- which(mat ==0, arr.ind=T)
+  while(nrow(which(mat==0,arr.ind=T))>0){
+    allowedvalues <- allowed(test[i,1],test[i,2],mat)
+    currentvalue <- mat[test[i,1],test[i,2]]
+    allowedvalues <- allowedvalues[allowedvalues>currentvalue]
+    if(length(allowedvalues)==0){
+      mat[test[i,1],test[i,2]] <- 0
+      i <- i -1
+    } else{
+      mat[test[i,1],test[i,2]] <- min(allowedvalues)
+      i <- i + 1
+    }
+  }
+  mat
+  }
+
+
+The function takes a matrix. It sets the counter/pointer i to 1.
+
+Then a test-matrix is generated, containing all the positions that are empty.
+
+While the number of empty places in the matrix is larger than zero do this:
+
+Find the allowed values.
+Find the current value in the cell.
+Remove all allowed values that are smaller than the current value. In that way, taking the minimum of the remaining allowed values, will always give us the next lowest value. And if the original value was 0, we will get the lowest.
+If there are no allowed values, set the value of the cell to zero, and decrement the counter.
+If there are allowed values, set the value of the cell to the lowest of the remaining allowed values, and increment the counter.
+End by returning the now filled matrix.
+
+Does it work?
+
+solve(mat)
+
+##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+##  [1,]    4    8    3    9    2    1    6    5    7
+##  [2,]    9    6    7    3    4    5    8    2    1
+##  [3,]    2    5    1    8    7    6    4    9    3
+##  [4,]    5    4    8    1    3    2    9    7    6
+##  [5,]    7    2    9    5    6    4    1    3    8
+##  [6,]    1    3    6    7    9    8    2    4    5
+##  [7,]    3    7    2    6    8    9    5    1    4
+##  [8,]    8    1    4    2    5    3    7    6    9
+##  [9,]    6    9    5    4    1    7    3    8    2
+
+
+It does! Qap'la!
+
+I now have two functions that solves sudokus. solve(), that bruteforces it and will always get a solution. And
+repsinglevalues() that uses logic, gets a solution sometimes, but not always.
+
+I also have a dataframe with 50 sudokus that I need to solve.
+
+And what was the task again? Take the three first digits in the first row. Concatenate them to a single three digit number. Do that for all 50 puzzles. Add them all up. That should be the answer.
+
+answer <- 0
+for(i in 1:50){
+  mat <- matrix(as.numeric(unlist(strsplit(prob_df[i,2],""))),9,9,byrow=TRUE)  
+  mat <- repsinglevalues(mat)
+  mat <- solve(mat)
+  answer <<- answer + as.numeric(paste(mat[1,1:3],collapse=""))
+}
+
+Set a variable answer to zero.
+Pick out the sudokus one by one.
+Run the logic-solving function on it.
+Then run the brute-force function on the result of that.
+Pick out the three first digits in row 1, collapse them, cast as numeric, and add to the answer-variable.
+
+Done!
+
+Lessons learned
+Errors in the logic are a bit difficult to locate. I forgot to take into account that the list of allowed values in the brute-force solution does not include the value that is already in the cell. That made the function run for eternity. Or something pretty close. Had I not made that mistake, I would finished this problem a day earlier.
+Technically the lesson has not been learned yet. But below there is a note ot speed. Adding just one extra value to the puzzle reduces the time it takes to bruteforce the solution significantly.
+Set-functions, here specifically setdiff(), are neat!
+Notes on speed
+
+OK. I needed a function for returning a vector for getting the relevant frame in the matrix. As I mentioned, my colleague Henrik thought it should be done wit integer division rather than if-statements.
+
+This was the way I originally did it:
+
+ifgetint <- function(x){
+if(x %in% c(1:3)){
+  res <- c(1:3)
+} else if(x %in% c(4:6)){
+  res <- c(4:6)
+  } else {  
+      res <- c(7:9)
+  }
+  return(res)
+}
+
+
+But what way is faster? Lets find out:
+
+library(microbenchmark)
+mbm <- microbenchmark(ifgetint, getint, times=1000)
+mbm
+
+## Unit: nanoseconds
+##      expr min lq   mean median uq  max neval cld
+##  ifgetint  46 61 63.678     63 65 1236  1000   a
+##    getint  49 63 67.615     65 66 2916  1000   a
+
+
+Actually my original way of doing it was a little bit faster.
+
+library(ggplot2)
+autoplot(mbm)
+
+
+So. I found two methods for solving sudokus. It would be interesting to compare them. I can't do that on just any sudoku. I need to use one that can be solved with both methods. Luckily the first problem in the set can do just that.
+
+mat <- matrix(as.numeric(unlist(strsplit(prob_df[1,2],""))),9,9,byrow=TRUE)  
+solve(mat)
+
+##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+##  [1,]    4    8    3    9    2    1    6    5    7
+##  [2,]    9    6    7    3    4    5    8    2    1
+##  [3,]    2    5    1    8    7    6    4    9    3
+##  [4,]    5    4    8    1    3    2    9    7    6
+##  [5,]    7    2    9    5    6    4    1    3    8
+##  [6,]    1    3    6    7    9    8    2    4    5
+##  [7,]    3    7    2    6    8    9    5    1    4
+##  [8,]    8    1    4    2    5    3    7    6    9
+##  [9,]    6    9    5    4    1    7    3    8    2
+
+repsinglevalues(mat)
+
+##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+##  [1,]    4    8    3    9    2    1    6    5    7
+##  [2,]    9    6    7    3    4    5    8    2    1
+##  [3,]    2    5    1    8    7    6    4    9    3
+##  [4,]    5    4    8    1    3    2    9    7    6
+##  [5,]    7    2    9    5    6    4    1    3    8
+##  [6,]    1    3    6    7    9    8    2    4    5
+##  [7,]    3    7    2    6    8    9    5    1    4
+##  [8,]    8    1    4    2    5    3    7    6    9
+##  [9,]    6    9    5    4    1    7    3    8    2
+
+mbm <- microbenchmark(solve(mat),repsinglevalues(mat), times=100)
+mbm
+
+## Unit: milliseconds
+##                  expr       min        lq      mean   median        uq
+##            solve(mat) 47.627037 53.516049 54.225652 54.26330 54.815257
+##  repsinglevalues(mat)  6.746542  7.066549  7.702925  7.22182  7.509268
+##       max neval cld
+##  63.72794   100   b
+##  11.50775   100  a
+
+
+No surprise there. The logical method is much faster. Something like 8 times faster.
+
+autoplot(mbm)
+
+
+How much of a difference does it make when part of the sudoku has been solved already? By inspection (ie, trial and error) I find sudoku number 11. The original puzzle has 53 empty cells. By filling out what can be filled out using logic, that is reduced to 52 empty cells.
+
+How much faster is it to solve sudoku number 11, when an additional cell has been filled out using logic?
+mat is the original sudoku. redmat is the sudoku partially solved by logic.
+
+i <- 11
+mat <- matrix(as.numeric(unlist(strsplit(prob_df[i,2],""))),9,9,byrow=TRUE)  
+redmat <- repsinglevalues(mat)
+
+mbm <- microbenchmark(solve(mat),solve(redmat), times=10)
+mbm
+
+## Unit: milliseconds
+##           expr      min       lq     mean   median       uq      max neval
+##     solve(mat) 754.9624 769.3149 797.2162 780.1627 788.8825 892.5340    10
+##  solve(redmat) 534.7156 545.7596 550.4211 548.9691 552.2282 565.9535    10
+##  cld
+##    b
+##   a
+
+
+Wow! That really makes a difference!! Filling in just a single extra value using logic cuts about one third of the time it takes to solve the sudoku.
+
+autoplot(mbm)
+
+## Coordinate system already present. Adding new coordinate system, which will replace the existing one.

@@ -9,7 +9,7 @@ date: "2022-10-17"
 
 Bruteforcing - index by modulo.
 
-```{r}
+```{r eval=FALSE}
 t <- 1:999
 answer <- sum(t[t %% 3 == 0 | t %% 5 == 0])
 ```
