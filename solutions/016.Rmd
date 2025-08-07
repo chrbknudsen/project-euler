@@ -1,0 +1,52 @@
+---
+title: "Euler 16"
+output: html_document
+date: '2018-02-08'
+params:
+  done: T
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+$$2^{15} = 32768$$
+
+The sum of the digits for 32768 is:
+
+```{r}
+3 + 2 + 7 + 6 + 8
+```
+
+What is the sum of the digits of the number $2^{1000}$?
+
+That is a rather large number, larger than R is able to handle on its own.
+
+We load the `gmp` package that can handle very large numbers:
+
+```{r}
+library(gmp)
+```
+
+
+```{r}
+large_number <- as.bigz(2)^as.bigz(1000)
+```
+
+convert it to a character
+
+```{r}
+large_character <- as.character(large_number)
+```
+Split it in individual characters:
+
+```{r}
+large_character_vector <- strsplit(large_character, "")
+```
+
+That is a list, so we subset the first (and only) element, coerce it to 
+numeric, and sum all the numbers:
+```{r}
+answer <- sum(as.numeric(large_character_vector[[1]]))
+```
+
