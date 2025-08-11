@@ -24,7 +24,7 @@ combined with all the numbers from 1 to 99 (remember to add one hundred as itsel
 
 Instead we can load the package `english`, that does that for us:
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 library(english)
 english(999)
 ```

@@ -1,0 +1,35 @@
+---
+title: "Euler 20"
+output: html_document
+date: '2018-02-08'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The answer is the sum of the digits in 100!
+
+Eg 10! is 3628800, and the sum is 
+```{r}
+3 + 6 + 2 + 8 + 8 + 0 + 0
+```
+Solution is simple - unless we want to calculate everything on our own.
+Load gmp to handle lage numbers. Coerce 100 to bigz, calculate the factorial,
+coerce to text, split in individual characters, unlist, coerce to numeric and sum
+```{r}
+library(gmp)
+library(tidyverse)
+
+answer <- 100 %>% 
+  as.bigz() %>% 
+  factorial  %>% 
+  as.character() %>% 
+  strsplit("") %>% 
+  unlist() %>% 
+  as.numeric() %>% 
+  sum()
+```
+
