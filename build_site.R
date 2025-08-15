@@ -1,7 +1,7 @@
 build_site <- function(
     solutions_dir = "solutions",
     out_dir = "docs",
-    max_id = 900,
+    max_id = 947,
     force = FALSE,
     force_ids = integer(0)  # fx c(1, 17) for kun at tvinge bestemte filer
 ) {
@@ -18,7 +18,7 @@ build_site <- function(
     
     html <- file.path(out_dir, paste0(id, ".html"))
     
-    # Skal vi rende?
+    # Skal vi rendere?
     doit <- FALSE
     if (force || i %in% force_ids) {
       doit <- TRUE
@@ -56,7 +56,7 @@ build_site <- function(
     if (isTRUE(has_html[id])) {
       sprintf('<a class="card" href="%s.html"><span class="id">%s</span><span class="status ok">link</span></a>', id, id)
     } else {
-      sprintf('<div class="card missing"><span class="id">%s</span><span class="status no">mangler</span></div>', id)
+      sprintf('<div class="card missing"><span class="id">%s</span><span class="status no">missing</span></div>', id)
     }
   }, character(1))
   
