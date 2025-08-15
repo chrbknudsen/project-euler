@@ -1,0 +1,26 @@
+---
+title: "Euler 24"
+output: html_document
+date: '2018-02-10'
+params:
+  done: F
+---
+
+
+A permutation is an ordered arrangement of objects. For the objects 0, 1 and 2, "012" is one permutation. And "201" is 
+another.
+
+If we make all permutations of the digits 0 to 9, and order them in alphabetical order. What permutation is number one 
+million?
+
+We can get all permutations of the digits using `permutations()` from `gtools`. Convert to a tibble, arrange, and then
+slice out the answer:
+```{r}
+library(tidyverse)
+library(gtools)
+answer <- permutations(10, 10, 0:9) |> 
+    as_tibble() |> 
+    arrange(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10) |> 
+    slice(1000000) |> 
+    transmute(answer = paste0(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10))
+```
