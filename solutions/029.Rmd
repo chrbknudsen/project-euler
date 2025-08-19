@@ -1,0 +1,29 @@
+---
+title: "Euler 29"
+output: html_document
+date: '2018-02-26'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+alle heltals kombinationer af a^b for 2<= a <= 5 og 2<=b<=5
+
+sorter i numerisk orden, og fjern gentagelser.
+Hvor mange unikke termer får vi for 
+2<= a<= 100 og 2<=b<= 100?
+
+
+```{r}
+library(tidyverse)
+answer <- expand_grid(a = 2:100,  b = 2:100) |> 
+    transmute(comb = a^b) |> 
+    distinct(comb) |>
+    nrow()
+```
+
+Vi er heldige at selvom vi ikke kan arbejde med så store heltal i R (vi når op på 1*10^200), så er de forskellige nok
+til at få kan se forskel.
