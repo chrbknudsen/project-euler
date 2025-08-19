@@ -57,7 +57,7 @@ test_n <- function(n = 2, df){
 }
 ```
 
-```{r}
+```{r eval = TRUE}
 n <- 1
 while(nrow(kand)>1){
     kand <<- test_n(n, kand)

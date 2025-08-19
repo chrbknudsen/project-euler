@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2015-07-23" />
+<meta name="date" content="2015-07-22" />
 
-<title>Euler</title>
+<title>Euler 2</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -349,15 +349,22 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Euler</h1>
-<h4 class="date">2015-07-23</h4>
+<h1 class="title toc-ignore">Euler 2</h1>
+<h4 class="date">2015-07-22</h4>
 
 </div>
 
 
+<div id="even-fibonacci" class="section level2">
+<h2>Even Fibonacci</h2>
+<p>Generating the sequence using <code>numbers</code>. Restricting,
+indexing on modulo 2, and summing.</p>
 <pre class="r"><code>library(numbers)
-primes &lt;- Primes(250000)
-answer &lt;- primes[10001]</code></pre>
+t &lt;- fibonacci(50, sequence = T)
+t &lt;- t[t &lt; 4000000]
+
+answer &lt;- sum(t[t %% 2 == 0])</code></pre>
+</div>
 
 
 

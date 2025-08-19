@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2015-07-23" />
+<meta name="date" content="2015-07-22" />
 
-<title>Euler</title>
+<title>Euler 1</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -349,15 +349,18 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Euler</h1>
-<h4 class="date">2015-07-23</h4>
+<h1 class="title toc-ignore">Euler 1</h1>
+<h4 class="date">2015-07-22</h4>
 
 </div>
 
 
-<pre class="r"><code>library(numbers)
-primes &lt;- Primes(250000)
-answer &lt;- primes[10001]</code></pre>
+<div id="sum-of-multiples-of-numbers" class="section level2">
+<h2>Sum of multiples of numbers</h2>
+<p>Bruteforcing - index by modulo.</p>
+<pre class="r"><code>t &lt;- 1:999
+answer &lt;- sum(t[t %% 3 == 0 | t %% 5 == 0])</code></pre>
+</div>
 
 
 

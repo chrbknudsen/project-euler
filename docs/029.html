@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2015-07-23" />
+<meta name="date" content="2018-02-26" />
 
-<title>Euler</title>
+<title>Euler 29</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -349,15 +349,24 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Euler</h1>
-<h4 class="date">2015-07-23</h4>
+<h1 class="title toc-ignore">Euler 29</h1>
+<h4 class="date">2018-02-26</h4>
 
 </div>
 
 
-<pre class="r"><code>library(numbers)
-primes &lt;- Primes(250000)
-answer &lt;- primes[10001]</code></pre>
+<p>alle heltals kombinationer af a^b for 2&lt;= a &lt;= 5 og
+2&lt;=b&lt;=5</p>
+<p>sorter i numerisk orden, og fjern gentagelser. Hvor mange unikke
+termer får vi for 2&lt;= a&lt;= 100 og 2&lt;=b&lt;= 100?</p>
+<pre class="r"><code>library(tidyverse)
+answer &lt;- expand_grid(a = 2:100,  b = 2:100) |&gt; 
+    transmute(comb = a^b) |&gt; 
+    distinct(comb) |&gt;
+    nrow()</code></pre>
+<p>Vi er heldige at selvom vi ikke kan arbejde med så store heltal i R
+(vi når op på 1*10^200), så er de forskellige nok til at få kan se
+forskel.</p>
 
 
 

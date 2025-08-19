@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2015-07-23" />
+<meta name="date" content="2018-02-26" />
 
-<title>Euler</title>
+<title>Euler 27</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -349,15 +349,49 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Euler</h1>
-<h4 class="date">2015-07-23</h4>
+<h1 class="title toc-ignore">Euler 27</h1>
+<h4 class="date">2018-02-26</h4>
 
 </div>
 
 
+<p>Considering this expression:</p>
+<p><span class="math display">\[n^2 + an + b\]</span></p>
+<p>Where <span class="math inline">\(|a| &lt; 1000\)</span> and <span class="math inline">\(|b| \leq 1000\)</span></p>
+<p>The answer is the product ab for the expression that produces the
+maximum number of primes for consecutive values of n, starting with n =
+0.</p>
+<p>for n = 0, reducerer udtrykket til b. så b skal være et primtal. Og
+derfor kan vi også udelukke alle de negative.</p>
 <pre class="r"><code>library(numbers)
-primes &lt;- Primes(250000)
-answer &lt;- primes[10001]</code></pre>
+library(tidyverse)
+b &lt;- Primes(1000)</code></pre>
+<p>Vi ved også at når n = 1 reducerer udtrykket til: 1+a+b. Dette tal
+behøver for så vidt ikke været et primtal. Men det skal være ulige, for
+ellers kan det ikke være et primtal. Men det skal nu være et primtal
+alligevel. For ellers stopper sekvensen af primtal allerede ved n = 1.
+Og så er det ihvertfald ikke ret langt.</p>
+<pre class="r"><code>a &lt;- -999:999
+kand &lt;- expand_grid(a = a, b = b) |&gt; 
+    mutate(test_1 = a + b + 1) |&gt; 
+    filter(test_1 &gt; 0) |&gt; 
+    filter(isPrime(test_1)) |&gt; 
+    select(-test_1)</code></pre>
+<p>En funktion der piller kandidater ud</p>
+<pre class="r"><code>test_n &lt;- function(n = 2, df){
+    df |&gt; 
+        mutate(test = n^2 + a*n + b) |&gt; 
+        filter(test &gt; 0) |&gt; 
+        filter(isPrime(test)) |&gt; 
+        select(-test)
+}</code></pre>
+<pre class="r"><code>n &lt;- 1
+while(nrow(kand)&gt;1){
+    kand &lt;&lt;- test_n(n, kand)
+    n &lt;- n + 1
+}
+
+answer &lt;- kand |&gt; summarise(answer = a*b)</code></pre>
 
 
 
