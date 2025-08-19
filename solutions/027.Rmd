@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Considering this expression:
-
+ 
 $$n^2 + an + b$$
 
 Where $|a| < 1000$ and $|b| \leq 1000$
@@ -65,7 +65,5 @@ while(nrow(kand)>1){
 }
 
 answer <- kand |> summarise(answer = a*b)
-
-
 ```
 
