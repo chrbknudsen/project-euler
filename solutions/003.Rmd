@@ -1,7 +1,6 @@
 ---
 title: "Euler 3"
-author: "Christian Knudsen"
-date: "2022-10-17"
+date: "2015-07-23"
 output: html_document
 params:
   done: T

@@ -1,0 +1,19 @@
+---
+title: "Euler 2"
+format: html
+date: "2015-07-22"
+---
+
+## Even Fibonacci
+
+Generating the sequence using `numbers`. Restricting, indexing on modulo 2, and
+summing.
+
+```{r}
+library(numbers)
+t <- fibonacci(50, sequence = T)
+t <- t[t < 4000000]
+
+answer <- sum(t[t %% 2 == 0])
+```
+
