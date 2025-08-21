@@ -1,0 +1,44 @@
+---
+title: "Euler 41"
+format: html
+date: "2018-02-10"
+---
+
+An n-digit number is pandigital if it contains all digits from 1 to n 
+exactly once.
+
+I can't be bothered to write my own permutation function, the `RcppAlgos`
+package can do it. I'll also need `tidyverse` and `numbers`: 
+```{r}
+library(RcppAlgos)
+library(tidyverse)
+library(numbers)
+```
+
+First, generate all pandigital numbers for n = 4 to 9.
+```{r}
+
+possible <- list()
+for(i in 4:9){
+possible[[i]] <- permuteGeneral(1:i) |> 
+    apply(1, paste0, collapse = "")}
+```
+
+Unlist and convert to numeric:
+```{r}
+possible <- possible |> 
+    unlist() |> 
+    as.numeric()
+```
+
+ Remove all even numbers. And numbers divisible by 5:
+
+```{r}
+possible <- possible[possible%%2 != 0]
+possible <- possible[possible%%5 != 0]
+```
+
+And then subset only the primes - and find the largest:
+```{r}
+answer <- possible[isPrime(possible)] |> max()
+```
