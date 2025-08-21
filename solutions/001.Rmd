@@ -4,8 +4,6 @@ format: html
 date: "2015-07-22"
 ---
 
-## Sum of multiples of numbers
-
 Bruteforcing - index by modulo.
 
 ```{r eval=FALSE}

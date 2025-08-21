@@ -4,7 +4,6 @@ format: html
 date: "2015-07-22"
 ---
 
-## Even Fibonacci
 
 Generating the sequence using `numbers`. Restricting, indexing on modulo 2, and
 summing.

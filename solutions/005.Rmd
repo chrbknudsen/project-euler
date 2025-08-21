@@ -1,10 +1,8 @@
 ---
 title: "Euler 5"
-author: "Christian Knudsen"
 date: "2015-07-23"
 output: html_document
-params:
-  done: T
+
 ---
 
 ```{r setup, include=FALSE}

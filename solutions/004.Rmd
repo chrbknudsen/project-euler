@@ -1,9 +1,7 @@
 ---
-title: '4'
+title: 'Euler 4'
 output: html_document
 date: '2015-07-23'
-params:
-  done: T
 ---
 
 
