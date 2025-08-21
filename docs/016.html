@@ -365,6 +365,11 @@ own.</p>
 <p>We load the <code>gmp</code> package that can handle very large
 numbers:</p>
 <pre class="r"><code>library(gmp)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;gmp&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     %*%, apply, crossprod, matrix, tcrossprod</code></pre>
 <pre class="r"><code>large_number &lt;- as.bigz(2)^as.bigz(1000)</code></pre>
 <p>convert it to a character</p>
 <pre class="r"><code>large_character &lt;- as.character(large_number)</code></pre>

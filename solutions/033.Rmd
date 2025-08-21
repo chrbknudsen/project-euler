@@ -1,0 +1,35 @@
+---
+title: "Euler 33"
+output: html_document
+date: '2023-05-27'
+---
+
+Hm. Hvis et ciffer optræder i både tæller og nævner, reducerer vi det ud. 
+
+
+```{r}
+library(tidyverse)
+tibble(tæller = c(49, 39), nævner = c(98, 98))
+```
+
+
+det er også gældende at tæller skal være større end nævner
+
+
+```{r }
+a <- c(2,8)
+b <- c(3, 2)
+a[!(a %in% b)]
+
+```
+
+
+men det vil fjerne for meget.
+```{r}
+expand.grid(t = 10:99, n = 10:99) |> 
+    filter(t<n) |> 
+    mutate(t_s = str_split(t, ""),
+            n_s = str_split(n, "")) 
+    
+
+```

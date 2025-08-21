@@ -66,7 +66,7 @@ build_site <- function(
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Solutions</title>
+<title>Project Euler</title>
 <style>
   body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
   h1 { margin-bottom: 12px; }
@@ -83,7 +83,8 @@ build_site <- function(
 </style>
 </head>
 <body>
-<h1>Solutions (001–', max_id, ')</h1>
+<h1>Solutions for Project Euler problems)</h1>
+<p>These are my solutions for Project Euler problems. Find the problems on the <a href="https://projecteuler.net/">Project Euler homepage</a>. Since the problems are copyrighted, the solutions does not contain much information on what the problem actually was</p>
 <div class="legend">Links findes for genererede filer; resten vises som “mangler”.</div>
 <div class="grid">
 ', paste(items, collapse = "\n"), '

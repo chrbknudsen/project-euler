@@ -355,8 +355,6 @@ display: none;
 </div>
 
 
-<div id="even-fibonacci" class="section level2">
-<h2>Even Fibonacci</h2>
 <p>Generating the sequence using <code>numbers</code>. Restricting,
 indexing on modulo 2, and summing.</p>
 <pre class="r"><code>library(numbers)
@@ -364,7 +362,6 @@ t &lt;- fibonacci(50, sequence = T)
 t &lt;- t[t &lt; 4000000]
 
 answer &lt;- sum(t[t %% 2 == 0])</code></pre>
-</div>
 
 
 

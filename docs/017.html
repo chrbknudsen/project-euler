@@ -367,8 +367,9 @@ words “one” to “nine”. When we have all numbers spelled out from 1 to
 from 1 to 99 (remember to add one hundred as itself).</p>
 <p>Instead we can load the package <code>english</code>, that does that
 for us:</p>
-<pre class="r"><code>library(english)
-english(999)</code></pre>
+<pre class="r"><code>library(english)</code></pre>
+<pre><code>## Warning: package &#39;english&#39; was built under R version 4.5.1</code></pre>
+<pre class="r"><code>english(999)</code></pre>
 <pre><code>## [1] nine hundred and ninety-nine</code></pre>
 <p>Now we pour the numbers 1 to 1000 into it (fortunately it is
 vectorized):</p>
