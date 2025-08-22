@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2025-08-21" />
 
-<title>Project euler 209</title>
+<title>Euler 836</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -348,61 +349,14 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Project euler 209</h1>
+<h1 class="title toc-ignore">Euler 836</h1>
+<h4 class="date">2025-08-21</h4>
 
 </div>
 
 
-<p>Find the unique positive integer whose square has the form
-1_2_3_4_5_6_7_8_9_0, where each “_” is a single digit.</p>
-<p>All right. The largest square we can get is:</p>
-<pre class="r"><code>largest &lt;- 1929394959697989990</code></pre>
-<p>And the smallest:</p>
-<pre class="r"><code>smallest &lt;- 1020304050607080900</code></pre>
-<p>That means, that the integer we are looking for is in this
-interval:</p>
-<pre class="r"><code>sqrt(smallest)</code></pre>
-<pre><code>## [1] 1010101010</code></pre>
-<pre class="r"><code>sqrt(largest)</code></pre>
-<pre><code>## [1] 1389026623</code></pre>
-<p>We know that the square has to end on 0. That means, that the integer
-must also end on 0.</p>
-<p>Any integer with 0 as the last digit, will give us a square that ends
-with 00.</p>
-<p>From that we can conclude, that the square end with 900, and from
-that, that the integer must end with either 30 or 70.</p>
-<p>That trims the number of integers we need to check significantly.</p>
-<p>Although the range we are looking at, is reduced only a little:</p>
-<p>1010101030 to 1389026670.</p>
-<p>We are going to need a couple of libraries:</p>
-<pre class="r"><code>library(tibble)</code></pre>
-<pre><code>## Warning: package &#39;tibble&#39; was built under R version 4.5.1</code></pre>
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<p>And, thats it! Generate all the possible integers, filter out the
-ones not ending on 30 or 70, square them, and test if the third position
-of the square is 2, the fifth si 3 etc.</p>
-<pre class="r"><code>result &lt;- seq(1010101030,1389026670, by = 20) %&gt;% 
-  enframe() %&gt;% 
-  filter(value%%100 %in% c(30,70)) %&gt;% 
-  mutate(square = (value)**2) %&gt;% 
-  filter(square%/%10000000000000000%%10 == 2) %&gt;% 
-  filter(square%/%100000000000000%%10 == 3) %&gt;% 
-  filter(square%/%1000000000000%%10 == 4) %&gt;% 
-  filter(square%/%10000000000%%10 == 5) %&gt;% 
-  filter(square%/%100000000%%10 == 6) %&gt;% 
-  filter(square%/%1000000%%10 == 7) %&gt;% 
-  filter(square%/%10000%%10 == 8) %&gt;% 
-  select(value)</code></pre>
-<p>Not very elegant. A more detailed analysis might have given the
-result without having to write any code.</p>
+<p>No real code involved. Just read the problem - like really read it
+:D</p>
 
 
 

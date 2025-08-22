@@ -10,3 +10,23 @@ params:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+```{r}
+is_triangle <- function(t){
+  t*2
+}
+```
+
+
+Hvis et tal er en triangle.
+Jeg skal grundlæggende kunne teste om et givet tal er har en heltallig løsning på ligningene for triangle og pentagonal.
+Så genererer vi hexagonal - og tester om de er.
+
+
+```{r}
+hex <- function(n){
+  (2*n-1)*n
+}
+
+hex(27500) < 1533776805
+```
