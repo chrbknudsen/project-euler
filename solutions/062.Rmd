@@ -1,6 +1,7 @@
 ---
-title: "Cubic permutations"
-output: html_notebook
+title: "Euler 62"
+output: html_document
+date: '2018-04-19'
 ---
 # Euler problem 62
 

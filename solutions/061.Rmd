@@ -2,8 +2,6 @@
 title: "Euler 61"
 output: html_document
 date: '2018-04-19'
-params:
-  done: T
 ---
 
 ```{r setup, include=FALSE}
