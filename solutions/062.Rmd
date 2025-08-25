@@ -18,6 +18,8 @@ We can generate the largest permutation of a given number. If the largest permut
 So I need a function, that returns the largest permutation of a number. It would be nice, if that function was vectorized.
 
 ```{r}
+library(stringr)
+library(dplyr)
 max_perm <- function(t){
   require(magrittr)
   options(scipen=5)
