@@ -1,55 +1,50 @@
 ---
 title: "Euler 46"
 output: html_document
-date: '2023-05-27'
+date: '2018-04-25'
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Project Euler 46.
+A composite number is - more or less - a non-prime number.
 
-Christian Goldbach apparently proposed, that every odd composite number, can be written as the sum of a prime, and twice a square. As in:
+A lot of them can be written as the sum of a prime, and twice a square, eg
 
-9 = 7 + 2 * 12
+$9 = 7 + 2 1^2$
 
-I had to look up what a composite number is. It is basically a number that is not a prime.
+What is the smallets, odd, number that can not be written as such.
 
-The conjecture was false. And we should now find the smallest, odd, composite number, that can not be written as the sum of a prime and twice a square.
-
-I was not able to find a shortcut, and apparently no one else has.
-
-So I brute forced it.
-
-I started with loading the trusted numbers, and purrr libraries:
-
+Loading `numbers` to handle primes. And `purrr`:
+```{r}
 library(numbers)
 library(purrr)
+```
 
 
-Then I guessed, correctly as it turned out, that the number I'm looking for, is less than 100000.
+Make a guess, the answer is smaller than 100000
 
-That means, that the prime that can take part in the sum, must also be less than 100000. So - generating two vectors, one of primes below 100000, and candidate odd composite numbers below 100000:
-
+Generate primes, and candidate, odd, numbers, smaller than that
+```{r}
 prim <- Primes(100000)
 test <- seq(3,100000,by=2)
+```
 
+Remove primes from test:
 
-1 is not included. I'm not sure if it is ruled out for not being a composite. But it is trival that it cannot be a sum of a prime and any thing else (positive). So I'm starting at 3.
-
-Actually test does not contain only composite numbers. Getting rid of the primes is the next step:
-
+```{r}
 test <- setdiff(test, prim)
+```
 
+Generate candidate squares:
 
-setdiff() is rather useful. It takes two sets - vectors, and removes all the elements in the last from the first.
-
+```{r}
+upper_limit <- ceiling(sqrt(100000/2))
+squares <- 2*(1:upper_limit)^2
+```
 Next up is getting candidate squares.
-As I'm squaring them, I don't need to look at squares of numbers larger than 707. Since 708 squared and doubled is larger than 100000.
 
-squares <- 1:707
-squares <- 2*squares**2
 
 
 Next I'm writing a function to test if any x can be expressed as the sum of twice a square and a prime.
@@ -58,11 +53,17 @@ x - squares will give me a vector with the result of substracting each of the el
 
 To do that:
 
+```{r}
 x - squares[squares<x]
+```
+
 
 Next, are the elements in that vector prime? The easy way is to test if they are in the list of primes. I use the %in% operator for that:
 
+```{r}
 (x - squares[squares<x]) %in% prim
+```
+
 
 That will return a logical vector, with a value TRUE or FALSE for each element in the vector resulting from the subtraction, depending on whether it is in the list of primes. If any element is TRUE, we have a result.
 
@@ -70,15 +71,21 @@ The any() function does that. If any element in the vector is true, any() will r
 
 Putting all of that into a function:
 
+```{r}
 testing <- function(x){
   any((x - squares[squares<x]) %in% prim)
 }
+```
+
 
 
 I now have a function that returns true, if a number x can be written as the sum of a prime and twice a square.
 
 Finally I filter that through the discard() function - basically getting rid of all the numbers in my test-vector, that can be written as this sum. And finally passing those values to the min() function. And I have my answer:
 
+```{r}
 answer <- test %>%
   discard(function(x) testing(x)) %>%
   min()
+```
+
