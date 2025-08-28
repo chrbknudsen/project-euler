@@ -11,6 +11,82 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+$T = t(t+1)/2$, $P=p(3p-1)/2$ and $H=h(2h-1)$
+
+Looking for 
+$$T = P = H$$
+
+$$t(t+1)/2 = h(2h-1)$$
+$$t^2 + t = 2h(2h-1)$$
+$$t^2 + t = 2(2h^2 - h)$$
+$$t^2 + t = 4h^2 - 2h)$$
+
+Every hexagonal number is also a triangular number:
+Og det betyder at vi kan sætte P = H, og teste for h indtil vi rammer et 
+
+𝐻
+ℎ
+=
+𝑇
+2
+ℎ
+−
+1
+H
+h
+	​
+
+=T
+2h−1
+	​
+
+
+because
+
+𝑇
+2
+ℎ
+−
+1
+=
+(
+2
+ℎ
+−
+1
+)
+(
+2
+ℎ
+)
+2
+=
+ℎ
+(
+2
+ℎ
+−
+1
+)
+=
+𝐻
+ℎ
+.
+T
+2h−1
+	​
+
+=
+2
+(2h−1)(2h)
+	​
+
+=h(2h−1)=H
+h
+	​
+
+.
+
 n(n+1)/2 = t
 2t = n(n+1)
 2t = n^2 + n
@@ -45,13 +121,15 @@ is_pentagonal <- function(p){
   (1 + c(-1,1)*sqrt(1 + 24*p))/6
 }
 
-is_pentagonal(22)
+is_pentagonal(35)
 ```
 is_pentagonal <- function(p){
   (1 + c(-1,1)*sqrt(1 + 24*p))
 }
 
-
+```{r}
+is_triangle(1533776805)
+```
 
 ```{r}
 is_triangle(3)
