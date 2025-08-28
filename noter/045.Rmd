@@ -11,12 +11,51 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+n(n+1)/2 = t
+2t = n(n+1)
+2t = n^2 + n
+0 = n^2 + n - 2t
+
+a = 1
+b = 1
+c = -2t
+
+(-1 +c(-1,1)*sqrt(1 +4*2*t))/2
+
+
 ```{r}
 is_triangle <- function(t){
-  t*2
+  (-1 +c(-1,1)*sqrt(1 +4*2*t))/2
 }
 ```
 
+
+pentagonal
+n(3n - 1)/2 = P
+2P = n(3n-1)
+2P = 3n^2 - n
+0 = 3n^2 - n - 2p
+a = 3
+b = -1
+c = -2p
+
+den er ikke korrekt... hvorfor fejler det?
+```{r}
+is_pentagonal <- function(p){
+  (1 + c(-1,1)*sqrt(1 + 24*p))/6
+}
+
+is_pentagonal(22)
+```
+is_pentagonal <- function(p){
+  (1 + c(-1,1)*sqrt(1 + 24*p))
+}
+
+
+
+```{r}
+is_triangle(3)
+```
 
 Hvis et tal er en triangle.
 Jeg skal grundlæggende kunne teste om et givet tal er har en heltallig løsning på ligningene for triangle og pentagonal.
