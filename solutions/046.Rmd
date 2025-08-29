@@ -4,9 +4,7 @@ output: html_document
 date: '2018-04-25'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 A composite number is - more or less - a non-prime number.
 
@@ -43,6 +41,7 @@ Generate candidate squares:
 upper_limit <- ceiling(sqrt(100000/2))
 squares <- 2*(1:upper_limit)^2
 ```
+
 Next up is getting candidate squares.
 
 
@@ -53,14 +52,14 @@ x - squares will give me a vector with the result of substracting each of the el
 
 To do that:
 
-```{r}
+```{r eval = FALSE}
 x - squares[squares<x]
 ```
 
 
 Next, are the elements in that vector prime? The easy way is to test if they are in the list of primes. I use the %in% operator for that:
 
-```{r}
+```{r eval = FALSE}
 (x - squares[squares<x]) %in% prim
 ```
 
