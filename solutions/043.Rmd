@@ -1,14 +1,8 @@
 ---
 title: "Euler 43"
-output: html_document
-date: '2023-05-27'
+format: html
+date: '2018-04-11'
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-Euler problem 43. Sub-string divisibility
 
 Ok. Take all numbers that contains the ten digits 0:9 exactly once.
 

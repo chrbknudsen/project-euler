@@ -1,14 +1,13 @@
 ---
 title: "Euler 42"
-output: html_document
-date: '2023-05-27'
+format: html
+date: '2018-03-20'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-A triangle number is given by t~n~ = ½(n(n+1))
+A triangle number is given by
+
+$$t_n = \frac{1}{2}n(n+1)$$
 
 Lets start by writing a function for that:
 

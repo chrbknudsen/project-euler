@@ -1,25 +1,26 @@
 ---
 title: "Euler 96"
-output: html_document
+format: html
 date: '2018-04-06'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+Make an automated sudoku solver. 
 
-This problem is basically about making a sudoku solver, that can be automated. If you don't know what a sudoku is - google it and come back.
+We need a brute force solution, rather than trying to code the different techniques, and using them.
 
-I have solved a LOT of sudokus. Manually. There are several techniques, but some of them are not that easy to code. And of course I'll need a method that guarantees a solution.
-
-Fortunately a brute force solution exists:
+Such a brute force solution exist:
 
 https://en.wikipedia.org/wiki/Sudoku_solving_algorithms
 
+It is called backtracking. 
 
-It is called backtracking. The process is to look at all the empty cells.
+Observe all empty cells in the sudoku. In the first empty cell, insert the lowest allowed value. Go to the
+next empty cell. Insert the lowest allowed value in that. Continue until you reach a cell with no allowed 
+values. Return to the previous cell. And insert the next lowest allowed value. Go to the next empty cell (the 
+one you just left). If it still have no allowed vales, go one step further back. Continue until you reach the
+last cell in the puzzle.
 
-In the first one - insert the lowest allowed value, and progress to the next empty cell. Insert the lowest allowed value in it. Continue until you reach a cell with no allowed values. When you do that, go back to the previous cell, and insert the next-lowest allowed value. And then go back (forward?) to the next cell. If the cell you went back to also have no allowed values, you go one step futher back. Continue until you reach the last cell in the puzzle.
+Lets get the neccesary things in place.
 
 So. We'll need a few things.
 
