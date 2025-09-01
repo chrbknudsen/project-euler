@@ -9,89 +9,50 @@ A triangle number is given by
 
 $$t_n = \frac{1}{2}n(n+1)$$
 
-Lets start by writing a function for that:
+We want to determine if a number is triangular.
 
-triangle <- function(n){
-  (n*(n+1))/2
-}
+I have a helperfunction for that:
+
+```{r}
+source("solutions/helpers.R")
+```
+
+It looks like this:
+
+```{r}
+is_triangle
+```
 
 
-If we take a word, Project Euler uses SKY as an example, we can take each letter, assign to it the value of its position in the alphabet, and add together the values of the letters.
-SKY becomes 19 + 11 + 25 = 55.
+We can also represent a number as a combination of letters. Or rather the other way around. 
 
-Lets write a function that finds that:
+Take each letter, give it the value of its position in the alphabet. Add all values togehter:
 
+ABC -> 1, 2, 3 -> 1 + 2 + 3 =6
+
+Let us also write a function for that:
+
+```{r}
 lettervalue <- function(chars){
   chars <- toupper(chars)
   t <- unlist(strsplit(chars,""))
   sum(match(t, LETTERS))
 }
+```
 
+We now get a list of words. How many of these, converted to a sum with the function above, is a triangle number?
 
-First I convert the character string in the input to uppercase letters. This might not be necessary.
-Then I split the string in individual characters. And unlist() the result.
-Then I pass it to the match() function. That gives me the position of a character as a numerical value, in the vector LETTERS.
-Neat function.
-Then I sum it.
+```{r eval = FALSE}
+wordlist <- scan("solutions/0042_words.txt", what=character(), sep=",", quiet=TRUE)
+```
 
-This is nice and vectorized all the way through.
+Neither the `is_triangle` nor `lettervalues` functions are vectorised, so I have to map:
 
-But what was the problem I should solve?
-Project Euler provides a list of words. How many of these are, when converted to a sum with the function above, a triangle number?
-
-I have no idea about how long a given word is. But lets find out.
-
-First, lets read in the file.
-
-wordlist <- scan("p042_words.txt", what=character(), sep=",", quiet=TRUE)
-
-
-What are the numerical values as defined above?
-My function lettervalue just adds everything together. Which is a bit unhelpful. If I use map() from the purrr-libray, I can apply the function to each element in wordlist. I'll have to unlist() it afterwards. That gives me all the numerical values:
-
+```{r}
 library(purrr)
-values <- unlist(map(wordlist, lettervalue))
 
+answer <- map_int(wordlist, lettervalue) |> 
+  map_lgl(is_triangle) |> 
+  sum()
+```
 
-What is the largest of them?
-
-max(values)
-
-## [1] 192
-
-
-That is the highest number I have to check is triangular.
-
-Lets generate a list of the first 20 triangle numbers:
-
-t <- 1:20
-triangles <- triangle(t)
-max(triangles)
-
-## [1] 210
-
-
-That was lucky, triangle-number 20 is 210, which is larger than the largest value I have in the set of words.
-Now I just need to find out how many of the values in values are in the variable triangles:
-
-answer <- sum(values%in%triangles)
-
-
-Neat.
-Lessons learned:
-1. map() can be used to apply a function to a vector. Even functions that are not that well behaved.
-And it's pretty damn fast. An alternative would be one of the apply-functions:
-
-library(microbenchmark)
-map_test <- function(){map(wordlist, lettervalue)}
-apply_test <- function() {lapply(wordlist, lettervalue)}
-mbm <- microbenchmark(map_test, apply_test, times=1000)
-library(ggplot2)
-autoplot(mbm)
-
-## Warning: Transformation introduced infinite values in continuous y-axis
-
-## Warning: Removed 915 rows containing non-finite values (stat_ydensity).
-
-
-match() is also pretty useful. I spend a couple of frustrated minutes trying to get a list to behave as a lookup-table. match() is much easier.
