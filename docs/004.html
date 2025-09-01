@@ -366,74 +366,11 @@ Vectorized!</p>
   y &lt;- lapply(y, paste, collapse = &quot;&quot;)
   y == x
 }</code></pre>
+<p>Then all combinations of two three-digit numbers - multiply - get the
+largest that is palindromic.</p>
 <pre class="r"><code>t &lt;- expand.grid(100:999, 100:999)
 t &lt;- t[,&quot;Var1&quot;] * t[,&quot;Var2&quot;]
 answer &lt;- max(t[is_palindromic(t)])</code></pre>
-<div id="fra-nusse.dk" class="section level2">
-<h2>fra nusse.dk</h2>
-<p>I solved this more than four years ago. So I have no idea if this was
-the way I did it originally.</p>
-<p>The problem is:</p>
-<p>A palindromic number is a number that reads the same both ways. Like
-“A man, a plan, a canal, Panama!” just with numbers.</p>
-<p>The problem informs us, that the largest palindrome made from the
-product of two two-digit numbers, is 9009.</p>
-<p>We get that from 91 × 99. We must now find the largest palindrome,
-made from the product of two three-digit numbers.</p>
-<p>First, we need to figure out how to test if a number is palindromic.
-There might be easier ways. But this is mine.</p>
-<p>Convert the number to a string. Split it in individual characters
-reverse the string, and compare to the original.</p>
-<p>Like this, using the stringr library:</p>
-<p>library(stringr) rev(unlist(str_split(“9009”, ““))) ==
-unlist(str_split(”9009”, ““))</p>
-</div>
-<div id="true-true-true-true" class="section level2">
-<h2>[1] TRUE TRUE TRUE TRUE</h2>
-<p>Everything is TRUE, as it should be - lets make a function.</p>
-<p>is_palindromic &lt;- function(x){ all(rev(unlist(str_split(x, ““)))
-== unlist(str_split(x,”“))) }</p>
-<p>is_palindromic(9009)</p>
-</div>
-<div id="true" class="section level2">
-<h2>[1] TRUE</h2>
-<p>Only problem is that it is not vectorized</p>
-<p>is_palindromic(c(991, 9009))</p>
-</div>
-<div id="false" class="section level2">
-<h2>[1] FALSE</h2>
-<p>Just for the fun of it, lets write something vectorized. This is
-definitely not the way I did it originally.</p>
-<p>is_palindromic &lt;- function(x){
-unlist(lapply(lapply(str_split(x,““), rev),str_c, collapse=”“)) ==
-as.character(x) }</p>
-<p>is_palindromic(c(991, 9009))</p>
-</div>
-<div id="false-true" class="section level2">
-<h2>[1] FALSE TRUE</h2>
-<p>Nice. There are definitely faster ways of doing it.</p>
-<p>Now I just need to generate all products made up of two three-digit
-numbers, test if it is palindromic, and find the largest.</p>
-<p>I use expand.grid to generate all combinations of all three-digit
-numbers, transmute the product into existence, and filter out all the
-non-palindromic products. Then I arrange the product variable in
-descending order, and take the first.</p>
-<p>library(dplyr) answer &lt;- expand.grid(100:999, 100:999) %&gt;%
-transmute(product = Var1*Var2) %&gt;% filter(is_palindromic(product))
-%&gt;% arrange(desc(product)) %&gt;% slice(1)</p>
-<p>Not very fast… The main problem is that I check all 810.000 products.
-There is no need for that. If I instead test the products in order, from
-the largest, to the smallest, the first palindromic number I find, is
-the largest.</p>
-<p>Let us generate a list of candidates, in descending order:</p>
-<p>cand &lt;- expand.grid(100:999, 100:999) %&gt;% transmute(product =
-Var1*Var2) %&gt;% arrange(desc(product)) %&gt;% .$product</p>
-<p>And now, for each element in the candidate-vector, if it is
-palindromic, set that to be the answer, and break out of the
-for-loop.</p>
-<p>for(i in cand){ if(is_palindromic(i)){ answer &lt;- i break() } }</p>
-<p>Much faster.</p>
-</div>
 
 
 
