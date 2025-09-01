@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-05-27" />
+<meta name="date" content="2018-03-20" />
 
 <title>Euler 42</title>
 
@@ -350,74 +350,44 @@ display: none;
 
 
 <h1 class="title toc-ignore">Euler 42</h1>
-<h4 class="date">2023-05-27</h4>
+<h4 class="date">2018-03-20</h4>
 
 </div>
 
 
-<p>A triangle number is given by t<sub>n</sub> = ½(n(n+1))</p>
-<p>Lets start by writing a function for that:</p>
-<p>triangle &lt;- function(n){ (n*(n+1))/2 }</p>
-<p>If we take a word, Project Euler uses SKY as an example, we can take
-each letter, assign to it the value of its position in the alphabet, and
-add together the values of the letters. SKY becomes 19 + 11 + 25 =
-55.</p>
-<p>Lets write a function that finds that:</p>
-<p>lettervalue &lt;- function(chars){ chars &lt;- toupper(chars) t &lt;-
-unlist(strsplit(chars,““)) sum(match(t, LETTERS)) }</p>
-<p>First I convert the character string in the input to uppercase
-letters. This might not be necessary. Then I split the string in
-individual characters. And unlist() the result. Then I pass it to the
-match() function. That gives me the position of a character as a
-numerical value, in the vector LETTERS. Neat function. Then I sum
-it.</p>
-<p>This is nice and vectorized all the way through.</p>
-<p>But what was the problem I should solve? Project Euler provides a
-list of words. How many of these are, when converted to a sum with the
-function above, a triangle number?</p>
-<p>I have no idea about how long a given word is. But lets find out.</p>
-<p>First, lets read in the file.</p>
-<p>wordlist &lt;- scan(“p042_words.txt”, what=character(), sep=“,”,
-quiet=TRUE)</p>
-<p>What are the numerical values as defined above? My function
-lettervalue just adds everything together. Which is a bit unhelpful. If
-I use map() from the purrr-libray, I can apply the function to each
-element in wordlist. I’ll have to unlist() it afterwards. That gives me
-all the numerical values:</p>
-<p>library(purrr) values &lt;- unlist(map(wordlist, lettervalue))</p>
-<p>What is the largest of them?</p>
-<p>max(values)</p>
-<div id="section" class="section level2">
-<h2>[1] 192</h2>
-<p>That is the highest number I have to check is triangular.</p>
-<p>Lets generate a list of the first 20 triangle numbers:</p>
-<p>t &lt;- 1:20 triangles &lt;- triangle(t) max(triangles)</p>
-</div>
-<div id="section-1" class="section level2">
-<h2>[1] 210</h2>
-<p>That was lucky, triangle-number 20 is 210, which is larger than the
-largest value I have in the set of words. Now I just need to find out
-how many of the values in values are in the variable triangles:</p>
-<p>answer &lt;- sum(values%in%triangles)</p>
-<p>Neat. Lessons learned: 1. map() can be used to apply a function to a
-vector. Even functions that are not that well behaved. And it’s pretty
-damn fast. An alternative would be one of the apply-functions:</p>
-<p>library(microbenchmark) map_test &lt;- function(){map(wordlist,
-lettervalue)} apply_test &lt;- function() {lapply(wordlist,
-lettervalue)} mbm &lt;- microbenchmark(map_test, apply_test, times=1000)
-library(ggplot2) autoplot(mbm)</p>
-</div>
-<div id="warning-transformation-introduced-infinite-values-in-continuous-y-axis" class="section level2">
-<h2>Warning: Transformation introduced infinite values in continuous
-y-axis</h2>
-</div>
-<div id="warning-removed-915-rows-containing-non-finite-values-stat_ydensity." class="section level2">
-<h2>Warning: Removed 915 rows containing non-finite values
-(stat_ydensity).</h2>
-<p>match() is also pretty useful. I spend a couple of frustrated minutes
-trying to get a list to behave as a lookup-table. match() is much
-easier.</p>
-</div>
+<p>A triangle number is given by</p>
+<p><span class="math display">\[t_n = \frac{1}{2}n(n+1)\]</span></p>
+<p>We want to determine if a number is triangular.</p>
+<p>I have a helperfunction for that:</p>
+<pre class="r"><code>source(&quot;helpers.R&quot;)</code></pre>
+<p>It looks like this:</p>
+<pre class="r"><code>is_triangle</code></pre>
+<pre><code>## function(x) {
+##   if (x &lt; 1) return(FALSE)
+##   s &lt;- sqrt(8 * x + 1)
+##   s == floor(s)
+## }</code></pre>
+<p>We can also represent a number as a combination of letters. Or rather
+the other way around.</p>
+<p>Take each letter, give it the value of its position in the alphabet.
+Add all values togehter:</p>
+<p>ABC -&gt; 1, 2, 3 -&gt; 1 + 2 + 3 =6</p>
+<p>Let us also write a function for that:</p>
+<pre class="r"><code>lettervalue &lt;- function(chars){
+  chars &lt;- toupper(chars)
+  t &lt;- unlist(strsplit(chars,&quot;&quot;))
+  sum(match(t, LETTERS))
+}</code></pre>
+<p>We now get a list of words. How many of these, converted to a sum
+with the function above, is a triangle number?</p>
+<pre class="r"><code>wordlist &lt;- scan(&quot;solutions/0042_words.txt&quot;, what=character(), sep=&quot;,&quot;, quiet=TRUE)</code></pre>
+<p>Neither the <code>is_triangle</code> nor <code>lettervalues</code>
+functions are vectorised, so I have to map:</p>
+<pre class="r"><code>library(purrr)
+
+answer &lt;- map_int(wordlist, lettervalue) |&gt; 
+  map_lgl(is_triangle) |&gt; 
+  sum()</code></pre>
 
 
 
