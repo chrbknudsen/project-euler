@@ -14,7 +14,7 @@ We want to determine if a number is triangular.
 I have a helperfunction for that:
 
 ```{r}
-source("solutions/helpers.R")
+source("helpers.R")
 ```
 
 It looks like this:
