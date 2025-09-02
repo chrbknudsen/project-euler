@@ -4,100 +4,62 @@ format: html
 date: '2018-04-11'
 ---
 
-Ok. Take all numbers that contains the ten digits 0:9 exactly once.
+All 0:9 pandigital numbers.
 
-Lets call position 1 in such a number d1, position 2 d2 etc.
+Numbering the positions $d_1$ to $d_10$, certain conditions have to be met,
+eg $d_2d_3d_4$ have to be divisible by 2. Increasing the "window" the three
+digits have to be divisible by the consecutive primes.
 
-Of these numbers, sum the numbers that satisfies a set of conditions.
-The conditions are, that
-1. d2d3d4 is divisible by 2
-2. d3d4d5 is divisible by 3
-3. d4d5d6 is divisible by 5
-4. d5d6d7 is divisible by 7
-5. d6d7d8 is divisible by 11
-6. d7d8d9 is divisible by 13
-7. d8d9d10 is divisible by 17
-
-This could be done by hand.
-
-From condition 3, we know that d6 is either 0 or 5, but combined with condition 5, if d6 is 0,
-the only values for d7d8 that are divisible by 11 would be 011, 022 etc.
-
-That would violate restriction 0 - a digit can only occur once. So d6 must be 5.
-
-It is possible to pare it all down in this way.
-
-However, I solve these problems as a way of training programming. So…
-
-What I need is all the allowed numbers:
-
+Generating all the potential pandigital numbers (as individual numbers)
+```{r eval = FALSE}
 library(gtools)
 test <- permutations(10,10,c(0:9))
+```
 
+We now have $d_6$ in column 6. And it needs to be either 0 or 5.
 
-Permutations(n,m,v) takes a vector v with length n, and returns all permutations of m elements from the vector.
+```{r}
+test <- subset(test,test[,6]%in%c(05))
+```
 
-test now contains the 3628800 numbers that are pandigital 0:9.
+$d_4$ needs to be even:
 
-What is even better, is that I get them in a nice matrix. So it is easy to subset based on the restrictions.
-
-Condition 1, d4 must be equal:
-
+```{r}
 test <- subset(test,test[,4]%in%c(0,2,4,6,8))
+```
 
 
-Next condition 2, d3d4d5 must be divisible by 3. Or:
+$d_3d_4_d5$ needs to be divisible by 3:
 
-(d3*100 + d4*10 + d5)%%3 == 0
-
+```{r}
 test <- subset(test,((test[,3]*100+test[,4]*10+test[,5])%%3)==0)
+```
 
+$d_5d_6d_7$ must be divisible by 7
 
-Condition 3. d6 is either 0 or 5:
-
-test <- subset(test,test[,6]%in%c(0,5))
-
-
-Yeah, I know that 0 is not allowed.
-
-Condition 4 - the same as condition 2, just with d5,d6 and d7. And modulus 7
-
+```{r}
 test <- subset(test, ((test[,5]*100+test[,6]*10+test[,7])%%7)==0)
+```
 
+$d_6d_7d_8$ must be divisible by 11:
 
-Condition 5 - now I won't explain that again, it's the same procedure as last time:
-
+```{r}
 test <- subset(test, ((test[,6]*100+test[,7]*10+test[,8])%%11)==0)
+```
 
-
-Condition 6:
-
+$d_7d_8d_9$ must be divisible by 13:
+```{r}
 test <- subset(test, ((test[,7]*100+test[,8]*10+test[,9])%%13)==0)
+```
 
+And finally, $d_8d_9d_10$ must be divisible by 17:
 
-And finally condition 7:
-
+```{r}
 test <- subset(test, ((test[,8]*100+test[,9]*10+test[,10])%%17)==0)
+```
 
+Collapse the surviving numbers and convert to numeric:
 
-Lets collapse the digits to numbers:
-
-res <- apply(test,1,paste, collapse="")
-
-
-And convert them to numeric:
-
-res <- as.numeric(res)
-
-
-And finally sum them:
-
-answer <- sum(res)
-
-
-Super simple. The permuations could of course be optimized. If I instead get all the permutations of c(0:4,6:9), and then insert
-5 in the appropriate column, I save some time. Making all the 3628800 permutations takes a little while.
-
-Lessons learned
-
-This was a good exercise in using subset. And also in using matrices instead of dataframes for everything.
+```{r}
+answer <- sum(as.numeric(apply(test,1,paste, collapse="")))
+```
