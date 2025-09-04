@@ -1,12 +1,9 @@
 ---
 title: "Euler"
-output: html_document
+format: html
 date: '2015-07-23'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ```{r eval = F}
 library(numbers)
