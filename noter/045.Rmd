@@ -1,14 +1,8 @@
 ---
 title: "Euler 45"
-output: html_document
-date: '2023-05-27'
-params:
-  done: F
+format: html
+date: '2018-02-11'
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 
 $T = t(t+1)/2$, $P=p(3p-1)/2$ and $H=h(2h-1)$
