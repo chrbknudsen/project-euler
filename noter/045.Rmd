@@ -4,140 +4,35 @@ format: html
 date: '2018-02-11'
 ---
 
+Studying the math, we learn that every hexagonal number is also triangular.
 
-$T = t(t+1)/2$, $P=p(3p-1)/2$ and $H=h(2h-1)$
+Therefore we only need to identify the next hexagonal number that is also pentagonal.
 
-Looking for 
-$$T = P = H$$
-
-$$t(t+1)/2 = h(2h-1)$$
-$$t^2 + t = 2h(2h-1)$$
-$$t^2 + t = 2(2h^2 - h)$$
-$$t^2 + t = 4h^2 - 2h)$$
-
-Every hexagonal number is also a triangular number:
-Og det betyder at vi kan sætte P = H, og teste for h indtil vi rammer et 
-
-𝐻
-ℎ
-=
-𝑇
-2
-ℎ
-−
-1
-H
-h
-	​
-
-=T
-2h−1
-	​
-
-
-because
-
-𝑇
-2
-ℎ
-−
-1
-=
-(
-2
-ℎ
-−
-1
-)
-(
-2
-ℎ
-)
-2
-=
-ℎ
-(
-2
-ℎ
-−
-1
-)
-=
-𝐻
-ℎ
-.
-T
-2h−1
-	​
-
-=
-2
-(2h−1)(2h)
-	​
-
-=h(2h−1)=H
-h
-	​
-
-.
-
-n(n+1)/2 = t
-2t = n(n+1)
-2t = n^2 + n
-0 = n^2 + n - 2t
-
-a = 1
-b = 1
-c = -2t
-
-(-1 +c(-1,1)*sqrt(1 +4*2*t))/2
-
+I have a helperfunction for that:
 
 ```{r}
-is_triangle <- function(t){
-  (-1 +c(-1,1)*sqrt(1 +4*2*t))/2
-}
+source("solutions/helpers.R")
+is_pentagonal
 ```
 
+Generate hexanogals, and continue until one is pentagonal. We can start at 144.
 
-pentagonal
-n(3n - 1)/2 = P
-2P = n(3n-1)
-2P = 3n^2 - n
-0 = 3n^2 - n - 2p
-a = 3
-b = -1
-c = -2p
-
-den er ikke korrekt... hvorfor fejler det?
-```{r}
-is_pentagonal <- function(p){
-  (1 + c(-1,1)*sqrt(1 + 24*p))/6
-}
-
-is_pentagonal(35)
-```
-is_pentagonal <- function(p){
-  (1 + c(-1,1)*sqrt(1 + 24*p))
-}
+I also have a helper function for generating hexagonals:
 
 ```{r}
-is_triangle(1533776805)
+hexagonal
 ```
 
 ```{r}
-is_triangle(3)
-```
-
-Hvis et tal er en triangle.
-Jeg skal grundlæggende kunne teste om et givet tal er har en heltallig løsning på ligningene for triangle og pentagonal.
-Så genererer vi hexagonal - og tester om de er.
-
-
-```{r}
-hex <- function(n){
-  (2*n-1)*n
+found <- FALSE
+n <- 144
+while(!found){
+  if(is_pentagonal(hexagonal(n))){
+    answer <- hexagonal(n)
+    found <- TRUE
+  }else{
+    n <- n + 1
+  }
 }
 
-hex(27500) < 1533776805
 ```
