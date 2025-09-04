@@ -11,7 +11,7 @@ Therefore we only need to identify the next hexagonal number that is also pentag
 I have a helperfunction for that:
 
 ```{r}
-source("solutions/helpers.R")
+source("helpers.R")
 is_pentagonal
 ```
 

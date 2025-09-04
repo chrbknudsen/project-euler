@@ -18,48 +18,48 @@ test <- permutations(10,10,c(0:9))
 
 We now have $d_6$ in column 6. And it needs to be either 0 or 5.
 
-```{r}
+```{r eval = FALSE}
 test <- subset(test,test[,6]%in%c(05))
 ```
 
 $d_4$ needs to be even:
 
-```{r}
+```{r eval = FALSE}
 test <- subset(test,test[,4]%in%c(0,2,4,6,8))
 ```
 
 
 $d_3d_4_d5$ needs to be divisible by 3:
 
-```{r}
+```{r eval = FALSE}
 test <- subset(test,((test[,3]*100+test[,4]*10+test[,5])%%3)==0)
 ```
 
 $d_5d_6d_7$ must be divisible by 7
 
-```{r}
+```{r eval = FALSE}
 test <- subset(test, ((test[,5]*100+test[,6]*10+test[,7])%%7)==0)
 ```
 
 $d_6d_7d_8$ must be divisible by 11:
 
-```{r}
+```{r eval = FALSE}
 test <- subset(test, ((test[,6]*100+test[,7]*10+test[,8])%%11)==0)
 ```
 
 $d_7d_8d_9$ must be divisible by 13:
-```{r}
+```{r eval = FALSE}
 test <- subset(test, ((test[,7]*100+test[,8]*10+test[,9])%%13)==0)
 ```
 
 And finally, $d_8d_9d_10$ must be divisible by 17:
 
-```{r}
+```{r eval = FALSE}
 test <- subset(test, ((test[,8]*100+test[,9]*10+test[,10])%%17)==0)
 ```
 
 Collapse the surviving numbers and convert to numeric:
 
-```{r}
+```{r eval = FALSE}
 answer <- sum(as.numeric(apply(test,1,paste, collapse="")))
 ```
