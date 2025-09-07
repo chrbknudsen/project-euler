@@ -1,0 +1,32 @@
+---
+title: "Euler 53"
+output: html_document
+date: '2018-09-20'
+---
+
+How many:
+$$\binom{n}{r}$$
+
+for $1 \le n \le 100$ are greater than 1.000.000.
+
+r have to be smaller than (or equal to) n.
+
+For at given combination of n,r, we get the number of combinations by:
+
+```{r}
+choose(23,10)
+```
+
+Generate all combinations of n,r, filter, mutate with the `choose` function,
+filter and count:
+
+```{r}
+library(tidyverse)
+
+answer <- 1:100 %>% 
+  expand_grid(Var1 = ., Var2 = .) %>% 
+  transmute(n=Var1, r=Var2) %>% 
+  filter(n>r) %>% 
+  filter(choose(n,r)>1000000) %>% 
+  count()
+```
