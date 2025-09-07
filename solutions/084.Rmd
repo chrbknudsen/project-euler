@@ -1,17 +1,12 @@
 ---
 title: "Euler 84"
-output: html_document
-date: '2023-05-27'
-params:
-  done: F
+format: html
+date: '2018-05-26'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-Monopoly - Project Euler problem 84
 
-This is basically a question of building a Monopoly simulator.
+Build a Monopoly simulator.
+
 
 We begin at square GO. Roll two six-sided dice, and advance.
 

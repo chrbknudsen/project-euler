@@ -1,0 +1,69 @@
+---
+title: "Euler 27"
+output: html_document
+date: '2018-02-26'
+params:
+  done: F
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Considering this expression:
+ 
+$$n^2 + an + b$$
+
+Where $|a| < 1000$ and $|b| \leq 1000$
+
+The answer is the product ab for the expression that produces the maximum number of primes for consecutive 
+values of n, starting with n = 0.
+
+
+
+
+for n = 0, reducerer udtrykket til b. så b skal være et primtal. Og derfor kan vi også udelukke alle de negative.
+```{r}
+library(numbers)
+library(tidyverse)
+b <- Primes(1000)
+
+```
+
+
+Vi ved også at når n = 1 reducerer udtrykket til:
+1+a+b. Dette tal behøver for så vidt ikke været et primtal. Men det skal være ulige, for ellers kan det ikke være et primtal.
+Men det skal nu være et primtal alligevel. For ellers stopper sekvensen af primtal allerede ved n = 1. Og så er det 
+ihvertfald ikke ret langt.
+
+```{r}
+a <- -999:999
+kand <- expand_grid(a = a, b = b) |> 
+    mutate(test_1 = a + b + 1) |> 
+    filter(test_1 > 0) |> 
+    filter(isPrime(test_1)) |> 
+    select(-test_1)
+```
+
+En funktion der piller kandidater ud
+
+```{r}
+test_n <- function(n = 2, df){
+    df |> 
+        mutate(test = n^2 + a*n + b) |> 
+        filter(test > 0) |> 
+        filter(isPrime(test)) |> 
+        select(-test)
+}
+```
+
+```{r eval = TRUE}
+n <- 1
+while(nrow(kand)>1){
+    kand <<- test_n(n, kand)
+    n <- n + 1
+}
+
+answer <- kand |> summarise(answer = a*b)
+```
+

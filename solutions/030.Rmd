@@ -1,0 +1,61 @@
+---
+title: "Euler 30"
+format: html
+date: "2018-02-09"
+---
+
+
+The number 1634 can be written as the sum of fourth powers of its digits:
+
+$$1634 = 1^4 + 6^4 + 3^4 + 4^4$$
+
+Identify all numbers that can be written as the sum of their fifth powers of their digits. We do not include 1, as 
+1 = 1^5 is not a sum.
+
+Jumping right into it - a (vectorised) function that returns the sum of the fifth powers of the digits. Yes 
+it could probably be written in a single line:
+```{r}
+fifth_sum <- function(number){
+    number <- as.character(number)
+    number <- lapply(sapply(number, strsplit, ""), as.numeric)
+    number <- lapply(number, function(x) x^5)
+    lapply(number, sum)
+}
+```
+
+
+Where should we stop? The maximum value of a single digit is:
+
+```{r}
+9^5
+```
+
+If we have a 9 digit number, the maximum sum of the fifth powers of a 9 digit number would be:
+```{r}
+9*9^5
+```
+
+For af 7 digit number it would be:
+
+```{r}
+7*9^5
+```
+
+This is significantly less than the lowest 7 digit number: No sum of the fifth powers of a 7 digit number will ever
+be 7 digits itself.
+
+Whereas a 6 digit numer have a maximum sum of:
+```{r}
+6*9^5
+```
+
+So we do have to check up to and including 6 digit numbers.
+
+Lets do that. Construct a vector with all numbers from 2 to 999999. Calculate the sums, subset the original 
+vector, and sum:
+
+```{r}
+test <- 2:999999
+sums <- fifth_sum(test)
+answer <- sum(test[test == sums])
+```

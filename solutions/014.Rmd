@@ -2,8 +2,6 @@
 title: "Euler 14"
 output: html_document
 date: '2018-02-12'
-params:
-  done: F
 ---
 
 ```{r setup, include=FALSE}
@@ -29,7 +27,7 @@ From that, we can conclude, that if we start with 13, a chain starting with
 40, 20, 10, 5, 16, 8, 4, 2 or 1. Because they will all lead to a chain that
 is shorter than the chain beginning with 13.
 
-```{r}
+```{r eval = FALSE}
 as.logical(4%%2)
 library(tidyverse)
 next_step <- function(n){
@@ -51,7 +49,7 @@ Because of that, we can generate a chain for a given starting number,
 and not only get the length, but also eliminate all the numbers in the chain
 as possible candiates (except the first in the chain of course)
 
-```{r}
+```{r eval = FALSE}
 candidates <- data.frame(candidate = 1:1000000, length = 0)
 
 while(nrow(candidates)>1){

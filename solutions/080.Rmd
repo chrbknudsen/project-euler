@@ -1,16 +1,8 @@
 ---
 title: "Euler 80"
 output: html_document
-date: '2023-05-27'
-params:
-  done: F
+date: '2018-03-15'
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-Problem 80 from Project Euler.
 
 The problem tells us that if the square root of a natural number is not an integer, it is irrational.
 Project Euler also claims that it is well known. I did not know it.

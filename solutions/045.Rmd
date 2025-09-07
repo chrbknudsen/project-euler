@@ -1,0 +1,38 @@
+---
+title: "Euler 45"
+format: html
+date: '2018-02-11'
+---
+
+Studying the math, we learn that every hexagonal number is also triangular.
+
+Therefore we only need to identify the next hexagonal number that is also pentagonal.
+
+I have a helperfunction for that:
+
+```{r}
+source("helpers.R")
+is_pentagonal
+```
+
+Generate hexanogals, and continue until one is pentagonal. We can start at 144.
+
+I also have a helper function for generating hexagonals:
+
+```{r}
+hexagonal
+```
+
+```{r}
+found <- FALSE
+n <- 144
+while(!found){
+  if(is_pentagonal(hexagonal(n))){
+    answer <- hexagonal(n)
+    found <- TRUE
+  }else{
+    n <- n + 1
+  }
+}
+
+```

@@ -1,0 +1,37 @@
+---
+title: "Euler 25"
+output: html_document
+date: '2018-02-10'
+params:
+  done: F
+---
+
+The Fibonacci sequence consists of elements $F_n$ defined by 
+
+$F_n = F_{n-1} + F_{n-1}$ Where $F_1 = 1$ and $F_2 = 1$.
+
+What is the lowest n that results in $F_n$ containing 1000 digits?
+
+Those are large numbers - so we use `fibnum()` from the `gmp` package. We wrap that in a function that returns
+the number of digits;
+```{r}
+library(gmp)
+
+fib_n_dig <- function(n){
+    nchar(as.character(fibnum(n)))
+}
+
+
+```
+
+And then we calculate the number of digits in $F_n$ for increasing n until the number of digits is 1000:
+```{r}
+n_d <- 0
+n <- 0
+while(n_d != 1000){
+        n <- n + 1
+    n_d <- fib_n_dig(n)
+
+}
+answer <- n
+```

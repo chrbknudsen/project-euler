@@ -1,0 +1,12 @@
+---
+title: "Euler 1"
+format: html
+date: "2015-07-22"
+---
+
+Bruteforcing - index by modulo.
+
+```{r eval=FALSE}
+t <- 1:999
+answer <- sum(t[t %% 3 == 0 | t %% 5 == 0])
+```

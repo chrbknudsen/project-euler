@@ -1,0 +1,33 @@
+---
+title: "Euler 19"
+output: html_document
+date: '2018-02-08'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+How many sundays fell on the first of the month in the period 1 january 1901 
+to 31 december 2000?
+
+```{r}
+library(tidyverse)
+```
+
+Construct vector with all dates from january first 1901 to december 31st 2000.
+
+Filter to only get the first of every month. And to get sundays (running this
+on a danish computer, so "søndag").
+
+Get number of rows:
+```{r}
+answer <- as_date(as_date("1901-01-01"):as_date("2000-12-31")) %>% 
+  as_tibble() %>% 
+  filter(day(value) == 1,
+         weekdays(value) == "søndag") %>% 
+  nrow()
+  
+```
+

@@ -1,0 +1,65 @@
+---
+title: "Euler 62"
+output: html_document
+date: '2018-04-19'
+---
+# Euler problem 62
+
+The cube, 41063625 (345^3^), can be permuted to produce two other cubes: 56623104 (384^3^) and 66430125 (405^3^). In fact, 41063625 is the smallest cube which has exactly three permutations of its digits which are also cube.
+
+Find the smallest cube for which exactly five permutations of its digits are cube.
+
+Alright. I need to find five cubes, that are permutations of the same digits.
+
+How to check if two numbers are permutations of each other?
+
+We can generate the largest permutation of a given number. If the largest permutation of two numbers are identical, the two numbers are permutations of each other.
+
+So I need a function, that returns the largest permutation of a number. It would be nice, if that function was vectorized.
+
+```{r}
+library(stringr)
+library(dplyr)
+max_perm <- function(t){
+  require(magrittr)
+  options(scipen=5)
+  t %>% 
+    as.character() %>% 
+    str_split("") %>% 
+    lapply(sort, decreasing=TRUE) %>% 
+    lapply(paste0, collapse="") %>% 
+    unlist() %>% 
+    as.double()
+}
+```
+
+Convert the input to character. Split at "". That returns a list with vectors containing the individual digits of the input. lapply sorts the individual vectors in the list in decreasing order. Then lapply pastes the elements in each vector together with paste0 and "" as the separator. Then it is unlisted, and returned as numeric.
+
+What is worth noting is a thing I was struggling with for far too long. R likes to write numbers in scientific notation. As in "1e+06". I have not studied the phenomenon in detail. But options(scipen=5) solves the problem. It is the "penalty" used to decide when a number should be written in scientific notation. Unless I change that (trial and error, but it should be larger than whatever is default), as.character(1000000) will return "1e+06". And the permutations of "1" "e" "+" "0" "6" are not terribly useful in this context.
+
+I'm hazarding a guess that I don't need to handle cubes of values of more than four digits. 
+
+Beginning with a vector of all numbers from 1 to 9999, I convert it to a dataframe. I transmute the first column to a column with the name x.
+Then I mutate a second column, cube, into existence, and calculate it as the cube of the x-value. A third column, max_cube, is mutated with the result from my max_perm function above. And tha column is immediately used to group the data, so I get date grouped by identical maximum values of the permutations. I filter on the count of those groups, and only keep the groups that contain 5 elements. Then I ungroup it, and select just the cube column. 
+
+I now have a data frame with a single column containing 10 values. They are all cubes, five of them are permutations of each other. The other five are also permutaions of each other. And now I just have to take the smallest of them.
+
+
+```{r}
+result <- 1:9999 %>% 
+  as.double() %>% 
+  as.data.frame() %>% 
+  transmute(., x = .) %>% 
+  mutate(cube = x**3) %>% 
+  mutate(max_cube = max_perm(cube)) %>% 
+  group_by(max_cube) %>% 
+  filter(n()==5) %>% 
+  ungroup() %>% 
+  select(cube) %>% 
+  min()
+```
+Before I print the result, so I can enter it into Project Euler, I set options(digits=17).
+
+
+Done! A good exercise. And a valuable lesson in the importance of the options in R.
+

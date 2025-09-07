@@ -1,0 +1,39 @@
+---
+title: "Euler 15"
+output: html_document
+date: '2018-02-06'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In a nxn grid move between the nodes in the grid, starting at the upper-left
+corner. Take 1 step either to the right or to the left. How many routes are
+there to the bottom right corner.
+
+We are told there are exactly 6 routes in an 2x2 grid.
+
+In that case we need to take exactly 4 steps. Two to the left, and two downwards.
+
+or, l,l,d,d. How many ways can we do that?
+
+That is a permutation, and a formula for handling that exists:
+
+$$ \frac{n!}{k_1!\cdot k_2!\cdot \ldots \dot k_r!} $$
+
+Where n is the total number of elements (4), and $k_r$ is the number of unique
+elements r (2 each, $k_1 = 2$ and $k_2 = 2$), and the ! denotes taking the faculty.
+
+Resulting in:
+```{r}
+factorial(4)/(factorial(2)*factorial(2))
+```
+Now we are tasked with finding the number of different ways to get from the 
+upper-left corner to the lower-right corner in a 20x20 grid.
+
+That translates to the same calculation for n = 40 and $k_1 = k_2 = 20$:
+
+```{r}
+answer <- factorial(40)/(factorial(20)*factorial(20))
+```

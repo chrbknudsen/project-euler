@@ -1,0 +1,53 @@
+---
+title: "Euler 22"
+output: html_document
+date: '2018-02-15'
+params:
+  done: F
+---
+
+Sort a file containing a lot of strings alphabetically. 
+
+Calculate a value of each string - as the sum of the alphabetical position of
+each letter. As in:
+
+"ABC" has the value 1 + 2 + 3
+
+```{r}
+library(tidyverse)
+```
+
+Read the file, split by ",", unlist and store in a tibble. Remove the '"', sort:
+
+```{r}
+
+data <- readLines("../data/0022.txt") %>% 
+  strsplit(",") %>% 
+  unlist() %>% 
+  as_tibble() %>% 
+  mutate(value = str_remove_all(value, '"')) %>% 
+  arrange(value) 
+```
+
+Write a function to calculate the value:
+```{r}
+positional_sum <- function(string){
+  sapply(string, function(string){
+    sum(match(strsplit(string, "")[[1]], LETTERS))
+  })
+}
+```
+A bit cumbersome - because I would like a vectorised version.
+
+Now we add the positional sums to our dataframe, multiply with the position in
+the dataframe (row number), and add everything together:
+
+```{r}
+answer <- data %>% 
+  mutate(sum = positional_sum(value)) %>% 
+  mutate(sum = sum*row_number()) %>% 
+  summarise(answer = sum(sum))
+```
+
+
+

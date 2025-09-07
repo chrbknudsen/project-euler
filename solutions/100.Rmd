@@ -1,15 +1,13 @@
 ---
 title: "Euler 100"
-output: html_document
-date: '2023-05-27'
-params:
-  done: F
+format: html
+date: '2018-03-19'
+
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-Project Euler - problem 100
+Picking balls from a back containing two different color balls. Picking two balls, without replacement, what
+distribution of the colours (and number of balls) should we have to have a 50% chance of picking two balls of the same 
+color.
 
 Back to the hopeless examples of probabilities from school.
 In a bag there are 15 black balls and six white ones. Project Euler talks about discs, math-teachers has always used balls as examples, and they where always white and black. So I'll stick with that.
@@ -103,9 +101,4 @@ while(n<10**12){
 answer <- b
 
 
-Lessons learned:
 
-Solving Diophantine equations is at the heart of a lot of these problems. I've learned a new tools to handle them!
-If you want to subscript stuff in RMarkdown, you place a ~ on each side of what you want subscripted.
-
-Other stuff to note: Maybe it is time someone wrote a new solver for Diophantine equations. The one I found is 19 years old. Something to do in Shiny perhaps?

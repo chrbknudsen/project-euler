@@ -2,15 +2,13 @@
 title: "Euler 12"
 output: html_document
 date: '2018-02-06'
-params:
-  done: F
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r eval = FALSE}
 library(numbers)
 test <- 1
 noget <- 1:28

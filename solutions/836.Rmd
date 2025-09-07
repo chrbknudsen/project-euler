@@ -1,0 +1,8 @@
+---
+title: "Euler 836"
+output: html_document
+date: '2025-08-21'
+---
+
+No real code involved. Just read the problem - like really read it :D
+

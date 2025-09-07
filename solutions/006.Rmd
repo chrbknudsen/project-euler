@@ -1,20 +1,10 @@
 ---
 title: "Euler 6"
-author: "Christian Knudsen"
 date: "2015-07-23"
-output: html_document
-params:
-  done: T
+format: html
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-
-Eneste egentlige trick her er at kende pakken gmp, og de ekstra datatyper til
-meget store tal den giver adgang til.
-
+Only trick is knowing `gmp`
 ```{r eval  = F}
 library(gmp)
 t <- as.bigz(1:100)

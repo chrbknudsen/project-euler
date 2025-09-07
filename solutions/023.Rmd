@@ -1,0 +1,67 @@
+---
+title: "Euler 23"
+output: html_document
+date: '2018-02-25'
+params:
+  done: F
+---
+
+Et perfekt tal er et tal hvor summen af dets divisorer er lig tallet.
+
+Eksemplet er 28. 28 har divisorene 1, 2, 4, 7, 14. Summen af de tal er 28.
+28 er derfor et perfekt nummer.
+
+Et tal er "deficient" hvis summen af dets divisorer er mindre end tallet.
+Og abundant hvis summen er større.
+
+12 er det mindste abundant. 1 + 2+ 3+ 4+ 6 er lig 16. 
+Det mindste tal der kan skrives som summen af to abundant tal er 24. 
+Vi ved at alle heltal større end 28123 kan skrives som summen af to abundant tal.
+
+Find summen af alle positive helta der ikke kan skrives som summen af to "abundant"
+tal.
+
+Vi ved at vi ikke behøver at tjekke til højere end 28123.
+
+Så vi skal have fundet alle abundant tal mindre end 28123. 
+når vi har fundet dem, skal vi have fundet de tal der ikke kan udtrykkes som summen af 
+to af disse abundant tal.
+
+Og så skal vi have dem summeret.
+
+Vi starter med at skrive en funktion der fortæller os om et tal er abundant.
+
+```{r}
+library(tidyverse)
+library(numbers)
+
+abundant <- function(tal){
+  sapply(tal, function(tal){
+    tal < sum(divisors(tal))-tal
+  })
+}
+
+```
+Vi trækker tal fra, fordi "divisors" også returnerer tallet selv. 
+
+Så laver vi en vektor, og bruger abundant, der returnerer sand hvis tallet er
+abundant, til at indeksere det, og får en vektor med alle abundant tal:
+
+```{r}
+test_tal <- 1:28123
+
+abundance <- test_tal[abundant(test_tal)]
+```
+
+```{r}
+summer <- crossing(a = abundance, b = abundance) %>% 
+  mutate(summer = a + b) %>% 
+  filter() %>% 
+  pull(summer)
+```
+
+
+```{r}
+sum(test_tal[!(test_tal %in% summer)])
+```
+
