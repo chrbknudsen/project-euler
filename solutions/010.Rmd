@@ -6,14 +6,12 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
 ```
 
-Hvad er summen af alle primtal under to millioner?
+
 
 ```{r}
 library(numbers)
-svar <- sum(Primes(1, 2000000))
+answer <- sum(Primes(1, 2000000))
 ```
-
-Lidt snyd. Jeg bruger biblioteket `numbers` til at 
-generere primtal.
