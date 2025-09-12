@@ -355,17 +355,8 @@ display: none;
 </div>
 
 
-<p>31875000</p>
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>t &lt;- expand.grid(a = 1:1000, b = 1:1000)
+<pre class="r"><code>library(dplyr)
+t &lt;- expand.grid(a = 1:1000, b = 1:1000)
 
 
 answer &lt;- t %&gt;% 
@@ -377,7 +368,6 @@ answer &lt;- t %&gt;%
   filter(sum == 1000) %&gt;% 
   slice(1) %&gt;% 
   transmute(answer = a*b*c)</code></pre>
-<p>Man bør nok generere de der tripler.</p>
 
 
 

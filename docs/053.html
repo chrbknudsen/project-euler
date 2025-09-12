@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2015-07-23" />
+<meta name="date" content="2018-09-20" />
 
-<title>euler 10</title>
+<title>Euler 53</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -349,14 +349,30 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">euler 10</h1>
-<h4 class="date">2015-07-23</h4>
+<h1 class="title toc-ignore">Euler 53</h1>
+<h4 class="date">2018-09-20</h4>
 
 </div>
 
 
-<pre class="r"><code>library(numbers)
-answer &lt;- sum(Primes(1, 2000000))</code></pre>
+<p>How many: <span class="math display">\[\binom{n}{r}\]</span></p>
+<p>for <span class="math inline">\(1 \le n \le 100\)</span> are greater
+than 1.000.000.</p>
+<p>r have to be smaller than (or equal to) n.</p>
+<p>For at given combination of n,r, we get the number of combinations
+by:</p>
+<pre class="r"><code>choose(23,10)</code></pre>
+<pre><code>## [1] 1144066</code></pre>
+<p>Generate all combinations of n,r, filter, mutate with the
+<code>choose</code> function, filter and count:</p>
+<pre class="r"><code>library(tidyverse)
+
+answer &lt;- 1:100 %&gt;% 
+  expand_grid(Var1 = ., Var2 = .) %&gt;% 
+  transmute(n=Var1, r=Var2) %&gt;% 
+  filter(n&gt;r) %&gt;% 
+  filter(choose(n,r)&gt;1000000) %&gt;% 
+  count()</code></pre>
 
 
 
