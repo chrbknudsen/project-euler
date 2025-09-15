@@ -1,24 +1,17 @@
 ---
 title: "Euler 12"
-output: html_document
+format: html
 date: '2018-02-06'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ```{r eval = FALSE}
-library(numbers)
-test <- 1
-noget <- 1:28
-length(noget[(28 %% noget)==0])
-result <- FALSE
-while(!result){
-  test <- test + 1
-  testing <- 1:test
-  result <- length(testing[(test %% testing)==0]) > 500
+source("solutions/helpers.R")
+test <- FALSE
+n <- 1
+while(!test){
+  n <- n + 1
+  test <- length(divisors(triangle(n))) > 500
+  if(test){answer <- triangle(n)}
 }
-test
 ```
-
