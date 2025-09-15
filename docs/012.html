@@ -355,17 +355,14 @@ display: none;
 </div>
 
 
-<pre class="r"><code>library(numbers)
-test &lt;- 1
-noget &lt;- 1:28
-length(noget[(28 %% noget)==0])
-result &lt;- FALSE
-while(!result){
-  test &lt;- test + 1
-  testing &lt;- 1:test
-  result &lt;- length(testing[(test %% testing)==0]) &gt; 500
-}
-test</code></pre>
+<pre class="r"><code>source(&quot;solutions/helpers.R&quot;)
+test &lt;- FALSE
+n &lt;- 1
+while(!test){
+  n &lt;- n + 1
+  test &lt;- length(divisors(triangle(n))) &gt; 500
+  if(test){answer &lt;- triangle(n)}
+}</code></pre>
 
 
 
