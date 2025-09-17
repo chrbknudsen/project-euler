@@ -4,53 +4,42 @@ output: html_document
 date: '2018-02-08'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+Counting the number of letters when we write out a sequence of numbers. As:
+1, 2 is written as one, two - a total of 6 letters. We ignore whitespaces and
+hyphens.
 
-Writing out the numbers 1 to 5 in words give us:
-one, two, three, four, five. There are 3 + 3 + 5 + 4 + 4 = 19 letters in total.
-
-If we write out all numbers from 1 to 1000 (inclusive) in words, how many letters
-would be used? Note that 342 is written as "three hundred and forty-two" and that
-we count "and" but not "-" or " ". 
-
-We could write something on our own. Numbers 1 to 19 are different, but otherwise
-there is a system. 20 to 29 is ten times "twenty" and the words "one" to "nine".
-When we have all numbers spelled out from 1 to 99, there is repetition. "one hundred and" 
-combined with all the numbers from 1 to 99 (remember to add one hundred as itself).
-
-Instead we can load the package `english`, that does that for us:
+Using the library `english`
 
 ```{r eval = TRUE}
 library(english)
 english(999)
 ```
 
-Now we pour the numbers 1 to 1000 into it (fortunately it is vectorized):
+
 
 ```{r}
 all_numbers_as_words <- english(1:1000)
 ```
 
-We then collapse that to a single string:
+Collapse that to a single string:
 
 ```{r}
 one_single_string <- paste0(all_numbers_as_words, collapse = "")
 ```
-We do get rid of a lot of the whitespaces. But not all of them. 
+
+Remove whitespace:
 
 ```{r}
 without_ws <- gsub(" ", "", one_single_string)
 ```
 
-The hyphens are removed in the same way:
+Remove hyphens:
 
 ```{r}
 without_hyphens <- gsub("-", "", without_ws)
 ```
 
-And the answer is found by counting the number of characters in the string:
+Count characters:
 
 ```{r}
 answers <- nchar(without_hyphens)
