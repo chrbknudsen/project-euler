@@ -1,18 +1,28 @@
-387
-Harshad numbers
+---
+title: "Euler 387"
+format: html
+date: "2019-07-15"
+---
 
-Et tal der kan divideres med summen af dens cifre er et harshad tal. 
+A Harshad number is divisible by the sum of its digtis.
 
-højretrunkerer vi et tal, og er det også et harshad tal, og kan vi fortsætte hele vejen - så er det et højre trunkerbart harshad tal
-  Et harshad tal, der resulterer i et primtal, er et stærkt harshad tal. 
-  
-  
-  
-  Et primtal, der, højretrunkeret, giver et stærkt højretrunkertbart harshad tal, er et stærkt højre trunkertbart harshad primtal. 
+The example is 201. That is divisible by 3.
+Truncating 201 from the right give us 20, which is divisible by 2.
+Doing it again give 2 - divisible by 2.
 
-  
-  Så. stærke harshad tal der er højretrunkerbare. 
-  
+Numbers that fulfill this pattern are right truncatable Harshad numbers.
+
+A Harshad number divided by the sum of its digits, that give a prime,
+is a strong Harshad number.
+
+2011 is a prime. When we truncate that, we have a Harshad number. That is
+also a strong, right truncatable Harshad number. Therefore 2011 is a 
+strong, right truncatable Harshad Prime.
+
+Find the sum of all such primse less thatn $10^14$
+
+
+
   Vi har nok ikke lyst til at finde alle primtal mindre end 10^14, og teste om de er stærke, højretrunkerbare harshad tal. 
   
   Vejen frem må være at finde alle højretrunkerbare harshad tal.  

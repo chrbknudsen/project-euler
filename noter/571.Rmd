@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Euler 571"
 output: html_notebook
 ---
 A positive number is pandigital in base b if it contains all digits from 0 to b - 1 at least once when written in base b.
@@ -173,8 +173,9 @@ res %>%
 
 ```
 
-
-
+  filter(map_lgl(value, ~ any(sapply(2:9, function(k) pan_b(.x, k))))) er mere fikst
+ eller
+  filter(reduce(2:9, ~ .x | pan_b(value, .y), .init = FALSE))
 
 ```{r}
 convert_to <- function(n,b) {
