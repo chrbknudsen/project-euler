@@ -1,13 +1,8 @@
 ---
 title: "Euler 19"
-output: html_document
+format: html
 date: '2018-02-08'
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 
 How many sundays fell on the first of the month in the period 1 january 1901 
 to 31 december 2000?

@@ -1,9 +1,7 @@
 ---
 title: "Euler 21"
-output: html_document
+format: html
 date: '2018-02-15'
-params:
-  done: F
 ---
 
 Ku godt bruge lidt forklaring. Der er også mere elegante måder at 

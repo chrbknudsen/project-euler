@@ -1,55 +1,27 @@
 ---
 title: "Euler 18"
-output: html_document
+format: html
 date: '2018-02-12'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+
+Given a triangle of this shape
+```text
+   3
+  7 4
+ 2 4 6
+8 5 9 3
 ```
 
+Taking a route from top to bottom, moving to adjacent numbers in the row below, 
+and adding the numbers on the path - what is the maximum sum we can get?
 
-We are given this triangle:
-3
-7 4
-2 4 6 
-8 5 9 3 
+Rather than going from top to bottom, we can go from bottom to top.
+If we get to "4" in the third row, we should chose 9 - because that will maximise
+the sum regardles of the path that led us to the 4. 
 
-
-If we begin at the top, and move to adjacent numbers in the row below, that is
-from 3 in the top, we can move to 7 or 4. If we chose 4, we can move to 4 or 6 
-in the third row. 
-
-Continuing to the bottom, and adding the numbers on the path, what is the 
-maximum sum we can get?
-
-The trick is to look at the second to last row. If we are at the number 4, 
-we can either chose 5 or 9, to get to the bottom. No matter what the sum
-of the path that led us to the number 4 in the third row, we should chose 9
-to maximise the sum. 
-
-Therefore, the effective value of reaching 4 in the third row, is to reach 
-a value of 13. We calculate new values in the third row as the effective
-values based on the binary choice bringing us to row 4. We now have a new
-second to last row, and repeat. 
-
-3
-7 4
-2 4 6
-8 5 9 3
-
-->
-3
-7 4
-10 13 15
-
-->
-3
-20 19
-
--> 
-
-23
+So we collapse the larger triangle from bottom to top.
 
 
 
