@@ -1,0 +1,97 @@
+---
+title: "Euler 75"
+format: html
+date: "2019-10-31"
+---
+
+Let L be the total (integer) length of an integer sided right angle triangle.
+For a given value of L, we can either make no integer sided right triangles. More than one such triangle. Or only one.
+
+For how many values of L <= 1500000 does only one triangle as described exist?
+
+The requre us to to construct all primitive pythagorean triples. That can be done by:
+
+$$a = m^2 - n^2$$ 
+
+$$b = 2mn$$
+
+$$c = m^2 + n^2$$
+
+Where $m>n>0$
+
+We get some limitations:
+
+$$a+b+c < 1500000$$
+
+$$m^2 + 2mn + m^2 < 1500000$$
+
+$$2m^2 + 2mn < 1500000$$
+$$2(m^2 + mn) < 1500000$$
+$$(m^2 + mn) < 1500000/2$$
+
+
+Since $m>n$, and $n>0$ we get that $m^2 + m < 1500000/2$
+
+And therefore the upper limit of m is 865
+
+Other limits exist. At least one value of m and n have to be even. And they have to be coprime.
+
+Lets identify all m and ns neede for calculating the relevant primitive pythagorean triples:
+
+```{r}
+library(tidyr)
+
+library(numbers)
+library(dplyr)
+library(purrr)
+
+candidate_mn <- expand.grid(m= 1:866, n = 1:866) %>%
+  filter(m>n) %>%
+  mutate(at_least_one_even = 1-m%%2 + 1- n%%2) %>%
+  filter(at_least_one_even != 0) %>% 
+  select(-at_least_one_even)
+
+```
+
+Filtering for coprime:
+
+```{r}
+candidate_mn <- candidate_mn |> 
+  mutate(coprim  = (map2(m,n, coprime))) |> 
+  unnest(coprim) |> 
+  filter(coprim)
+```
+
+Generating a,b and c - and filtering for too large values:  
+
+```{r}
+candidate_abc <- candidate_mn |> 
+    mutate(a= m^2 - n^2,
+         b = 2*m*n,
+         c = m^2 + n^2,
+         total = a+b+c) %>% 
+  filter(total <= 1500000)  
+
+```
+
+A primitive triangle with length 12, can construct triangels with length 12, 24, 36 etc. Generating all multiple of them:
+```{r}
+more_candidates <- candidate_abc %>% 
+  mutate(length = map(total, function(x) seq(x, 1500010,x))) |> 
+  unnest(length)
+
+```
+
+
+Filtering, grouping by length, counting number of times a given length occurs, and only counting the unique:
+```{r}
+answer <- more_candidates %>% 
+  select(-c(m,n)) |> 
+  filter(length <= 1500000) |> 
+  group_by(length) %>% 
+  add_tally()  %>% 
+  ungroup() %>% 
+  filter(n==1)  |> 
+  nrow()
+```
+

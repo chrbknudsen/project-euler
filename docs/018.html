@@ -355,25 +355,18 @@ display: none;
 </div>
 
 
-<p>We are given this triangle: 3 7 4 2 4 6 8 5 9 3</p>
-<p>If we begin at the top, and move to adjacent numbers in the row
-below, that is from 3 in the top, we can move to 7 or 4. If we chose 4,
-we can move to 4 or 6 in the third row.</p>
-<p>Continuing to the bottom, and adding the numbers on the path, what is
-the maximum sum we can get?</p>
-<p>The trick is to look at the second to last row. If we are at the
-number 4, we can either chose 5 or 9, to get to the bottom. No matter
-what the sum of the path that led us to the number 4 in the third row,
-we should chose 9 to maximise the sum.</p>
-<p>Therefore, the effective value of reaching 4 in the third row, is to
-reach a value of 13. We calculate new values in the third row as the
-effective values based on the binary choice bringing us to row 4. We now
-have a new second to last row, and repeat.</p>
-<p>3 7 4 2 4 6 8 5 9 3</p>
-<p>-&gt; 3 7 4 10 13 15</p>
-<p>-&gt; 3 20 19</p>
-<p>-&gt;</p>
-<p>23</p>
+<p>Given a triangle of this shape</p>
+<pre class="text"><code>   3
+  7 4
+ 2 4 6
+8 5 9 3</code></pre>
+<p>Taking a route from top to bottom, moving to adjacent numbers in the
+row below, and adding the numbers on the path - what is the maximum sum
+we can get?</p>
+<p>Rather than going from top to bottom, we can go from bottom to top.
+If we get to “4” in the third row, we should chose 9 - because that will
+maximise the sum regardles of the path that led us to the 4.</p>
+<p>So we collapse the larger triangle from bottom to top.</p>
 <p>Having figured this out, two steps remain. Store the triangle in some
 datastructure. Write a function that returns the last row</p>
 <p>Tricket er at i stedet for at finde den største sum der starter i
@@ -392,6 +385,18 @@ stå 67. Følger vi en sti der ender med tallet 66, skal vi enten lægge 62
 eller 98 til. Vi vælger 98, for det vil maksimere den samlede sum. Så vi
 kan kollapse de to nederste linier til en ny nederste linie.</p>
 <p>Lad os prøve det.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## Warning: package &#39;tidyverse&#39; was built under R version 4.5.1</code></pre>
+<pre><code>## Warning: package &#39;tibble&#39; was built under R version 4.5.1</code></pre>
+<pre><code>## Warning: package &#39;stringr&#39; was built under R version 4.5.1</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 2.0.0 ──
+## ✔ forcats   1.0.0     ✔ readr     2.1.5
+## ✔ ggplot2   3.5.2     ✔ stringr   1.5.1
+## ✔ lubridate 1.9.4     ✔ tibble    3.3.0
+## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
 <pre class="r"><code>næst &lt;- c(63, 66, 04, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31)
 nederst &lt;- c(04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23)</code></pre>
 <p>position 1 i næst, kan kun pege på position i nederst. Position 2 i

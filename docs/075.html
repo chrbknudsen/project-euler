@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2018-02-08" />
+<meta name="date" content="2019-10-31" />
 
-<title>Euler 20</title>
+<title>Euler 75</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -349,32 +349,72 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Euler 20</h1>
-<h4 class="date">2018-02-08</h4>
+<h1 class="title toc-ignore">Euler 75</h1>
+<h4 class="date">2019-10-31</h4>
 
 </div>
 
 
-<p>The answer is the sum of the digits in 100!</p>
-<p>Load gmp to handle lage numbers. Coerce 100 to bigz, calculate the
-factorial, coerce to text, split in individual characters, unlist,
-coerce to numeric and sum</p>
-<pre class="r"><code>library(gmp)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;gmp&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     %*%, apply, crossprod, matrix, tcrossprod</code></pre>
-<pre class="r"><code>library(tidyverse)
+<p>Let L be the total (integer) length of an integer sided right angle
+triangle. For a given value of L, we can either make no integer sided
+right triangles. More than one such triangle. Or only one.</p>
+<p>For how many values of L &lt;= 1500000 does only one triangle as
+described exist?</p>
+<p>The requre us to to construct all primitive pythagorean triples. That
+can be done by:</p>
+<p><span class="math display">\[a = m^2 - n^2\]</span></p>
+<p><span class="math display">\[b = 2mn\]</span></p>
+<p><span class="math display">\[c = m^2 + n^2\]</span></p>
+<p>Where <span class="math inline">\(m&gt;n&gt;0\)</span></p>
+<p>We get some limitations:</p>
+<p><span class="math display">\[a+b+c &lt; 1500000\]</span></p>
+<p><span class="math display">\[m^2 + 2mn + m^2 &lt;
+1500000\]</span></p>
+<p><span class="math display">\[2m^2 + 2mn &lt; 1500000\]</span> <span class="math display">\[2(m^2 + mn) &lt; 1500000\]</span> <span class="math display">\[(m^2 + mn) &lt; 1500000/2\]</span></p>
+<p>Since <span class="math inline">\(m&gt;n\)</span>, and <span class="math inline">\(n&gt;0\)</span> we get that <span class="math inline">\(m^2 + m &lt; 1500000/2\)</span></p>
+<p>And therefore the upper limit of m is 865</p>
+<p>Other limits exist. At least one value of m and n have to be even.
+And they have to be coprime.</p>
+<p>Lets identify all m and ns neede for calculating the relevant
+primitive pythagorean triples:</p>
+<pre class="r"><code>library(tidyr)
 
-answer &lt;- 100 %&gt;% 
-  as.bigz() %&gt;% 
-  factorial  %&gt;% 
-  as.character() %&gt;% 
-  strsplit(&quot;&quot;) %&gt;% 
-  unlist() %&gt;% 
-  as.numeric() %&gt;% 
-  sum()</code></pre>
+library(numbers)
+library(dplyr)
+library(purrr)
+
+candidate_mn &lt;- expand.grid(m= 1:866, n = 1:866) %&gt;%
+  filter(m&gt;n) %&gt;%
+  mutate(at_least_one_even = 1-m%%2 + 1- n%%2) %&gt;%
+  filter(at_least_one_even != 0) %&gt;% 
+  select(-at_least_one_even)</code></pre>
+<p>Filtering for coprime:</p>
+<pre class="r"><code>candidate_mn &lt;- candidate_mn |&gt; 
+  mutate(coprim  = (map2(m,n, coprime))) |&gt; 
+  unnest(coprim) |&gt; 
+  filter(coprim)</code></pre>
+<p>Generating a,b and c - and filtering for too large values:</p>
+<pre class="r"><code>candidate_abc &lt;- candidate_mn |&gt; 
+    mutate(a= m^2 - n^2,
+         b = 2*m*n,
+         c = m^2 + n^2,
+         total = a+b+c) %&gt;% 
+  filter(total &lt;= 1500000)  </code></pre>
+<p>A primitive triangle with length 12, can construct triangels with
+length 12, 24, 36 etc. Generating all multiple of them:</p>
+<pre class="r"><code>more_candidates &lt;- candidate_abc %&gt;% 
+  mutate(length = map(total, function(x) seq(x, 1500010,x))) |&gt; 
+  unnest(length)</code></pre>
+<p>Filtering, grouping by length, counting number of times a given
+length occurs, and only counting the unique:</p>
+<pre class="r"><code>answer &lt;- more_candidates %&gt;% 
+  select(-c(m,n)) |&gt; 
+  filter(length &lt;= 1500000) |&gt; 
+  group_by(length) %&gt;% 
+  add_tally()  %&gt;% 
+  ungroup() %&gt;% 
+  filter(n==1)  |&gt; 
+  nrow()</code></pre>
 
 
 
