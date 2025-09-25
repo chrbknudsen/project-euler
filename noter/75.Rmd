@@ -1,20 +1,43 @@
-# 75
-# Alle primitive pythagoræiske tripler kan konstueres ved
-# a = m^2 - n^2
-# b = 2mn
-# c= m^2 + n^2
-# hvor m>n>0
-# Begrænsningen fra opgaven giver os:
-# a+b+c < 1500000
-# m^2 + 2mn + m^2 < 1500000
-# 2m^2 + 2mn < 1500000
-# 2(m^2 + mn) < 1500000
-# (m^2 + mn) < 1500000/2
-# 
-# Da m skal være større end n og n skal være større end 0, kan m højest være:
-# 865
-# m^2 + m < 1500000/2  
-# 
+---
+title: "Euler 75"
+format: html
+date: "2019-10-31"
+---
+
+
+
+Let L be the total (integer) length of an integer sided right angle triangle.
+For a given value of L, we can either make no integer sided right triangles. More than one such triangle. Or only one.
+
+For how many values of L <= 1500000 does only one triangle as described exist?
+
+The requre us to to construct all primitive pythagorean triples. That can be done by:
+
+$$a = m^2 - n^2$$ 
+
+$$b = 2mn$$
+
+$$c = m^2 + n^2$$
+
+Where $m>n>0$
+
+We get some limitations:
+
+$$a+b+c < 1500000$$
+
+$$m^2 + 2mn + m^2 < 1500000$$
+
+$$2m^2 + 2mn < 1500000$$
+$$2(m^2 + mn) < 1500000$$
+$$(m^2 + mn) < 1500000/2$$
+
+
+Since $m>n$, and $n>0$ we get that $m^2 + m < 1500000/2$
+
+And therefore the upper limit of m is 865
+
+
+
 # Yderligere begrænsninger. m og n må ikke begge være ulige. Der skal altså være mindst en af de to der er lige.
 # Og så skal de være coprime.
 # 
