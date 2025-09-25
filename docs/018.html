@@ -368,79 +368,30 @@ If we get to “4” in the third row, we should chose 9 - because that will
 maximise the sum regardles of the path that led us to the 4.</p>
 <p>So we collapse the larger triangle from bottom to top.</p>
 <p>Having figured this out, two steps remain. Store the triangle in some
-datastructure. Write a function that returns the last row</p>
-<p>Tricket er at i stedet for at finde den største sum der starter i
-toppen. Så fjerner vi den øverste linie. Og behandler resten som to
-trekanter, en med 95 og en med 64 i toppen. Vi finder den størst mulige
-sum for hver af de trekanter. Den største af de to, lagt til 75 er den
-største sum. Det kan vi gentage.</p>
-<p>Men vi kan også tage det nede fra. Fjern den nederste række, og find
-den største sum i den resterende trekant. Hvis den involverer tallet 66,
-vil vi skulle lægge enten 62 eller 98 til for at få den største samlede
-sum.</p>
-<p>Det kan vi gøre iterativt. Kig på næstnederste linie. Hvis vi følger
-en sti der ender med tallet 63 i næstnederste linie - så kan vi kun
-tilføje 04 til den. Det er ækvivalent til at der i stedet for 63 skal
-stå 67. Følger vi en sti der ender med tallet 66, skal vi enten lægge 62
-eller 98 til. Vi vælger 98, for det vil maksimere den samlede sum. Så vi
-kan kollapse de to nederste linier til en ny nederste linie.</p>
-<p>Lad os prøve det.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## Warning: package &#39;tidyverse&#39; was built under R version 4.5.1</code></pre>
-<pre><code>## Warning: package &#39;tibble&#39; was built under R version 4.5.1</code></pre>
-<pre><code>## Warning: package &#39;stringr&#39; was built under R version 4.5.1</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 2.0.0 ──
-## ✔ forcats   1.0.0     ✔ readr     2.1.5
-## ✔ ggplot2   3.5.2     ✔ stringr   1.5.1
-## ✔ lubridate 1.9.4     ✔ tibble    3.3.0
-## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
-<pre class="r"><code>næst &lt;- c(63, 66, 04, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31)
-nederst &lt;- c(04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23)</code></pre>
-<p>position 1 i næst, kan kun pege på position i nederst. Position 2 i
-næst, kan kun pege på position 2 og 3 i nederst</p>
-<p>Så vi kan skrive en funktion, der kollapser de to nederste til en ny
-nederst:</p>
-<pre class="r"><code># b er den nederste. a er den næstnederste.
-# funktionen kollapser de to til en ny nederste række.
-kollaps &lt;- function(a, b ){
-output &lt;- numeric()
-for(i in 1:length(a)){
-  output[i] &lt;- max(a[i]+b[i], a[i]+b[i+1])
-}
-output}</code></pre>
-<p>Og det betyder at den nye nederste er:</p>
-<pre class="r"><code>kollaps(næst, nederst)</code></pre>
-<pre><code>##  [1] 125 164 102  95 112 123 165 128 166 109 122 147 100  54</code></pre>
-<p>Lad os få data ind i noget vi kan arbejde med:</p>
-<pre class="r"><code>trekant &lt;- &quot;75
-95 64
-17 47 82
-18 35 87 10
-20 04 82 47 65
-19 01 23 75 03 34
-88 02 77 73 07 63 67
-99 65 04 28 06 16 70 92
-41 41 26 56 83 40 80 70 33
-41 48 72 33 47 32 37 16 94 29
-53 71 44 65 25 43 91 52 97 51 14
-70 11 33 28 77 73 17 78 39 68 17 57
-91 71 52 38 17 14 91 43 58 50 27 29 48
-63 66 04 68 89 53 67 30 73 16 69 87 40 31
-04 62 98 27 23 09 70 98 73 93 38 53 60 04 23&quot;
-trekant &lt;- str_split(trekant, &quot;\\n&quot;) %&gt;% unlist() %&gt;% 
+datastructure. Write a function that take the two last rows, and
+collapse them into a new row with the maximum possible result. Update
+the triangle, and continue until only the top row is left. Theres your
+answer.</p>
+<p>Let us write at function that collapses two rows into one:</p>
+<pre class="r"><code>collapse &lt;- function(a, b ){
+  output &lt;- numeric()
+  for(i in 1:length(a)){
+    output[i] &lt;- max(a[i]+b[i], a[i]+b[i+1])
+  }
+  output
+  }</code></pre>
+<p>Import the data into something we can work with:</p>
+<pre class="r"><code>triangle &lt;- str_split(triangle, &quot;\\n&quot;) %&gt;% unlist() %&gt;% 
   str_split(&quot; &quot;) %&gt;% 
   lapply(as.numeric)</code></pre>
-<p>Og så kaster vi det hele sammen:</p>
-<pre class="r"><code>nederst &lt;- 1000
-while(nederst &gt; 2){
-  nederst &lt;- length(trekant)
-  trekant[[nederst - 1]] &lt;- kollaps(trekant[[nederst-1]], trekant[[nederst]])
-  trekant[[nederst]] &lt;- NULL  
+<p>Throw everything together:</p>
+<pre class="r"><code>lowest &lt;- length(triangle)
+while(lowest &gt; 2){
+  lowest &lt;- length(triangle)
+  triangle[[lowest - 1]] &lt;- collapse(triangle[[lowest-1]], triangle[[lowest]])
+  triangle[[lowest]] &lt;- NULL  
 }
-answer &lt;- unlist(trekant)</code></pre>
+answer &lt;- unlist(triangle)</code></pre>
 
 
 
