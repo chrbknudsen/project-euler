@@ -23,64 +23,29 @@ the sum regardles of the path that led us to the 4.
 
 So we collapse the larger triangle from bottom to top.
 
-
-
 Having figured this out, two steps remain. Store the triangle in some datastructure.
-Write a function that returns the last row
+Write a function that take the two last rows, and collapse them into a new row with the maximum possible result. 
+Update the triangle, and continue until
+only the top row is left. Theres your answer.
 
-Tricket er at i stedet for at finde den største sum der starter
-i toppen. Så fjerner vi den øverste linie. Og behandler resten
-som to trekanter, en med 95 og en med 64 i toppen. Vi finder den 
-størst mulige sum for hver af de trekanter. Den største af de
-to, lagt til 75 er den største sum. Det kan vi gentage.
 
-Men vi kan også tage det nede fra. Fjern den nederste række, og find
-den største sum i den resterende trekant. Hvis den involverer 
-tallet 66, vil vi skulle lægge enten 62 eller 98 til for at få
-den største samlede sum. 
+Let us write at function that collapses two rows into one:
 
-Det kan vi gøre iterativt. Kig på næstnederste linie. Hvis vi
-følger en sti der ender med tallet 63 i næstnederste linie - så 
-kan vi kun tilføje 04 til den. Det er ækvivalent til at der i stedet
-for 63 skal stå 67. Følger vi en sti der ender med tallet 66,
-skal vi enten lægge 62 eller 98 til. Vi vælger 98, for det vil maksimere
-den samlede sum. Så vi kan kollapse de to nederste linier til en
-ny nederste linie.
-
-Lad os prøve det.
 ```{r}
-library(tidyverse)
-næst <- c(63, 66, 04, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31)
-nederst <- c(04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23)
-
+collapse <- function(a, b ){
+  output <- numeric()
+  for(i in 1:length(a)){
+    output[i] <- max(a[i]+b[i], a[i]+b[i+1])
+  }
+  output
+  }
 ```
 
 
-position 1 i næst, kan kun pege på position i nederst.
-Position 2 i næst, kan kun pege på position 2 og 3 i nederst
+Import the data into something we can work with:
 
-Så vi kan skrive en funktion, der kollapser de to nederste til
-en ny nederst:
-```{r}
-
-# b er den nederste. a er den næstnederste.
-# funktionen kollapser de to til en ny nederste række.
-kollaps <- function(a, b ){
-output <- numeric()
-for(i in 1:length(a)){
-  output[i] <- max(a[i]+b[i], a[i]+b[i+1])
-}
-output}
-```
-
-Og det betyder at den nye nederste er:
-```{r}
-kollaps(næst, nederst)
-```
-Lad os få data ind i noget vi kan arbejde med:
-
-```{r}
-trekant <- "75
+```{r echo = FALSE}
+triangle <- "75
 95 64
 17 47 82
 18 35 87 10
@@ -95,19 +60,25 @@ trekant <- "75
 91 71 52 38 17 14 91 43 58 50 27 29 48
 63 66 04 68 89 53 67 30 73 16 69 87 40 31
 04 62 98 27 23 09 70 98 73 93 38 53 60 04 23"
-trekant <- str_split(trekant, "\\n") %>% unlist() %>% 
+
+
+
+```
+
+```{r}
+triangle <- str_split(triangle, "\\n") %>% unlist() %>% 
   str_split(" ") %>% 
   lapply(as.numeric)
 ```
 
-Og så kaster vi det hele sammen:
+Throw everything together:
 ```{r}
-nederst <- 1000
-while(nederst > 2){
-  nederst <- length(trekant)
-  trekant[[nederst - 1]] <- kollaps(trekant[[nederst-1]], trekant[[nederst]])
-  trekant[[nederst]] <- NULL  
+lowest <- length(triangle)
+while(lowest > 2){
+  lowest <- length(triangle)
+  triangle[[lowest - 1]] <- collapse(triangle[[lowest-1]], triangle[[lowest]])
+  triangle[[lowest]] <- NULL  
 }
-answer <- unlist(trekant)
+answer <- unlist(triangle)
 ```
 
