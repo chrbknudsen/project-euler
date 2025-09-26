@@ -1,3 +1,9 @@
+---
+title: "Euler 51"
+format: html
+date: '2019-04-15'
+---
+
 library(numbers)
 Primes(1000)
 
