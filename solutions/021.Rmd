@@ -4,25 +4,41 @@ format: html
 date: '2018-02-15'
 ---
 
-Ku godt bruge lidt forklaring. Der er også mere elegante måder at 
-få summen end at skulle have den forbi en dataframe.
+[Amicable numbers](https://en.wikipedia.org/wiki/Amicable_numbers) are pairs of two different numbers, so that the sum of the proper divisors of each is
+equal to the other number.
 
+What is the sum of amicable numbers under 10000.
 
-Let d(n) be the sum of divisors of n (nunbers less than n)
-
-If d(a) = b and d(b) = a, where a is not equal to b, a and b are called amicable.
-Find the sum of amicable numbers under 10000.
-
-
+First all numbers under 10000
 ```{r eval = FALSE}
 a <- c(1:10000)
-library(numbers)
-
-b <- unlist(lapply(a, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
-c <- unlist(lapply(b, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
-d <- data.frame(opr=a, sum=b, anden = c)
-e <- d[which(d$opr==d$anden),]
-e <- e[which(e$opr != e$sum),]
-answer <- sum(e$opr)
 ```
 
+Then the sum of the proper divisors of all of them:
+```{r}
+library(numbers)
+b <- unlist(lapply(a, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
+```
+
+These are the numbers that _can_ be amicable with the numbers in `a`.
+
+Next the sum of the proper divisors of b:
+```{r}
+c <- unlist(lapply(b, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
+```
+
+These are the numbers that _can_ be amicable with the numbers in `b`.
+
+```{r}
+# a <- a[a==c]
+# a[a %in% b] |> sum()
+
+```
+
+In total - numbers in a _can_ be amicable with the numbers in b. And the numbers in `c` _can_ be amicable with 
+the numbers in `b`. Therefore a number in a is amicable with an number in b, if it is equal to the number in c (with the
+same index). Except for the fact that the two amicable numbers in a and be have to be different:
+
+```{r}
+answer <- sum(a[a==c & a!=b])
+```
