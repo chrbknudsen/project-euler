@@ -1,0 +1,37 @@
+---
+title: "Euler 47"
+format: html
+date: '2018-02-11'
+---
+
+to på hinanden følgende tal med to distinkte primfaktorer
+de første er 14 og 15. 
+
+tre på hinanden følgende tal med tre distinkte primfaktorer
+644, 645, 646
+
+fire på hinanden følgende tal med fire distinkte primfaktorer.
+
+
+```{r}
+library(numbers)
+library(tidyverse)
+dist_num_prim_factors <- function(x){
+    primeFactors(x) |> 
+        unique() |> 
+        length()
+}
+
+test <- tibble(x = 1:250000) |> 
+    mutate(n_distinct_prim_factors = map(x, dist_num_prim_factors))
+
+test |> 
+    unnest(n_distinct_prim_factors) |> 
+    filter(n_distinct_prim_factors == 4) |> 
+    mutate(næste_1 = lead(x,1) - x) |> 
+    mutate(næste_2 = lead(x,2) - x) |>
+    mutate(næste_3 = lead(x,3) - x) |>
+    filter(næste_1 == 1) |> 
+    filter(næste_2 == 2) |> 
+    filter(næste_3 == 3) 
+```
