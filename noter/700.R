@@ -14,14 +14,14 @@ modulus(a) <- b
 c <- 1
 n <- 0
 coins <- as.bigz(1504170715041707)
-while(c >= 0){
+while(length(coins) <= 15){
   n <- n + 1
   cat(sprintf("\rnået til %d", n))
   c <- as.bigz(as.numeric(a*n))
   if(c < min(coins)){
   coins <- append(coins, c)
   print("antal coins fundet: ")
-    print(length(coins))
+  print(length(coins))
   print("seneste coin: ")
   print(c)
   print("seneste gæt:")
@@ -67,7 +67,26 @@ Derfor kan vi starte fra 1 og gå opad. Vi skal hver gang tjekke at n for den fu
 coin er mindre end den vi fandt lige før.
 
 
+Vi finder x ved den udvidede euklidiske algoritme som løser
+as + bt = gcd(a,b)
+as + bt = 1
+vi regner modulo b. Så
+as = 1 (modulo b)
+gcdex(a,b) giver gcd, s og t.
 
-gcdex(b, a)
+s modulo b giver så x
 
+g <- gcdex(a, b)
+x <- g[2] %% b
+modulus(x) <- b
+så. 1 er en eulercoin.
+så er det tilhørende n:
+modulus(x) <- b
+
+n 
+1*x 
+2*x
+3*x
+4*x
+e <- 1
 
