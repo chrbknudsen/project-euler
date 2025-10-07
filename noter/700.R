@@ -83,10 +83,21 @@ så. 1 er en eulercoin.
 så er det tilhørende n:
 modulus(x) <- b
 
+
+
 n 
 1*x 
 2*x
 3*x
 4*x
-e <- 1
+e <- 15806432 
+
+
+
+get_n <- function(e){
+  as.bigz(as.numeric(x*e))
+
+}
+
+get_n(1:10000000)
 
