@@ -1,0 +1,32 @@
+---
+title: "Euler 52"
+format: html
+date: '2018-07-05'
+---
+
+
+tallet 125874 og det dobbelte 251748 indeholder de samme cifrer,
+men i forskellig orden.
+
+Find mindste heltal x, således at 2x, 3x 4x, 5x og 6x indeholder de 
+samme cifre.
+
+Det betyder at der i 6x skal være samme antal cifre som i x. 
+
+142857*6
+
+
+```{r}
+142857*6
+```
+
+Det kan vi bruge til at sætte øvre grænse. 
+
+
+```{r}
+not_found <- TRUE
+i <- 1
+while(not_found){
+   
+}
+```

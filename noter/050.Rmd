@@ -1,0 +1,27 @@
+---
+title: "Euler 50"
+format: html
+date: '2018-02-13'
+---
+
+primtallet 41 kan skrives som summen af seks konsekutive primtal.
+Det er den længeste sum af consekutive primtal der er et primtal - under 100.
+
+Den længste sum af konsekutive primtal under 1000 der adderer til et 
+primtal. indeholder 21 led, og summerer til 953
+
+Hvilket primtal - under 1.000.000 kan skrives som summe af flest
+på hinanden følgende primtal.
+
+
+```{r}
+library(numbers)
+
+primes <- Primes(2, 1000000)
+length(primes)
+```
+
+Så. Hvis jeg begynder fra position 1 til length(primes) så er summen for
+stor. 
+1 til length(primes)-1
+eller 2 til length(primes)
