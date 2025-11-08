@@ -4,17 +4,13 @@ format: html
 date: '2018-07-05'
 ---
 
-```{r}
+The number 125874 and its double 251748 contains the same digits, but in a different
+order.
 
-```
+Identify the smallest integer x, such that 2x, 3x, 4x, 5x and 6x contains the same
+digits.
 
-tallet 125874 og det dobbelte 251748 indeholder de samme cifrer,
-men i forskellig orden.
-
-Find mindste heltal x, således at 2x, 3x 4x, 5x og 6x indeholder de 
-samme cifre.
-
-Det betyder at der i 6x skal være samme antal cifre som i x. 
+First of all, there is an upper limit on x:
 
 142857*6
 
