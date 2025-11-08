@@ -14,6 +14,8 @@ First of all, there is an upper limit on x:
 
 142857*6
 
+(that is if the number have 6 digits)
+
 
 ```{r}
 142857*6
