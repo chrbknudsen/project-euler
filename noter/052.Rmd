@@ -4,6 +4,9 @@ format: html
 date: '2018-07-05'
 ---
 
+```{r}
+
+```
 
 tallet 125874 og det dobbelte 251748 indeholder de samme cifrer,
 men i forskellig orden.
@@ -21,7 +24,8 @@ Det betyder at der i 6x skal være samme antal cifre som i x.
 ```
 
 Det kan vi bruge til at sætte øvre grænse. 
-
+når ceiling(log10(x*6)) > ceiling(log10(x)) så er det tid at 
+starte forfra med en ny serie tal.
 
 ```{r}
 not_found <- TRUE
@@ -29,4 +33,18 @@ i <- 1
 while(not_found){
    
 }
+```
+
+```{r}
+source("solutions/helpers.R")
+n_digits(99999)
+```
+
+```{r}
+floor(log10(99999))
+```
+
+
+```{r}
+9/6
 ```
