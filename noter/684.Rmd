@@ -12,6 +12,22 @@
 # Find nu summen af i=2 til 90 af S(f_i)
 # Angiv svaret modulo 1 000 000 007
 
+det mindste tal der har en digitsum på et eller andet, er så mange nitaller som muligt. 
+Og så resten som det forreste. 
+
+Dvs 
+```{r}
+20 %% 9
+```
+
+nitaller.
+Og så
+
+```{r}
+20 %/% 9
+```
+
+foran.
 
 
 
@@ -52,6 +68,9 @@ s(20) = 299
 sum(1:9)
 sum(1:9,19)
 
+```{r}
+sum(1:9)
+```
 
 sum(seq(19, 99, 10))
 eller, 54*10-9
@@ -141,3 +160,49 @@ s(37)
 x <- 5
 (exp(9*x) - 1)*exp(x)/9
 
+
+
+100
+200
+300
+400
+500
+600
+700
+800
+900
+
+```{r}
+sum(seq(100,900,100))
+```
+
+
+
+
+```{r}
+
+inv_dig_sum <- function(x){
+  (x%%9+1)*10^(x%/%9)-1  
+}
+
+sum(inv_dig_sum(1:20))
+
+library(numbers)
+
+fibonacci(90)
+
+inv_dig_sum(14)
+
+14%/%9  # antal nitaller
+14%%9  # det der skal stå foran
+(20%%9+1)*10^(20%/%9)-1
+
+20%%9*9+20%/%9
+19%/%9
+10^(19%/%9)*(19%%9+1)-1
+```
+
+
+```{r}
+54*10^1- 9*2
+```
