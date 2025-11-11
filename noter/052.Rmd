@@ -4,16 +4,17 @@ format: html
 date: '2018-07-05'
 ---
 
+The number 125874 and its double 251748 contains the same digits, but in a different
+order.
 
-tallet 125874 og det dobbelte 251748 indeholder de samme cifrer,
-men i forskellig orden.
+Identify the smallest integer x, such that 2x, 3x, 4x, 5x and 6x contains the same
+digits.
 
-Find mindste heltal x, således at 2x, 3x 4x, 5x og 6x indeholder de 
-samme cifre.
-
-Det betyder at der i 6x skal være samme antal cifre som i x. 
+First of all, there is an upper limit on x:
 
 142857*6
+
+(that is if the number have 6 digits)
 
 
 ```{r}
@@ -21,7 +22,8 @@ Det betyder at der i 6x skal være samme antal cifre som i x.
 ```
 
 Det kan vi bruge til at sætte øvre grænse. 
-
+når ceiling(log10(x*6)) > ceiling(log10(x)) så er det tid at 
+starte forfra med en ny serie tal.
 
 ```{r}
 not_found <- TRUE
@@ -29,4 +31,18 @@ i <- 1
 while(not_found){
    
 }
+```
+
+```{r}
+source("solutions/helpers.R")
+n_digits(99999)
+```
+
+```{r}
+floor(log10(99999))
+```
+
+
+```{r}
+9/6
 ```
