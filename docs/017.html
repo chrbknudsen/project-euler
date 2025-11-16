@@ -359,9 +359,8 @@ display: none;
 numbers. As: 1, 2 is written as one, two - a total of 6 letters. We
 ignore whitespaces and hyphens.</p>
 <p>Using the library <code>english</code></p>
-<pre class="r"><code>library(english)</code></pre>
-<pre><code>## Warning: package &#39;english&#39; was built under R version 4.5.1</code></pre>
-<pre class="r"><code>english(999)</code></pre>
+<pre class="r"><code>library(english)
+english(999)</code></pre>
 <pre><code>## [1] nine hundred and ninety-nine</code></pre>
 <pre class="r"><code>all_numbers_as_words &lt;- english(1:1000)</code></pre>
 <p>Collapse that to a single string:</p>

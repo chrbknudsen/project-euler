@@ -15,7 +15,7 @@ a <- c(1:10000)
 ```
 
 Then the sum of the proper divisors of all of them:
-```{r}
+```{r eval  =FALSE}
 library(numbers)
 b <- unlist(lapply(a, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
 ```
@@ -23,22 +23,18 @@ b <- unlist(lapply(a, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
 These are the numbers that _can_ be amicable with the numbers in `a`.
 
 Next the sum of the proper divisors of b:
-```{r}
+```{r eval  = FALSE}
 c <- unlist(lapply(b, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
 ```
 
 These are the numbers that _can_ be amicable with the numbers in `b`.
 
-```{r}
-# a <- a[a==c]
-# a[a %in% b] |> sum()
 
-```
 
 In total - numbers in a _can_ be amicable with the numbers in b. And the numbers in `c` _can_ be amicable with 
 the numbers in `b`. Therefore a number in a is amicable with an number in b, if it is equal to the number in c (with the
 same index). Except for the fact that the two amicable numbers in a and be have to be different:
 
-```{r}
+```{r eval  = FALSE }
 answer <- sum(a[a==c & a!=b])
 ```

@@ -15,7 +15,7 @@ million?
 
 We can get all permutations of the digits using `permutations()` from `gtools`. Convert to a tibble, arrange, and then
 slice out the answer:
-```{r}
+```{r eval  =FALSE}
 library(tidyverse)
 library(gtools)
 answer <- permutations(10, 10, 0:9) |> 

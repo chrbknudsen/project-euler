@@ -359,13 +359,8 @@ display: none;
 <p>Load gmp to handle lage numbers. Coerce 100 to bigz, calculate the
 factorial, coerce to text, split in individual characters, unlist,
 coerce to numeric and sum</p>
-<pre class="r"><code>library(gmp)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;gmp&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     %*%, apply, crossprod, matrix, tcrossprod</code></pre>
-<pre class="r"><code>library(tidyverse)
+<pre class="r"><code>library(gmp)
+library(tidyverse)
 
 answer &lt;- 100 %&gt;% 
   as.bigz() %&gt;% 

@@ -363,13 +363,17 @@ alphabetical order. What permutation is number one million?</p>
 <code>permutations()</code> from <code>gtools</code>. Convert to a
 tibble, arrange, and then slice out the answer:</p>
 <pre class="r"><code>library(tidyverse)
-library(gtools)</code></pre>
-<pre><code>## Warning: package &#39;gtools&#39; was built under R version 4.5.1</code></pre>
-<pre class="r"><code>answer &lt;- permutations(10, 10, 0:9) |&gt; 
+library(gtools)
+answer &lt;- permutations(10, 10, 0:9) |&gt; 
     as_tibble() |&gt; 
     arrange(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10) |&gt; 
     slice(1000000) |&gt; 
     transmute(answer = paste0(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10))</code></pre>
+<pre><code>## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as
+## of tibble 2.0.0.
+## ℹ Using compatibility `.name_repair`.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
 
 
 

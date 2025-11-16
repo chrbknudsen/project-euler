@@ -368,7 +368,7 @@ position of each letter. As in:</p>
   as_tibble() %&gt;% 
   mutate(value = str_remove_all(value, &#39;&quot;&#39;)) %&gt;% 
   arrange(value) </code></pre>
-<pre><code>## Warning in readLines(&quot;../data/0022.txt&quot;): ufuldstændig endelig linje fundet på &#39;../data/0022.txt&#39;</code></pre>
+<pre><code>## Warning in readLines(&quot;../data/0022.txt&quot;): incomplete final line found on &#39;../data/0022.txt&#39;</code></pre>
 <p>Write a function to calculate the value:</p>
 <pre class="r"><code>positional_sum &lt;- function(string){
   sapply(string, function(string){

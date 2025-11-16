@@ -355,20 +355,28 @@ display: none;
 </div>
 
 
-<p>Ku godt bruge lidt forklaring. Der er også mere elegante måder at få
-summen end at skulle have den forbi en dataframe.</p>
-<p>Let d(n) be the sum of divisors of n (nunbers less than n)</p>
-<p>If d(a) = b and d(b) = a, where a is not equal to b, a and b are
-amicable. Find the sum of amicable numbers under 10000.</p>
-<pre class="r"><code>a &lt;- c(1:10000)
-library(numbers)
-
-b &lt;- unlist(lapply(a, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
-c &lt;- unlist(lapply(b, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))
-d &lt;- data.frame(opr=a, summen=b, anden = c)
-e &lt;- d[which(d$opr==d$anden),]
-e &lt;- e[which(e$opr != e$summen),]
-sum(e$opr)</code></pre>
+<p><a href="https://en.wikipedia.org/wiki/Amicable_numbers">Amicable
+numbers</a> are pairs of two different numbers, so that the sum of the
+proper divisors of each is equal to the other number.</p>
+<p>What is the sum of amicable numbers under 10000.</p>
+<p>First all numbers under 10000</p>
+<pre class="r"><code>a &lt;- c(1:10000)</code></pre>
+<p>Then the sum of the proper divisors of all of them:</p>
+<pre class="r"><code>library(numbers)
+b &lt;- unlist(lapply(a, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))</code></pre>
+<p>These are the numbers that <em>can</em> be amicable with the numbers
+in <code>a</code>.</p>
+<p>Next the sum of the proper divisors of b:</p>
+<pre class="r"><code>c &lt;- unlist(lapply(b, function(x) sum(divisors(x)[1:(length(divisors(x))-1)])))</code></pre>
+<p>These are the numbers that <em>can</em> be amicable with the numbers
+in <code>b</code>.</p>
+<p>In total - numbers in a <em>can</em> be amicable with the numbers in
+b. And the numbers in <code>c</code> <em>can</em> be amicable with the
+numbers in <code>b</code>. Therefore a number in a is amicable with an
+number in b, if it is equal to the number in c (with the same index).
+Except for the fact that the two amicable numbers in a and be have to be
+different:</p>
+<pre class="r"><code>answer &lt;- sum(a[a==c &amp; a!=b])</code></pre>
 
 
 
