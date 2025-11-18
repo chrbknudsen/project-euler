@@ -1,9 +1,7 @@
 ---
 title: "Euler 23"
-output: html_document
+format: html
 date: '2018-02-25'
-params:
-  done: F
 ---
 
 Et perfekt tal er et tal hvor summen af dets divisorer er lig tallet.
