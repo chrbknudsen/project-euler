@@ -1,25 +1,21 @@
 ---
 title: "Euler 23"
-output: html_document
+format: html
 date: '2018-02-25'
-params:
-  done: F
 ---
 
-Et perfekt tal er et tal hvor summen af dets divisorer er lig tallet.
+A number is perfect if the sum of its divisors are equal to the number.
 
-Eksemplet er 28. 28 har divisorene 1, 2, 4, 7, 14. Summen af de tal er 28.
-28 er derfor et perfekt nummer.
+A number is deficient if the sum of its divisors are smaller than the number.
 
-Et tal er "deficient" hvis summen af dets divisorer er mindre end tallet.
-Og abundant hvis summen er større.
+And a number is abundant if the sum of its divisors are larger than the number.
 
-12 er det mindste abundant. 1 + 2+ 3+ 4+ 6 er lig 16. 
-Det mindste tal der kan skrives som summen af to abundant tal er 24. 
-Vi ved at alle heltal større end 28123 kan skrives som summen af to abundant tal.
+As 12 is the smallest abundant number, the smallest number that can be written as the sum of
+two abundant numbers is 24. All integers larger than 28123 can be written as the sum of 
+two abundant numbers.
 
-Find summen af alle positive helta der ikke kan skrives som summen af to "abundant"
-tal.
+Find the sum of all positive integers that can not be written as the sum of two abundant numbers.
+
 
 Vi ved at vi ikke behøver at tjekke til højere end 28123.
 
