@@ -36,7 +36,12 @@ hit <- function(n){slide_dbl(
  
 
 
-
+slide_dbl(
+  primes,
+  .f = ~ sum(.x),
+  .before = 0,  
+  .after  = 542
+)
 
 
 ```
@@ -78,7 +83,7 @@ Og så er vi nede på under 5000 primtal.
 for(i in length(prime_cand):1){
     print(i)
     if(hit(i)){answer <- i
-    break()}
+    stop()}
     }
 
 cand <-     slide_dbl(
