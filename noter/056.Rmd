@@ -6,9 +6,6 @@ date: '2019-04-15'
 
 
 ## Powerful Digit Sum
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 
 Brutalt:

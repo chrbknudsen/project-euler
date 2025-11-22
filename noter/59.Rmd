@@ -1,6 +1,7 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Euler 59"
+format: html
+date: ''
 ---
 # 59
 

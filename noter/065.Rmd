@@ -1,5 +1,8 @@
-65
-
+---
+title: "Euler 65"
+format: html
+date: ''
+---
 library(tidyverse)
 
 Nå. Men rækken for e er:
