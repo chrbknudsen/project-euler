@@ -1,0 +1,26 @@
+---
+title: "Euler 89"
+format: html
+date: "2019-08-12"
+---
+
+Roman numerals - given in not nessecarily the minimal form preferred.
+
+Read in input (and load library)
+
+```{r eval = FALSE}
+library(tidyverse)
+input <- readLines("noter/0089_roman.txt")
+```
+
+
+Convert to numeric via `as.roman`. Convert back to roman. Calculate the saved characters, and summarise to get the answer:
+
+```{r eval = FALSE}
+tibble(input = input) |> 
+  mutate(numeric = as.numeric(as.roman(input)), 
+        roman = as.roman(numeric),
+        saved = nchar(input) - nchar(as.character(roman))) |> 
+  summarise(answer = sum(saved))
+```
+

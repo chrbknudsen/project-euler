@@ -6,9 +6,11 @@ params:
   done: F
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+For et sæt af k tal. Hvad er et mindste tal der kan udtrykkes som både sum og produkt af disse k tal.
+
+Den nedre grænse for det tal er k. de mindste k tal vi kan vælge er k 1. Summen af dem er k.
+
+
 
 Vi skal finde det minimale produkt-sum tal for k = noget
 
@@ -23,8 +25,21 @@ Partitioner
 4 kan partitioneres som 4, og 1 + 3. Og 3-tallet kan så partitioneres på alle de
 måder som 3 kan partitioneres.
 
+En basic solution
+
+```{r}
+basic <- function(n){
+  c(rep(1, n-2), 2, n)
+}
 
 
+prod(basic(7))
+sum(basic(7))
+```
+
+Hvordan finder man så de andre? Og hvordan finder man den mindste?
+
+der skal altid være mindst et 1 
 
 ```{r}
 listen <- tibble(x = c(1, 2), part = list(list(c(1)), list(2, c(1, 1))))
