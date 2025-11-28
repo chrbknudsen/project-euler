@@ -1,3 +1,8 @@
+---
+title: "Euler 64"
+format: html
+date: ''
+---
 64
 
 

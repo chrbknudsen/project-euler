@@ -18,7 +18,7 @@ på hinanden følgende primtal.
 library(numbers)
 library(dplyr)
 primes <- Primes(2, 1000000)
-length(primes)
+
 ```
 
 
@@ -36,7 +36,12 @@ hit <- function(n){slide_dbl(
  
 
 
-
+slide_dbl(
+  primes,
+  .f = ~ sum(.x),
+  .before = 0,  
+  .after  = 542
+)
 
 
 ```
@@ -55,16 +60,43 @@ ok, det er virkelig ikke måden at gøre det på - også selvom det ville køre 
 Søgerummet kan begrænses ret voldsomt. 
 
 
-```{r}
-tail(primes)
-```
+
 
 de to sidste kan i sagens natur ikke lægges sammen.
 
+
+det kan begrænses yderligere. For vi ved at svaret må være på mindst 21 led. Så de sidste 21 primtal summeret skal være mindre end 1 million.
+
+
 ```{r}
-n <- 39600
-primes <- primes[primes < 500100]
-sum(primes[c(n,n +1)])
+1000000/21
+```
+
+```{r}
+prime_cand <- primes[primes < 48000] 
+```
+
+Og så er vi nede på under 5000 primtal.
 
 
+```{r}
+for(i in length(prime_cand):1){
+    print(i)
+    if(hit(i)){answer <- i
+    stop()}
+    }
+
+cand <-     slide_dbl(
+  primes,
+  .f = ~ sum(.x),
+  .before = 0,  
+  .after  = answer,
+  .complete = TRUE )
+cand[cand %in% Primes(1, 1000000)]
+
+```
+
+
+```{r}
+hit(133)
 ```

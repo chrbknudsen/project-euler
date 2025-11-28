@@ -1,34 +1,35 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Euler 63"
+format: html
+date: ''
 ---
 # euler 63
 
-Hvor mange n-digit tal findes der, der også er en nte power
+Hvor mange n-digit tal findes der, der ogsï¿½ er en nte power
 
 Som i :
 
-16807 er på fem cifre. 
+16807 er pï¿½ fem cifre. 
 
-Så. 
+Sï¿½. 
 
 1^1
 2^1
 
 9^1
 
-Og det skal Være positive integers, så 0 er ikke med.
+Og det skal Vï¿½re positive integers, sï¿½ 0 er ikke med.
 
 I anden.
 Er 1^2 to cifret?
 
 
-Så. vi lader n gå fra 1 til noget.
+Sï¿½. vi lader n gï¿½ fra 1 til noget.
 
-Så lader vi a gå fra 1 til noget
+Sï¿½ lader vi a gï¿½ fra 1 til noget
 
-Indtil antallet af cifre i a^n er større end n
-Hvis antallet af cifre i a^n er lig n tæller vi op.
+Indtil antallet af cifre i a^n er stï¿½rre end n
+Hvis antallet af cifre i a^n er lig n tï¿½ller vi op.
 
 
 
@@ -43,15 +44,15 @@ floor(log10(7**5))+1
 ```
 Logb(x y) = y ??? logb(x)
 
-Så log(7**5) er lig 5*log(7)
+Sï¿½ log(7**5) er lig 5*log(7)
 
-og antallet af cifre i en arbitrær potens er så:
+og antallet af cifre i en arbitrï¿½r potens er sï¿½:
 n*log10(y) + 1
 
 ```{r}
 floor(5*log10(7)+1)
 ```
-Den skal så være lig n
+Den skal sï¿½ vï¿½re lig n
 
 floor(n*log10(a)) + 1 = n
 
@@ -60,13 +61,13 @@ floor(n*log10(a)) + 1 = n
 log10(10)
 print(10*10*10*10*10, digits=7)
 ```
-Jeg føler mig med andre ord ret sikker på at a skal være mindre end 10.
+Jeg fï¿½ler mig med andre ord ret sikker pï¿½ at a skal vï¿½re mindre end 10.
 
 ```{r}
 
 log10(1:9)
 ```
-a skal også være større end 1.
+a skal ogsï¿½ vï¿½re stï¿½rre end 1.
 
 ```{r}
 log10(2:9)
@@ -80,14 +81,14 @@ log10(2:9)
 2**(1:10)
 ```
 
-Vi har selvfølgelig alle de encifrede tal, opløftet i 1st. De giver sig selv. Spørgsmålet er om de betragtes som trivielle.
+Vi har selvfï¿½lgelig alle de encifrede tal, oplï¿½ftet i 1st. De giver sig selv. Spï¿½rgsmï¿½let er om de betragtes som trivielle.
 ```{r}
 
 ```
 
-a skal altså være 3:9.
+a skal altsï¿½ vï¿½re 3:9.
 
-Og skal opløftes i 2 til et eller andet
+Og skal oplï¿½ftes i 2 til et eller andet
 
 Men 3 - vokser den hurtigt nok?
 ```{r}
