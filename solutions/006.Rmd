@@ -4,7 +4,8 @@ date: "2015-07-23"
 format: html
 ---
 
-Only trick is knowing `gmp`
+Only trick is knowing `gmp`:
+
 ```{r eval  = F}
 library(gmp)
 t <- as.bigz(1:100)
