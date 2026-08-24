@@ -1,0 +1,68 @@
+---
+title: "Euler 125"
+format: html
+date: '2026-08-18'
+
+---
+
+Mon ikke jeg skal starte med at generere palindromiske tal under 10^8
+
+```{r}
+ 9999 9999
+```
+
+
+
+## bruteforcing
+
+palindromic <- function(x){
+  x <- as.character(x)
+  x == stringi::stri_reverse(x)
+}
+
+palindromic(c(595, 1234))
+
+limit <- 10^8
+
+# palin <- palindromic(1:limit)
+# tjek <- 1:limit
+
+# tjek <- tjek[palin]
+
+# Så jeg kan bruteforce - men det er nok hurtigere at generere palindromiske tal.
+# Og det er nok hurtigere at tjekke om de kan udstrykkes som en sådan sum snarere end 
+# vi genererer alle summer og tjekker om de er palindromiske.
+
+# Så hvordan tjekker vi om tallet kan udtrykkes som sådan.
+
+# her er nogen tal der lever op til kravet
+# 5  55  77 181 505 636 595 818 434 313 545
+
+# hvis tallet er 818. 
+sqrt(818)
+
+# Hvis vi har to på hinanden følgende kvadrater. og lægger dem sammen. Så skal det første af dem
+# være mindre end halvdelen af de vi leder efter. For det næste er større, og så vil de 
+# to til sammen være større end tallet.
+# Så med 818 må det første kvadrat tal højes være 818/2  = 409.
+# Og det vil sige at vi ikke skal gå længere end til sqrt(818/2)
+
+# ceiling(sqrt((10^8)/2))
+
+(1:29)^2
+818-361
+
+# cumsum((1:19)^2)
+
+x <- (1:ceiling(as.integer(sqrt(limit/2))))^2
+
+search_grid <- expand.grid(1:length(x), 1:length(x)) 
+search_grid <- search_grid[search_grid$Var1 < search_grid$Var2, ] 
+
+search_grid$sekvens <- mapply(seq, from = search_grid$Var1, to = search_grid$Var2) 
+
+summer <- lapply(search_grid$sekvens, \(i) sum(x[i]^2))
+
+summer[summer < limit] |> sum()
+
+summer <- summer[palindromic(summer)] |> unlist()
