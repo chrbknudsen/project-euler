@@ -1,0 +1,54 @@
+---
+title: "Euler 124"
+format: html
+date: '2026-08-18'
+
+---
+Kinda cheating - `numbers` have a function for finding radicals
+
+```{r}
+library(tidyverse)
+library(numbers)
+
+radicals <- tibble(n = 1:100000)
+radicals <- radicals |>
+rowwise() |>
+mutate(rad_n = radical(n))
+
+radicals_sorted <- radicals |> arrange(rad_n)
+answer <- radicals_sorted[10000,]
+```
+
+
+Rather than cheating directly, we can cheat indirectly:
+```{r}
+own_radical <- function(n){
+  primeFactors(n) |> unique() |> prod()
+}
+
+```
+
+Or, vectorized:
+
+```{r}
+own_vect_radical <- function(v){
+  lapply(X = v, FUN = primeFactors) |> 
+  lapply(FUN = unique) |> 
+  lapply(FUN = prod) |> 
+  unlist()
+}
+```
+
+Or, somewhat, simpler:
+
+```{r}
+simpler_own_vect_radical <- function(v){
+  vapply(
+    X = v,
+    FUN = \(x) prod(unique(numbers::primeFactors(x))),
+    FUN.VALUE = numeric(1)
+)
+}
+```
+
+
